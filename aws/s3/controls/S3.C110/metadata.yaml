@@ -1,0 +1,18 @@
+id: S3.C110
+objective: S3.CO32
+coso: Assurance
+nist_csf: Detect
+effort: High
+description: 'Verify S3 bucket policies deny unauthorized S3 access points.'
+testing: 'Remove/modify the deny on the bucket policy; it should be detected.'
+mitigates_threats: []
+assured_by: ''
+depends_on: ''
+retired: 'false'
+ccr:
+  name: 'access_point_restriction'
+  file: 'access_point_restriction.rego'
+  test: 'access_point_restriction_test.rego'
+  implemented: true
+  modes:
+    - allowlist

@@ -1,0 +1,18 @@
+id: S3.C168
+objective: S3.CO16
+coso: Assurance
+nist_csf: Detect
+effort: Low
+description: 'Verify SS3-C is blocked only when not required for each bucket.'
+testing: '1) Block SSE-C on a bucket requiring SSE-C, or 2) remove the block on SSE-C on a bucket not requiring SSE-C; it should be detected.'
+mitigates_threats: []
+assured_by: ''
+depends_on: ''
+retired: 'false'
+ccr:
+  name: 'ssec_conditional_blocking'
+  file: 'ssec_conditional_blocking.rego'
+  test: 'ssec_conditional_blocking_test.rego'
+  implemented: true
+  modes:
+    - allowlist

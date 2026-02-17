@@ -1,0 +1,18 @@
+id: S3.C97
+objective: S3.CO28
+coso: Assurance
+nist_csf: Detect
+effort: High
+description: 'Verify only authorized buckets are configured to receive inventory.'
+testing: 'Create an unauthorized bucket to receive inventory; it should be detected.'
+mitigates_threats: []
+assured_by: ''
+depends_on: ''
+retired: 'false'
+ccr:
+  name: 'inventory_destination_check'
+  file: 'inventory_destination_check.rego'
+  test: 'inventory_destination_check_test.rego'
+  implemented: true
+  modes:
+    - allowlist

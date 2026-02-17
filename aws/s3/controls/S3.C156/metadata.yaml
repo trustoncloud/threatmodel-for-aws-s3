@@ -1,0 +1,18 @@
+id: S3.C156
+objective: S3.CO38
+coso: Assurance
+nist_csf: Detect
+effort: Medium
+description: 'Verify all requests from unauthorized service roles are blocked.'
+testing: 'Remove the statement on a bucket policy denying all unauthorized service roles; it should be detected.'
+mitigates_threats: []
+assured_by: ''
+depends_on: ''
+retired: 'false'
+ccr:
+  name: 'bucket_block_unauthorized_service_roles'
+  file: 'bucket_block_unauthorized_service_roles.rego'
+  test: 'bucket_block_unauthorized_service_roles_test.rego'
+  implemented: true
+  modes:
+    - allowlist

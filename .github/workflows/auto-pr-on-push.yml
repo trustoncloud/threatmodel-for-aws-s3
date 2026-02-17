@@ -1,0 +1,72 @@
+name: Auto PR on Push
+
+on:
+  push:
+    branches:
+      - "**"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create PR if missing
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+          if [ "${BRANCH}" = "${DEFAULT_BRANCH}" ]; then
+            echo "Default branch push (${DEFAULT_BRANCH}); skipping."
+            exit 0
+          fi
+
+          existing_count="$(gh pr list --repo "${REPO}" --head "${BRANCH}" --base "${DEFAULT_BRANCH}" --state open --json number --jq 'length')"
+          if [ "${existing_count}" != "0" ]; then
+            echo "Open PR already exists for ${BRANCH} -> ${DEFAULT_BRANCH}."
+            exit 0
+          fi
+
+          commit_msg="$(git log -1 --pretty=%B | sed -e 's/[[:space:]]*$//')"
+          if [ -z "$(printf '%s' "${commit_msg}" | tr -d '[:space:]')" ]; then
+            commit_msg="(no commit message found)"
+          fi
+
+          body_file="$(mktemp)"
+          export COMMIT_MSG="${commit_msg}"
+          export TEMPLATE_PATH=".github/pull_request_template.md"
+          export BODY_FILE="${body_file}"
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+
+          template_path = os.environ["TEMPLATE_PATH"]
+          commit_msg = os.environ.get("COMMIT_MSG", "").rstrip()
+          if not commit_msg.strip():
+              commit_msg = "(no commit message found)"
+
+          template = Path(template_path).read_text()
+          marker = "## 3. Description"
+          if marker not in template:
+              raise SystemExit(f"Missing '{marker}' in {template_path}")
+
+          replacement = f"{marker}\n\n{commit_msg}\n"
+          body = template.replace(f"{marker}\n", replacement, 1)
+
+          Path(os.environ["BODY_FILE"]).write_text(body)
+          PY
+
+                    gh pr create \
+                      --repo "${REPO}" \
+                      --head "${BRANCH}" \
+                      --base "${DEFAULT_BRANCH}" \
+                      --title "Auto PR: ${BRANCH}" \
+                      --body-file "${body_file}"

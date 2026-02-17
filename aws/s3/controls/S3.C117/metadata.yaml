@@ -1,0 +1,18 @@
+id: S3.C117
+objective: S3.CO25
+coso: Assurance
+nist_csf: Detect
+effort: Medium
+description: 'Verify all replicated buckets have metrics enabled on each replication rule (included by default in S3 RTC).'
+testing: 'Modify the replication metric of an authorized replication; it should be detected.'
+mitigates_threats: []
+assured_by: ''
+depends_on: ''
+retired: 'false'
+ccr:
+  name: 'replication_metrics_enabled'
+  file: 'replication_metrics_enabled.rego'
+  test: 'replication_metrics_enabled_test.rego'
+  implemented: true
+  modes:
+    - universal

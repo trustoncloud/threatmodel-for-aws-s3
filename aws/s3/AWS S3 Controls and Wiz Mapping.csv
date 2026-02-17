@@ -1,0 +1,43 @@
+Control ID,Short Summary,Supported Modes,Wiz Built-in CCR Mapping (If Applicable)
+S3.C2,the control blocking unencrypted requests and unauthorized TLS versions from IAM entities you control is properly implemented.,Universal,N/A
+S3.C5,"a statement exists on all your VPC endpoint policies denying all requests with the condition ""aws:SecureTransport"" = False or using ""s3:TlsVersion"" !=...",Universal,N/A
+S3.C7,all S3 bucket policies block unencrypted traffic and unauthorized versions of TLS.,Universal,N/A
+S3.C20,"all S3 VPC endpoints are blocking any IAM entity not belonging to authorized AWS Organizations, OUs, and/or AWS accounts.","Allowlist, Universal",N/A
+S3.C24,all VPCs are limited to accessing only authorized S3 bucket.,Allowlist,N/A
+S3.C28,all S3 bucket/access point/Object Lambda Access Point policies do not allow an IAM principal of the same AWS account.,,"S3-007, S3-026"
+S3.C36,the control blocking change ObjectACL to public is properly implemented.,Universal,N/A
+S3.C39,"the control blocking the action ""s3:DeleteBucket"" is properly implemented.",,S3-016
+S3.C48,no bucket is available publicly for write or read.,,S3-011
+S3.C50,"account-level S3 Block Public Access is enabled on all AWS accounts, with BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, and RestrictPublicBuckets set...",Universal,N/A
+S3.C52,"S3 Block Public Access is enabled on all S3 buckets, with BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, and RestrictPublicBuckets set to true.",,"S3-039, S3-037, S3-040, S3-038"
+S3.C54,"S3 Block Public Access is enabled on all S3 access points, with BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, and RestrictPublicBuckets set to true.",,PrivateEndpoint-001
+S3.C57,the control blocking bucket ACL changes is properly implemented.,,S3-044
+S3.C62,all objects in S3 buckets are encrypted with an authorized KMS key.,,S3-010
+S3.C65,each bucket has an authorized default encryption key and has S3 Bucket Key enabled.,,S3-049
+S3.C67,all buckets block PutObject requests with an unauthorized KMS key.,Allowlist,S3-022 (Partial)
+S3.C70,buckets holding primary data are versioned.,,S3-002
+S3.C75,all buckets requiring WORM have the correct default S3 Object Lock configuration.,,S3-041
+S3.C77,all buckets requiring WORM block PutObject and PutObjectRetention requests with unauthorized S3 Object Lock.,,S3-045
+S3.C79,a lifecycle policy on incomplete multipart uploads is implemented on all buckets.,,S3-048
+S3.C87,only authorized buckets have replication enabled with their correct configuration.,N/A due to duplicates,S3-023
+S3.C88,authorized buckets have the correct replication configuration.,Allowlist,N/A
+S3.C92,only the authorized IAM role is configured for each replication.,Allowlist,N/A
+S3.C95,only authorized notification receiver are configured for buckets.,Universal,S3-052 (Partial)
+S3.C97,only authorized buckets are configured to receive inventory.,Allowlist,N/A
+S3.C100,all buckets include a control to limit access to only authorized VPCs.,Allowlist,N/A
+S3.C102,"all associations of CloudFront distributions with buckets, access points, and/or Object Lambda Access Points are authorized.",Allowlist,N/A
+S3.C109,only access points are used in the resource-level statements in VPC endpoints.,,StorageBucket-024
+S3.C110,S3 bucket policies deny unauthorized S3 access points.,Allowlist,N/A
+S3.C111,all S3 access points are VPC-attached.,,PrivateEndpoint-002
+S3.C117,all replicated buckets have metrics enabled on each replication rule.,Universal,N/A
+S3.C123,only the authorized IAM role is configured for each Batch job.,Allowlist,N/A
+S3.C127,"only the authorized Lambda functions are configured on each Object Lambda Access Point, its associated access point, its associated HEAD/LIST/GET request,...",N/A due to feature EOL,N/A
+S3.C131,only the authorized cross-account IAM entities are allowed in the Object Lambda Access Point policy.,N/A due to feature EOL,N/A
+S3.C133,CloudWatch is enabled for all Object Lambda Access Points.,N/A due to feature EOL,N/A
+S3.C143,only authorized buckets are configured as S3 website endpoints.,,S3-024
+S3.C147,"For buckets requiring SSE-C, verify all buckets block PutObject requests with unauthorized encryption.",Allowlist,N/A
+S3.C151,only authorized IAM principals allowed to access via bucket policy are used.,Allowlist,N/A
+S3.C154,bucket ACL and object ACL are disabled on each bucket.,,S3-044
+S3.C156,all requests from unauthorized service roles are blocked.,Allowlist,N/A
+S3.C161,only authorized S3 buckets and their AWS accounts for cross-account access points are used.,Allowlist,StorageBucket-009 (Partial)
+S3.C168,SS3-C is blocked only when not required for each bucket.,Allowlist,N/A

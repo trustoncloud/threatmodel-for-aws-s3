@@ -1,0 +1,18 @@
+id: S3.C88
+objective: S3.CO25
+coso: Assurance
+nist_csf: Detect
+effort: High
+description: 'Verify authorized buckets have the correct replication configuration.'
+testing: 'Modify the configuration of an authorized replication; it should be detected.'
+mitigates_threats: []
+assured_by: ''
+depends_on: ''
+retired: 'false'
+ccr:
+  name: 'replication_destination_check'
+  file: 'replication_destination_check.rego'
+  test: 'replication_destination_check_test.rego'
+  implemented: true
+  modes:
+    - allowlist

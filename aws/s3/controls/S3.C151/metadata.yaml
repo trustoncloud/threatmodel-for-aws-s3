@@ -1,0 +1,18 @@
+id: S3.C151
+objective: S3.CO8
+coso: Assurance
+nist_csf: Detect
+effort: Medium
+description: 'Verify only authorized IAM principals allowed to access via bucket policy are used (e.g., using the AWS Config rule <a href="https://docs.aws.amazon.com/config/latest/developerguide/s3-bucket-policy-grantee-check.html">S3_BUCKET_POLICY_GRANTEE_CHECK</a>).'
+testing: 'Allow an unauthorized IAM principal on a bucket policy; it should be detected.'
+mitigates_threats: []
+assured_by: ''
+depends_on: ''
+retired: 'false'
+ccr:
+  name: 'bucket_policy_principal_check'
+  file: 'bucket_policy_principal_check.rego'
+  test: 'bucket_policy_principal_check_test.rego'
+  implemented: true
+  modes:
+    - allowlist

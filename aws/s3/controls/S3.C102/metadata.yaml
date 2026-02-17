@@ -1,0 +1,18 @@
+id: S3.C102
+objective: S3.CO30
+coso: Assurance
+nist_csf: Detect
+effort: High
+description: 'Verify all associations of CloudFront distributions with buckets, access points, and/or Object Lambda Access Points are authorized (e.g., using the Macie finding: "Policy:IAMUser/S3BucketSharedWithCloudFront").'
+testing: 'Create a non-authorized distribution or association; it should be detected.'
+mitigates_threats: []
+assured_by: ''
+depends_on: ''
+retired: 'false'
+ccr:
+  name: 'cloudfront_association_check'
+  file: 'cloudfront_association_check.rego'
+  test: 'cloudfront_association_check_test.rego'
+  implemented: true
+  modes:
+    - allowlist

@@ -1,0 +1,18 @@
+id: S3.C92
+objective: S3.CO25
+coso: Assurance
+nist_csf: Detect
+effort: High
+description: 'Verify only the authorized IAM role is configured for each replication.'
+testing: 'Create/modify a replication with an unauthorized IAM role; it should be detected.'
+mitigates_threats: []
+assured_by: ''
+depends_on: ''
+retired: 'false'
+ccr:
+  name: 'replication_role_check'
+  file: 'replication_role_check.rego'
+  test: 'replication_role_check_test.rego'
+  implemented: true
+  modes:
+    - allowlist
