@@ -46,6 +46,7 @@ jobs:
           export BODY_FILE="${body_file}"
           python3 - <<'PY'
           import os
+          import re
           from pathlib import Path
 
           template_path = os.environ["TEMPLATE_PATH"]
@@ -53,15 +54,22 @@ jobs:
           if not commit_msg.strip():
               commit_msg = "(no commit message found)"
 
-          template = Path(template_path).read_text()
-          marker = "## 3. Description"
-          if marker not in template:
-              raise SystemExit(f"Missing '{marker}' in {template_path}")
+          template = Path(template_path).read_text(encoding="utf-8")
+          marker_match = re.search(
+              r"^(##\s+(?:\d+\.\s+)?Description\s*)$",
+              template,
+              flags=re.MULTILINE,
+          )
+          if marker_match is None:
+              raise SystemExit(
+                  f"Missing a '## ... Description' section heading in {template_path}"
+              )
 
+          marker = marker_match.group(1)
           replacement = f"{marker}\n\n{commit_msg}\n"
-          body = template.replace(f"{marker}\n", replacement, 1)
+          body = template.replace(marker, replacement, 1)
 
-          Path(os.environ["BODY_FILE"]).write_text(body)
+          Path(os.environ["BODY_FILE"]).write_text(body, encoding="utf-8")
           PY
 
                     gh pr create \
