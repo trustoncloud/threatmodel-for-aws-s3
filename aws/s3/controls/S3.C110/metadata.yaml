@@ -1,8 +1,10 @@
-id: S3.C110
+﻿id: S3.C110
 objective: S3.CO32
 coso: Assurance
 nist_csf: Detect
 effort: High
+weighted_priority: High
+weighted_priority_score: 3
 description: 'Verify S3 bucket policies deny unauthorized S3 access points.'
 testing: 'Remove/modify the deny on the bucket policy; it should be detected.'
 mitigates_threats: []

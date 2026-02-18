@@ -1,8 +1,10 @@
-id: S3.C7
+﻿id: S3.C7
 objective: S3.CO1
 coso: Assurance
 nist_csf: Detect
 effort: Medium
+weighted_priority: High
+weighted_priority_score: 3
 description: 'Verify all S3 bucket policies block unencrypted traffic (e.g., using the AWS Config rule: <a href="https://docs.aws.amazon.com/config/latest/developerguide/s3-bucket-ssl-requests-only.html">S3_BUCKET_SSL_REQUESTS_ONLY</a>) and unauthorized versions of TLS.'
 testing: 'Remove the statement on a bucket policy 1) denying all unencrypted requests and 2) denying unauthorized TLS versions; it should be detected.'
 mitigates_threats: []

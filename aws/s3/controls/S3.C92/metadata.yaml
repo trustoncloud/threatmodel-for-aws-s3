@@ -1,8 +1,10 @@
-id: S3.C92
+﻿id: S3.C92
 objective: S3.CO25
 coso: Assurance
 nist_csf: Detect
 effort: High
+weighted_priority: Medium
+weighted_priority_score: 2
 description: 'Verify only the authorized IAM role is configured for each replication.'
 testing: 'Create/modify a replication with an unauthorized IAM role; it should be detected.'
 mitigates_threats: []

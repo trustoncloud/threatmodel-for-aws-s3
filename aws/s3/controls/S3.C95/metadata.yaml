@@ -1,8 +1,10 @@
-id: S3.C95
+﻿id: S3.C95
 objective: S3.CO27
 coso: Assurance
 nist_csf: Detect
 effort: High
+weighted_priority: Low
+weighted_priority_score: 1
 description: 'Verify only authorized notification receiver(s) are configured for buckets.'
 testing: 'Create an unauthorized receiver; it should be detected.'
 mitigates_threats: []

@@ -1,8 +1,10 @@
-id: S3.C117
+﻿id: S3.C117
 objective: S3.CO25
 coso: Assurance
 nist_csf: Detect
 effort: Medium
+weighted_priority: Medium
+weighted_priority_score: 2
 description: 'Verify all replicated buckets have metrics enabled on each replication rule (included by default in S3 RTC).'
 testing: 'Modify the replication metric of an authorized replication; it should be detected.'
 mitigates_threats: []

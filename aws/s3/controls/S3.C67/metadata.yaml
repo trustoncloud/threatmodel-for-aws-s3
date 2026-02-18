@@ -1,8 +1,10 @@
-id: S3.C67
+﻿id: S3.C67
 objective: S3.CO16
 coso: Assurance
 nist_csf: Detect
 effort: Medium
+weighted_priority: High
+weighted_priority_score: 3
 description: 'Verify all buckets block PutObject requests with an unauthorized KMS key (e.g., using the Config rule: <a href="https://docs.aws.amazon.com/config/latest/developerguide/s3-bucket-policy-not-more-permissive.html">S3_BUCKET_POLICY_NOT_MORE_PERMISSIVE</a>, note that a new rule needs to be deployed for each configuration, then the resource tracked by name or tag; alternatively, you might use <a href="https://docs.aws.amazon.com/config/latest/developerguide/s3-bucket-server-side-encryption-enabled.html">S3_BUCKET_SERVER_SIDE_ENCRYPTION_ENABLED</a> to ensure limited coverage).'
 testing: 'Create a bucket not blocking PutObject requests with an unauthorized KMS key; it should be detected.'
 mitigates_threats: []

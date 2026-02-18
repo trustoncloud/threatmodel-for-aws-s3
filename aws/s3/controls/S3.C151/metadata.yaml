@@ -1,8 +1,10 @@
-id: S3.C151
+﻿id: S3.C151
 objective: S3.CO8
 coso: Assurance
 nist_csf: Detect
 effort: Medium
+weighted_priority: High
+weighted_priority_score: 3
 description: 'Verify only authorized IAM principals allowed to access via bucket policy are used (e.g., using the AWS Config rule <a href="https://docs.aws.amazon.com/config/latest/developerguide/s3-bucket-policy-grantee-check.html">S3_BUCKET_POLICY_GRANTEE_CHECK</a>).'
 testing: 'Allow an unauthorized IAM principal on a bucket policy; it should be detected.'
 mitigates_threats: []

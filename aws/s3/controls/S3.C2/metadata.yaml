@@ -1,8 +1,10 @@
-id: S3.C2
+﻿id: S3.C2
 objective: S3.CO1
 coso: Assurance
 nist_csf: Detect
 effort: High
+weighted_priority: High
+weighted_priority_score: 3
 description: 'Verify the control blocking unencrypted requests and unauthorized TLS versions from IAM entities you control (e.g., an SCP on your AWS Organization''s root node) is properly implemented.'
 testing: 'Remove the control blocking unencrypted requests and unauthorized TLS version(s) (e.g., the SCP on your root node); it should be detected.'
 mitigates_threats: []

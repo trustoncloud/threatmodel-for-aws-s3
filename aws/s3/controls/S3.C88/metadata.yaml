@@ -1,8 +1,10 @@
-id: S3.C88
+﻿id: S3.C88
 objective: S3.CO25
 coso: Assurance
 nist_csf: Detect
 effort: High
+weighted_priority: Medium
+weighted_priority_score: 2
 description: 'Verify authorized buckets have the correct replication configuration.'
 testing: 'Modify the configuration of an authorized replication; it should be detected.'
 mitigates_threats: []

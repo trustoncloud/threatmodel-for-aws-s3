@@ -1,8 +1,10 @@
-id: S3.C97
+﻿id: S3.C97
 objective: S3.CO28
 coso: Assurance
 nist_csf: Detect
 effort: High
+weighted_priority: Very Low
+weighted_priority_score: 0
 description: 'Verify only authorized buckets are configured to receive inventory.'
 testing: 'Create an unauthorized bucket to receive inventory; it should be detected.'
 mitigates_threats: []

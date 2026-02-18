@@ -1,8 +1,10 @@
-id: S3.C168
+﻿id: S3.C168
 objective: S3.CO16
 coso: Assurance
 nist_csf: Detect
 effort: Low
+weighted_priority: High
+weighted_priority_score: 3
 description: 'Verify SS3-C is blocked only when not required for each bucket.'
 testing: '1) Block SSE-C on a bucket requiring SSE-C, or 2) remove the block on SSE-C on a bucket not requiring SSE-C; it should be detected.'
 mitigates_threats: []

@@ -1,8 +1,10 @@
-id: S3.C156
+﻿id: S3.C156
 objective: S3.CO38
 coso: Assurance
 nist_csf: Detect
 effort: Medium
+weighted_priority: Low
+weighted_priority_score: 1
 description: 'Verify all requests from unauthorized service roles are blocked.'
 testing: 'Remove the statement on a bucket policy denying all unauthorized service roles; it should be detected.'
 mitigates_threats: []

@@ -1,8 +1,10 @@
-id: S3.C5
+﻿id: S3.C5
 objective: S3.CO1
 coso: Assurance
 nist_csf: Detect
 effort: High
+weighted_priority: Medium
+weighted_priority_score: 2
 description: 'Verify a statement exists on all your VPC endpoint policies denying all requests with the condition "aws:SecureTransport" = False or using "s3:TlsVersion" != <i>authorized TLS version(s)</i>.'
 testing: 'Create/remove the statement on a VPC endpoint policy denying 1) all unencrypted requests or 2) unauthorized TLS version(s); it should be detected.'
 mitigates_threats: []

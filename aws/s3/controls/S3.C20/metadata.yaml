@@ -1,8 +1,10 @@
-id: S3.C20
+﻿id: S3.C20
 objective: S3.CO7
 coso: Assurance
 nist_csf: Detect
 effort: High
+weighted_priority: High
+weighted_priority_score: 3
 description: 'Verify all S3 VPC endpoints are blocking any IAM entity not belonging to authorized AWS Organizations, OUs, and/or AWS accounts.'
 testing: 'Remove the policy statement blocking any IAM entity not belonging to authorized AWS Organizations, OUs, and/or AWS accounts from the VPC endpoint; it should be detected.'
 mitigates_threats: []

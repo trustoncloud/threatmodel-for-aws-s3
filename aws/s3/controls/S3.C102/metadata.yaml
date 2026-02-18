@@ -1,8 +1,10 @@
-id: S3.C102
+﻿id: S3.C102
 objective: S3.CO30
 coso: Assurance
 nist_csf: Detect
 effort: High
+weighted_priority: Medium
+weighted_priority_score: 2
 description: 'Verify all associations of CloudFront distributions with buckets, access points, and/or Object Lambda Access Points are authorized (e.g., using the Macie finding: "Policy:IAMUser/S3BucketSharedWithCloudFront").'
 testing: 'Create a non-authorized distribution or association; it should be detected.'
 mitigates_threats: []

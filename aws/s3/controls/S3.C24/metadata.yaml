@@ -1,8 +1,10 @@
-id: S3.C24
+﻿id: S3.C24
 objective: S3.CO7
 coso: Assurance
 nist_csf: Detect
 effort: High
+weighted_priority: Medium
+weighted_priority_score: 2
 description: 'Verify all VPCs are limited to accessing only authorized S3 bucket(s).'
 testing: 'Remove the control limiting access to only authorized S3 bucket(s); it should be detected.'
 mitigates_threats: []
