@@ -1,0 +1,20 @@
+﻿id: S3.C36
+objective: S3.CO10
+coso: Assurance
+nist_csf: Detect
+effort: High
+weighted_priority: High
+weighted_priority_score: 3
+description: 'Verify the control blocking change ObjectACL to public (e.g., an SCP and VPC endpoint policy) is properly implemented.'
+testing: 'Remove the control blocking changes of ObjectACL to public; it should be detected.'
+mitigates_threats: []
+assured_by: ''
+depends_on: ''
+retired: 'false'
+ccr:
+  name: 'vpc_endpoint_block_public_acl'
+  file: 'vpc_endpoint_block_public_acl.rego'
+  test: 'vpc_endpoint_block_public_acl_test.rego'
+  implemented: true
+  modes:
+    - universal

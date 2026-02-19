@@ -1,0 +1,20 @@
+﻿id: S3.C100
+objective: S3.CO29
+coso: Assurance
+nist_csf: Detect
+effort: Medium
+weighted_priority: Very High
+weighted_priority_score: 4
+description: 'Verify all buckets include a control to limit access to only authorized VPCs (e.g., using the AWS Config rule <a href="https://docs.aws.amazon.com/config/latest/developerguide/s3-bucket-policy-grantee-check.html">S3_BUCKET_POLICY_GRANTEE_CHECK</a>).'
+testing: 'Remove the control limiting access to only authorized VPC(s); it should be detected.'
+mitigates_threats: []
+assured_by: ''
+depends_on: ''
+retired: 'false'
+ccr:
+  name: 'bucket_vpc_restriction'
+  file: 'bucket_vpc_restriction.rego'
+  test: 'bucket_vpc_restriction_test.rego'
+  implemented: true
+  modes:
+    - allowlist

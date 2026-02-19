@@ -1,0 +1,21 @@
+﻿id: S3.C20
+objective: S3.CO7
+coso: Assurance
+nist_csf: Detect
+effort: High
+weighted_priority: High
+weighted_priority_score: 3
+description: 'Verify all S3 VPC endpoints are blocking any IAM entity not belonging to authorized AWS Organizations, OUs, and/or AWS accounts.'
+testing: 'Remove the policy statement blocking any IAM entity not belonging to authorized AWS Organizations, OUs, and/or AWS accounts from the VPC endpoint; it should be detected.'
+mitigates_threats: []
+assured_by: ''
+depends_on: ''
+retired: 'false'
+ccr:
+  name: 'vpc_endpoint_org_restriction'
+  file: 'vpc_endpoint_org_restriction.rego'
+  test: 'vpc_endpoint_org_restriction_test.rego'
+  implemented: true
+  modes:
+    - allowlist
+    - universal

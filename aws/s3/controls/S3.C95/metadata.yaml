@@ -1,0 +1,20 @@
+﻿id: S3.C95
+objective: S3.CO27
+coso: Assurance
+nist_csf: Detect
+effort: High
+weighted_priority: Low
+weighted_priority_score: 1
+description: 'Verify only authorized notification receiver(s) are configured for buckets.'
+testing: 'Create an unauthorized receiver; it should be detected.'
+mitigates_threats: []
+assured_by: ''
+depends_on: ''
+retired: 'false'
+ccr:
+  name: 'bucket_notification_enabled'
+  file: 'bucket_notification_enabled.rego'
+  test: 'bucket_notification_enabled_test.rego'
+  implemented: true
+  modes:
+    - universal

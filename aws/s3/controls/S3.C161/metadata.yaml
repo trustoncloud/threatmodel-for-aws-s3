@@ -1,0 +1,20 @@
+﻿id: S3.C161
+objective: S3.CO40
+coso: Assurance
+nist_csf: Detect
+effort: Medium
+weighted_priority: Medium
+weighted_priority_score: 2
+description: 'Verify only authorized S3 buckets and their AWS accounts for cross-account access points are used.'
+testing: 'Deploy a cross-account access point with an unauthorized 1) bucket or 2) an authorized bucket in an unauthorized AWS account; it should be detected.'
+mitigates_threats: []
+assured_by: ''
+depends_on: ''
+retired: 'false'
+ccr:
+  name: 'cross_account_ap_check'
+  file: 'cross_account_ap_check.rego'
+  test: 'cross_account_ap_check_test.rego'
+  implemented: true
+  modes:
+    - allowlist

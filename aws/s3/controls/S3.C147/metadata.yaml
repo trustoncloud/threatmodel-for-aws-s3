@@ -1,0 +1,20 @@
+﻿id: S3.C147
+objective: S3.CO16
+coso: Assurance
+nist_csf: Detect
+effort: High
+weighted_priority: High
+weighted_priority_score: 3
+description: 'For buckets (or paths) requiring SSE-C, verify all buckets block PutObject requests with unauthorized encryption.'
+testing: 'Create a bucket requiring SSE-C, not blocking PutObject requests with unauthorized encryption; it should be detected.'
+mitigates_threats: []
+assured_by: ''
+depends_on: ''
+retired: 'false'
+ccr:
+  name: 'bucket_enforce_ssec'
+  file: 'bucket_enforce_ssec.rego'
+  test: 'bucket_enforce_ssec_test.rego'
+  implemented: true
+  modes:
+    - allowlist

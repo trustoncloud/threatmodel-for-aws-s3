@@ -1,0 +1,20 @@
+﻿id: S3.C123
+objective: S3.CO33
+coso: Assurance
+nist_csf: Detect
+effort: High
+weighted_priority: Medium
+weighted_priority_score: 2
+description: 'Verify only the authorized IAM role is configured for each Batch job.'
+testing: 'Create/modify a Batch job with an unauthorized IAM role; it should be detected.'
+mitigates_threats: []
+assured_by: ''
+depends_on: ''
+retired: 'false'
+ccr:
+  name: 'batch_job_role_check'
+  file: 'batch_job_role_check.rego'
+  test: 'batch_job_role_check_test.rego'
+  implemented: true
+  modes:
+    - allowlist

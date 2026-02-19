@@ -1,0 +1,20 @@
+﻿id: S3.C24
+objective: S3.CO7
+coso: Assurance
+nist_csf: Detect
+effort: High
+weighted_priority: Medium
+weighted_priority_score: 2
+description: 'Verify all VPCs are limited to accessing only authorized S3 bucket(s).'
+testing: 'Remove the control limiting access to only authorized S3 bucket(s); it should be detected.'
+mitigates_threats: []
+assured_by: ''
+depends_on: ''
+retired: 'false'
+ccr:
+  name: 'vpc_endpoint_bucket_restriction'
+  file: 'vpc_endpoint_bucket_restriction.rego'
+  test: 'vpc_endpoint_bucket_restriction_test.rego'
+  implemented: true
+  modes:
+    - allowlist
