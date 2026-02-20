@@ -9,7 +9,7 @@ on:
 
 permissions:
   id-token: write
-  contents: read
+  contents: write
   actions: read
 
 jobs:
@@ -22,4 +22,50 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.14"
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r .github/scripts/requirements.txt
+
+      - name: Compute XML filename
+        run: |
+          python -c "import json,glob; j=glob.glob('*.json'); assert len(j)==1, j; d=json.load(open(j[0],'r',encoding='utf-8')); print('XML_NAME=%s_%s_DFD.xml'%(d['metadata']['provider'].upper(), d['metadata']['service'].upper()))" >> $GITHUB_ENV
+
+      - name: Render artefacts
+        run: |
+          python .github/scripts/sync_and_render.py
+
+      - name: Commit and push generated outputs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "img" "${XML_NAME}"
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Generate DFD artefacts"
+            git push
+          fi
+
+      - name: Upload DFD XML artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dfd-xml
+          path: ${{ env.XML_NAME }}
+
+      - name: Compute release tag
+        run: |
+          python -c "import time,datetime; print('RELEASE_TAG=%s-%d'%(datetime.datetime.utcnow().strftime('%Y%m%d'), int(time.time())))" >> $GITHUB_ENV
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: ${{ env.RELEASE_TAG }}
+          generate_release_notes: false
+          files: |
+            *.docx
+            *.pdf
+            *.json

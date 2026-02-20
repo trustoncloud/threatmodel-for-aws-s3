@@ -1,1 +1,2 @@
 PyYAML>=6.0.1,<7
+beautifulsoup4>=4.12.3,<5
