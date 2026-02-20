@@ -12,7 +12,7 @@ import urllib.parse
 import zlib
 from pathlib import Path
 from subprocess import Popen
-from typing import Any
+from typing import Any, List, Tuple
 
 from bs4 import BeautifulSoup as BS4
 
@@ -455,20 +455,7 @@ def generate_variants_and_render(src_xml: Path, out_dir: Path, manage_xvfb: bool
             stop_xvfb(xvfb_proc)
 
 
-def upload_images(s3_bucket: str, s3_prefix: str, files: List[Path]) -> None:
-    s3 = aws_client("s3")
-    for f in files:
-        dashed_name = f.name.replace("_", "-")
-        key = f"{s3_prefix.rstrip('/')}/img/{dashed_name}"
-        logger.info("Uploading %s to s3://%s/%s", dashed_name, s3_bucket, key)
-        s3.upload_file(str(f), s3_bucket, key)
-
-def upload_xmls(s3_bucket: str, s3_prefix: str, files: List[Path]) -> None:
-    s3 = aws_client("s3")
-    for f in files:
-        key = f"{s3_prefix.rstrip('/')}/xml/{f.name}"
-        logger.info("Uploading XML %s to s3://%s/%s", f.name, s3_bucket, key)
-        s3.upload_file(str(f), s3_bucket, key)
+# NOTE: AWS/S3 upload helpers were removed as the workflow is now local-only.
 
 
 def prepare_drawio_environment() -> None:
