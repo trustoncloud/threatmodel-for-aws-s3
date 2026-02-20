@@ -42,14 +42,14 @@ jobs:
       - name: Download drawio package
         if: steps.cache-drawio.outputs.cache-hit != 'true'
         run: |
-          mkdir -p ~/drawio-package
-          curl -fL "https://github.com/jgraph/drawio-desktop/releases/download/v${DRAWIO_VERSION}/drawio-amd64-${DRAWIO_VERSION}.deb" -o "~/drawio-package/drawio-amd64-${DRAWIO_VERSION}.deb"
+          mkdir -p "$HOME/drawio-package"
+          curl -fL "https://github.com/jgraph/drawio-desktop/releases/download/v${DRAWIO_VERSION}/drawio-amd64-${DRAWIO_VERSION}.deb" -o "$HOME/drawio-package/drawio-amd64-${DRAWIO_VERSION}.deb"
 
       - name: Install Draw.io and its dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y desktop-file-utils libappindicator3-1 libnotify4 libsecret-1-0
-          sudo dpkg -i "~/drawio-package/drawio-amd64-${DRAWIO_VERSION}.deb"
+          sudo dpkg -i "$HOME/drawio-package/drawio-amd64-${DRAWIO_VERSION}.deb"
           drawio --version || true
 
       - name: Compute XML filename
