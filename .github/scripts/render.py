@@ -142,7 +142,11 @@ def start_xvfb() -> Popen[bytes]:
     """
     Start a single Xvfb server and configure environment.
     """
-    proc = Popen(["Xvfb", ":99", "-screen", "0", "3840x2160x24", "-nolisten", "tcp", "-ac"])
+    proc = Popen(
+        ["Xvfb", ":99", "-screen", "0", "3840x2160x24", "-nolisten", "tcp", "-ac"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
     os.environ["DISPLAY"] = ":99.0"
     os.environ.setdefault("LIBGL_ALWAYS_SOFTWARE", "1")
     os.environ.setdefault("NO_AT_BRIDGE", "1")
@@ -340,7 +344,7 @@ def drawio_export(input_path: Path, output_path: Path, width: int) -> None:
     log_path_debug("Pre-export input", inp)
     logger.debug("Pre-export listdir input_dir=%s -> %s", inp.parent, safe_listdir(inp.parent))
     logger.debug("Pre-export listdir out_dir=%s -> %s", out_dir, safe_listdir(out_dir))
-    logger.info("Attempting draw.io export: input=%s output=%s", inp, output_path)
+    logger.debug("Attempting draw.io export: input=%s output=%s", inp, output_path)
 
     MAX_RETRIES = 3
     for attempt in range(1, MAX_RETRIES + 1):
@@ -378,7 +382,7 @@ def drawio_export(input_path: Path, output_path: Path, width: int) -> None:
     size = output_path.stat().st_size
     if size <= 0:
         raise RuntimeError(f"drawio export produced empty file: {output_path} (size={size})")
-    logger.info("drawio export succeeded: %s (size=%d bytes)", output_path, size)
+    logger.debug("drawio export succeeded: %s (size=%d bytes)", output_path, size)
 
     if temp_copy and temp_copy.exists():
         try:
@@ -416,11 +420,15 @@ def generate_variants_and_render(src_xml: Path, out_dir: Path, manage_xvfb: bool
         if xvfb_proc is not None:
             time.sleep(0.5)
 
+        opacity_tool = Path(__file__).with_name("threat_opacity_xml_creator.py")
+        if not opacity_tool.exists():
+            raise FileNotFoundError(f"Opacity tool not found: {opacity_tool}")
+
         # Create FC and Threat variants with validation
         run_cmd(
             [
                 "python",
-                "/app/threat_opacity_xml_creator.py",
+                str(opacity_tool),
                 str(main_dir / src_xml.name),
                 "--threat-dir",
                 str(threat_dir),
@@ -441,7 +449,7 @@ def generate_variants_and_render(src_xml: Path, out_dir: Path, manage_xvfb: bool
         # Render other XMLs
         for sub in (fc_dir, threat_dir):
             xml_list = sorted(sub.glob("*.xml"))
-            logger.info("Will render %d PNG(s) from %s", len(xml_list), sub)
+            logger.debug("Will render %d PNG(s) from %s", len(xml_list), sub)
             for xml in xml_list:
                 out_png = out_dir / f"{xml.stem}.png"
                 drawio_export(xml, out_png, width=1200)
