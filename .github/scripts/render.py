@@ -36,7 +36,7 @@ def log_path_debug(label: str, p: Path) -> None:
 level_name = os.environ.get("LOG_LEVEL", "INFO").upper()
 level = getattr(logging, level_name, logging.INFO)
 logging.basicConfig(level=level)
-logger = logging.getLogger("etl-sync")
+logger = logging.getLogger("render")
 logger.info("Log level set to %s", logging.getLevelName(level))
 
 class DrawioExportHardFailure(RuntimeError):

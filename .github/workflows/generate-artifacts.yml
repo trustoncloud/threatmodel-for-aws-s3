@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
     paths:
-      - '**.json'
+      - '*.json'
   workflow_dispatch:
 
 permissions:
@@ -35,7 +35,7 @@ jobs:
 
       - name: Render artefacts
         run: |
-          python .github/scripts/sync_and_render.py
+          python .github/scripts/render.py
 
       - name: Commit and push generated outputs
         run: |
