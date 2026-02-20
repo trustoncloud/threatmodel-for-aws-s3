@@ -416,11 +416,15 @@ def generate_variants_and_render(src_xml: Path, out_dir: Path, manage_xvfb: bool
         if xvfb_proc is not None:
             time.sleep(0.5)
 
+        opacity_tool = Path(__file__).with_name("threat_opacity_xml_creator.py")
+        if not opacity_tool.exists():
+            raise FileNotFoundError(f"Opacity tool not found: {opacity_tool}")
+
         # Create FC and Threat variants with validation
         run_cmd(
             [
                 "python",
-                "/app/threat_opacity_xml_creator.py",
+                str(opacity_tool),
                 str(main_dir / src_xml.name),
                 "--threat-dir",
                 str(threat_dir),
