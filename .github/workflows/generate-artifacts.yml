@@ -7,6 +7,9 @@ on:
       - '*.json'
   workflow_dispatch:
 
+env:
+  DRAWIO_VERSION: "24.7.17"
+
 permissions:
   id-token: write
   contents: write
@@ -29,28 +32,24 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r .github/scripts/requirements.txt
 
-      - name: Install draw.io (diagrams.net) desktop CLI (latest .deb)
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Cache drawio package
+        id: cache-drawio
+        uses: actions/cache@v4
+        with:
+          path: ~/drawio-package
+          key: drawio-${{ env.DRAWIO_VERSION }}
+
+      - name: Download drawio package
+        if: steps.cache-drawio.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/drawio-package
+          curl -fL "https://github.com/jgraph/drawio-desktop/releases/download/v${DRAWIO_VERSION}/drawio-amd64-${DRAWIO_VERSION}.deb" -o "~/drawio-package/drawio-amd64-${DRAWIO_VERSION}.deb"
+
+      - name: Install Draw.io and its dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends ca-certificates curl jq
-          DRAWIO_DEB_URL=$(
-            curl -fsSL \
-              -H "Authorization: Bearer ${GH_TOKEN}" \
-              -H "X-GitHub-Api-Version: 2022-11-28" \
-              "https://api.github.com/repos/jgraph/drawio-desktop/releases/latest" \
-            | jq -r '.assets[] | select(.name | endswith("_amd64.deb")) | .browser_download_url' \
-            | head -n 1
-          )
-          if [ -z "$DRAWIO_DEB_URL" ] || [ "$DRAWIO_DEB_URL" = "null" ]; then
-            echo "Failed to find drawio-desktop latest amd64 .deb asset URL"
-            exit 1
-          fi
-          echo "Downloading: $DRAWIO_DEB_URL"
-          curl -fL "$DRAWIO_DEB_URL" -o /tmp/drawio.deb
-          sudo dpkg -i /tmp/drawio.deb || true
-          sudo apt-get -f install -y
+          sudo apt-get install -y desktop-file-utils libappindicator3-1 libnotify4 libsecret-1-0
+          sudo dpkg -i "~/drawio-package/drawio-amd64-${DRAWIO_VERSION}.deb"
           drawio --version || true
 
       - name: Compute XML filename
