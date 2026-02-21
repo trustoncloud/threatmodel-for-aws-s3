@@ -54,7 +54,7 @@ jobs:
 
       - name: Compute XML filename
         run: |
-          python -c "import json,glob; j=glob.glob('*.json'); assert len(j)==1, j; d=json.load(open(j[0],'r',encoding='utf-8')); print('XML_NAME=%s_%s_DFD.xml'%(d['metadata']['provider'].upper(), d['metadata']['service'].upper()))" >> $GITHUB_ENV
+          python -c "import json,glob; j=glob.glob('*.json'); assert len(j)==1, j; d=json.load(open(j[0],'r',encoding='utf-8')); print('XML_NAME=threatmodel-%s-%s-dfd-drawio.xml'%(d['metadata']['provider'].lower(), d['metadata']['service'].lower()))" >> $GITHUB_ENV
 
       - name: Render artefacts
         run: |

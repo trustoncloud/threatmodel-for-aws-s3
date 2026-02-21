@@ -101,7 +101,7 @@ def load_root_threatmodel_json(json_path: Path) -> dict[str, Any]:
 def build_root_xml_filename(tm_json: dict[str, Any]) -> str:
     provider = str(tm_json["metadata"]["provider"]).upper()
     service = str(tm_json["metadata"]["service"]).upper()
-    return f"{provider}_{service}_DFD.xml"
+    return f"threatmodel-{provider}-{service}-dfd-drawio.xml"
 
 
 def clean_img_dir(repo_root: Path) -> Path:
