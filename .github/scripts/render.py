@@ -439,7 +439,7 @@ def generate_variants_and_render(src_xml: Path, out_dir: Path, manage_xvfb: bool
         )
 
         # Render main DFD (higher width)
-        out_png_main = out_dir / f"{src_xml.stem}.png"
+        out_png_main = out_dir / f"{src_xml.stem.replace('-', '_')}.png"
         inp_main = main_dir / src_xml.name
         if not inp_main.exists():
             raise FileNotFoundError(f"Main input XML not found: {inp_main}")
@@ -451,7 +451,7 @@ def generate_variants_and_render(src_xml: Path, out_dir: Path, manage_xvfb: bool
             xml_list = sorted(sub.glob("*.xml"))
             logger.debug("Will render %d PNG(s) from %s", len(xml_list), sub)
             for xml in xml_list:
-                out_png = out_dir / f"{xml.stem}.png"
+                out_png = out_dir / f"{xml.stem.replace('-', '_')}.png"
                 drawio_export(xml, out_png, width=1200)
 
         pngs = sorted(out_dir.glob("*.png"))
