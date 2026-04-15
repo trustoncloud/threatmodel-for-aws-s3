@@ -1765,12 +1765,12 @@
     "S3.CO7": {
       "description": "Limit and monitor access via S3 VPC endpoints",
       "scf": [
+        "IAC-20",
+        "IAC-21",
+        "MON-01",
         "NET-02",
         "NET-09",
-        "NET-10",
-        "MON-01",
-        "IAC-20",
-        "IAC-21"
+        "NET-10"
       ],
       "retired": "false"
     },
