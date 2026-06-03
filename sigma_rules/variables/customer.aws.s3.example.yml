@@ -1,0 +1,215 @@
+# customer.aws.s3.example.yml — AWS S3 variable file for sigma rules.
+#
+# Supplies every variable referenced by the AWS S3 rule library. 
+# Passthis single file at conversion time:
+#
+# Copy this file and replace every value with your own bucket names, 
+# account IDs, regions, etc. 
+#
+# Every variable is suffixed with the owning control ID (`_cNNN`) so a value
+# tuned for one control can never leak into another control.
+
+name: example customer (aws s3)
+priority: 10
+vars:
+
+  # C4 — HTTP requests without strong TLS / cipher suites.
+  denied_cipher_suites_c4:
+    - TLS_RSA_WITH_3DES_EDE_CBC_SHA
+    - TLS_RSA_WITH_AES_128_CBC_SHA
+    - TLS_RSA_WITH_AES_256_CBC_SHA
+  denied_tls_versions_c4:
+    - TLSv1
+    - TLSv1.1
+
+  # C13 — unauthorized external bucket access.
+  authorized_external_account_ids_c13:
+    - '333333333333'
+  # Approved external buckets cleared for cross-account access; any bucket
+  # whose ARN is in here is exempt from C13.
+  authorized_external_buckets_c13:
+    - partner-shared-input
+
+  # C33 — KMS key account allowlist.
+  authorized_kms_account_ids_c33:
+    - '111111111111'
+    - '444444444444'
+
+  # C35 — public Object ACL attempts. 
+  denied_object_acls_c35:
+    - public-read
+    - public-read-write
+    - authenticated-read
+  denied_object_acl_grantees_c35:
+    - AllUsers
+    - AuthenticatedUsers
+
+# C43 — path-style request allowlist. Replace with your bucket / region values
+# to keep legacy clients allowed.
+  authorized_path_style_buckets_c43:
+    - __PLACEHOLDER_no_path_style_bucket_authorized__
+  authorized_path_style_regions_c43:
+    - __PLACEHOLDER_no_path_style_region_authorized__
+
+  # C56 — non-private Bucket ACL.
+  denied_bucket_acls_c56:
+    - public-read
+    - public-read-write
+    - authenticated-read
+  denied_bucket_acl_grantees_c56:
+    - AllUsers
+    - AuthenticatedUsers
+
+  # C68 — approved bucket-to-KMS-key pairings (5 static slots). Each slot binds
+  # ONE bucket name to ONE KMS key ARN; both must be scalars (never lists).
+  # `c68_pairN_key` must be the full ARN (e.g.
+  # `arn:aws:kms:us-east-1:111111111111:key/<uuid>`). To remove slots, edit both
+  # the rule and this file together. Replace unused slots with your own pairs. 
+  # Add or delete them in both files if you want more or less bucket/KMS pairs
+  c68_pair1_bucket: org-prod-app-data
+  c68_pair1_key: 'arn:aws:kms:us-east-1:111111111111:key/11111111-1111-1111-1111-111111111111'
+  c68_pair2_bucket: org-prod-logs-archive
+  c68_pair2_key: 'arn:aws:kms:us-east-1:111111111111:key/22222222-2222-2222-2222-222222222222'
+  c68_pair3_bucket: __c68_unused_pair_slot__
+  c68_pair3_key: __c68_unused_pair_slot__
+  c68_pair4_bucket: __c68_unused_pair_slot__
+  c68_pair4_key: __c68_unused_pair_slot__
+  c68_pair5_bucket: __c68_unused_pair_slot__
+  c68_pair5_key: __c68_unused_pair_slot__
+
+  # C82 — non-SigV4 signed requests.
+  denied_signature_versions_c82:
+    - SigV1
+    - SigV2
+
+  # C85 — requests without an Authorization header.
+  denied_auth_methods_c85:
+    - QueryString
+    - POST
+    - Anonymous
+
+  # C115 — legitimate AWS account IDs (your own org + trusted partners / MSPs).
+  # Anything NOT on this list is treated as an external caller by the C115
+  # allowlist mode. Include your own account — the rule has no automatic
+  # same-account detection.
+  legitimate_account_ids_c115:
+    - '111111111111'
+    - '222222222222'
+    - '333333333333'  # trusted external partner account
+
+  # C148 — SSE-C required buckets + valid algorithms. `valid_sse_c_algorithms_c148`
+  # lets customers extend without a rule change; AES256 is the only documented
+  # value today.
+  sse_c_required_buckets_c148:
+    - org-prod-customer-keys
+  valid_sse_c_algorithms_c148:
+    - AES256
+
+  # C157 — bucket logging redirected to unauthorized target.
+  authorized_logging_buckets_c157:
+    - org-security-s3-logs
+    - org-prod-audit-s3-logs
+
+  # C160 — CreateAccessPoint to unauthorized bucket or account.
+  authorized_buckets_c160:
+    - org-prod-app-data
+    - org-prod-logs-archive
+  authorized_account_ids_c160:
+    - '111111111111'
+    - '222222222222'
+
+  # C163 — DSSE-KMS required buckets.
+  dsse_required_buckets_c163:
+    - org-prod-regulated-pii
+
+transformations:
+  - id: expand_denied_cipher_suites_c4
+    type: value_placeholders
+    include: [denied_cipher_suites_c4]
+  - id: expand_denied_tls_versions_c4
+    type: value_placeholders
+    include: [denied_tls_versions_c4]
+  - id: expand_authorized_external_account_ids_c13
+    type: value_placeholders
+    include: [authorized_external_account_ids_c13]
+  - id: expand_authorized_external_buckets_c13
+    type: value_placeholders
+    include: [authorized_external_buckets_c13]
+  - id: expand_authorized_kms_account_ids_c33
+    type: value_placeholders
+    include: [authorized_kms_account_ids_c33]
+  - id: expand_denied_object_acls_c35
+    type: value_placeholders
+    include: [denied_object_acls_c35]
+  - id: expand_denied_object_acl_grantees_c35
+    type: value_placeholders
+    include: [denied_object_acl_grantees_c35]  
+  - id: expand_authorized_path_style_buckets_c43
+    type: value_placeholders
+    include: [authorized_path_style_buckets_c43]
+  - id: expand_authorized_path_style_regions_c43
+    type: value_placeholders
+    include: [authorized_path_style_regions_c43]
+  - id: expand_denied_bucket_acls_c56
+    type: value_placeholders
+    include: [denied_bucket_acls_c56]
+  - id: expand_denied_bucket_acl_grantees_c56
+    type: value_placeholders
+    include: [denied_bucket_acl_grantees_c56]  
+  - id: expand_c68_pair1_bucket
+    type: value_placeholders
+    include: [c68_pair1_bucket]
+  - id: expand_c68_pair1_key
+    type: value_placeholders
+    include: [c68_pair1_key]
+  - id: expand_c68_pair2_bucket
+    type: value_placeholders
+    include: [c68_pair2_bucket]
+  - id: expand_c68_pair2_key
+    type: value_placeholders
+    include: [c68_pair2_key]
+  - id: expand_c68_pair3_bucket
+    type: value_placeholders
+    include: [c68_pair3_bucket]
+  - id: expand_c68_pair3_key
+    type: value_placeholders
+    include: [c68_pair3_key]
+  - id: expand_c68_pair4_bucket
+    type: value_placeholders
+    include: [c68_pair4_bucket]
+  - id: expand_c68_pair4_key
+    type: value_placeholders
+    include: [c68_pair4_key]
+  - id: expand_c68_pair5_bucket
+    type: value_placeholders
+    include: [c68_pair5_bucket]
+  - id: expand_c68_pair5_key
+    type: value_placeholders
+    include: [c68_pair5_key]
+  - id: expand_denied_signature_versions_c82
+    type: value_placeholders
+    include: [denied_signature_versions_c82]
+  - id: expand_denied_auth_methods_c85
+    type: value_placeholders
+    include: [denied_auth_methods_c85]
+  - id: expand_legitimate_account_ids_c115
+    type: value_placeholders
+    include: [legitimate_account_ids_c115]
+  - id: expand_sse_c_required_buckets_c148
+    type: value_placeholders
+    include: [sse_c_required_buckets_c148]
+  - id: expand_valid_sse_c_algorithms_c148
+    type: value_placeholders
+    include: [valid_sse_c_algorithms_c148]
+  - id: expand_authorized_logging_buckets_c157
+    type: value_placeholders
+    include: [authorized_logging_buckets_c157]
+  - id: expand_authorized_buckets_c160
+    type: value_placeholders
+    include: [authorized_buckets_c160]
+  - id: expand_authorized_account_ids_c160
+    type: value_placeholders
+    include: [authorized_account_ids_c160]
+  - id: expand_dsse_required_buckets_c163
+    type: value_placeholders
+    include: [dsse_required_buckets_c163]

@@ -1,0 +1,59 @@
+title: AWS S3 C115 - PutObject With ACL Header To External Bucket
+id: 390d303b-e182-5336-9dd6-33b99b09a72e
+status: test
+description: For all external buckets with bucket-owner-full-control ACL requirements but without S3 Object Ownership handover, monitor that the PutObject operation does not include the ACL header.
+testing: Make a request to an external bucket with a bucket-owner-full-control ACL requirement but without an S3 Object Ownership handover requirement; it should be detected.
+notes: |
+    Fires on a data-plane write carrying an ownership-granting ACL header, unless the caller is an AWS service principal or its account is on the customer-curated `legitimate_account_ids_c115` list. ACL header values are inlined AWS constants.
+references:
+    - https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html
+    - https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html
+    - https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+author: TrustOnCloud
+date: 2026-02-15
+modified: 2026-05-21
+tags:
+    - trustoncloud.aws.s3
+    - trustoncloud.control.s3.c115
+logsource:
+    product: aws
+    service: cloudtrail
+detection:
+    selection_event:
+        eventSource: s3.amazonaws.com
+        eventName:
+            - PutObject
+            - CopyObject
+            - CreateMultipartUpload
+        eventCategory: Data
+    selection_acl_header_canned:
+        requestParameters.x-amz-acl:
+            - bucket-owner-full-control
+            - public-read
+            - public-read-write
+            - authenticated-read
+    selection_acl_header_grant_read:
+        requestParameters.x-amz-grant-read|contains:
+            - AllUsers
+            - AuthenticatedUsers
+    selection_acl_header_grant_read_acp:
+        requestParameters.x-amz-grant-read-acp|contains:
+            - AllUsers
+            - AuthenticatedUsers
+    selection_acl_header_grant_write_acp:
+        requestParameters.x-amz-grant-write-acp|contains:
+            - AllUsers
+            - AuthenticatedUsers
+    selection_acl_header_grant_full_control:
+        requestParameters.x-amz-grant-full-control|contains:
+            - AllUsers
+            - AuthenticatedUsers
+    filter_aws_service:
+        userIdentity.type: AWSService
+    filter_legitimate_account:
+        userIdentity.accountId|expand: '%legitimate_account_ids_c115%'
+    condition: selection_event and (selection_acl_header_canned or 1 of selection_acl_header_grant_*) and not filter_aws_service and not filter_legitimate_account
+falsepositives:
+    - Partner / MSP accounts not yet added to `legitimate_account_ids_c115`.
+    - Buckets configured with Object Ownership = BucketOwnerEnforced reject the ACL header at the API; if everything is BucketOwnerEnforced, this rule is largely redundant with the bucket-policy enforcement (defense in depth).
+level: medium

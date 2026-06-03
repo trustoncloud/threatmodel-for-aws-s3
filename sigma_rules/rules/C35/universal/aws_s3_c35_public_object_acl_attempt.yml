@@ -1,0 +1,47 @@
+title: AWS S3 C35 - Public Object ACL Attempt
+id: 9e699321-b964-57a2-a91f-791d9916542e
+status: test
+description: Monitor ObjectACL changes (or tentative changes) to public using CloudTrail S3 data events.
+testing: Make a call to create a public ObjectACL; it should be detected.
+notes: |
+    The `selection_public_acl` block matches `public-read`, `public-read-write`, and `authenticated-read` — `authenticated-read` is treated as public-facing because it grants read access to any AWS-authenticated user globally. Grant-header selections target `AllUsers` to detect grant-based ACL changes that bypass the canned-ACL header.
+references:
+    - https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObjectAcl.html
+    - https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html
+    - https://docs.aws.amazon.com/AmazonS3/latest/API/API_CreateMultipartUpload.html
+    - https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+author: TrustOnCloud
+date: 2026-02-15
+modified: 2026-03-25
+tags:
+    - trustoncloud.aws.s3
+    - trustoncloud.control.s3.c35
+logsource:
+    product: aws
+    service: cloudtrail
+detection:
+    selection_event:
+        eventSource: s3.amazonaws.com
+        eventCategory: Data
+        eventName:
+            - PutObjectAcl
+            - PutObject
+            - CopyObject
+            - CreateMultipartUpload
+    selection_public_acl:
+        requestParameters.x-amz-acl|contains:
+            - public-read
+            - public-read-write
+            - authenticated-read
+    selection_public_grant_read:
+        requestParameters.x-amz-grant-read|contains: AllUsers
+    selection_public_grant_full_control:
+        requestParameters.x-amz-grant-full-control|contains: AllUsers
+    selection_public_grant_read_acp:
+        requestParameters.x-amz-grant-read-acp|contains: AllUsers
+    selection_public_grant_write_acp:
+        requestParameters.x-amz-grant-write-acp|contains: AllUsers
+    condition: selection_event and (selection_public_acl or 1 of selection_public_grant_*)
+falsepositives:
+    - Intentional ACL-based sharing workflows.
+level: low
