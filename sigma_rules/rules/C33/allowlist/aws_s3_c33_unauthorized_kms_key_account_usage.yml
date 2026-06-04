@@ -1,0 +1,33 @@
+title: AWS S3 C33 - Unauthorized KMS Key Account Usage
+id: 9497f07a-a682-508b-8ab8-7821efb29d47
+status: test
+description: Monitor that only authorized AWS accounts provide KMS keys for each AWS account (using CloudTrail S3 data events in "response.x-amz-server-side-encryption-aws-kms-key-id").
+testing: Encrypt an object using an unauthorized key; it should be detected.
+notes: |
+    Detection reads `responseElements.x-amz-server-side-encryption-aws-kms-key-id` — the key actually applied to the object, including the bucket-default-encryption case where the client supplies no key.
+references:
+    - https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html
+    - https://docs.aws.amazon.com/AmazonS3/latest/API/API_CopyObject.html
+    - https://docs.aws.amazon.com/AmazonS3/latest/API/API_CreateMultipartUpload.html
+    - https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+author: TrustOnCloud
+date: 2026-02-15
+modified: 2026-03-25
+tags:
+    - trustoncloud.aws.s3
+    - trustoncloud.control.s3.c33
+logsource:
+    product: aws
+    service: cloudtrail
+detection:
+    selection_event:
+        eventSource: s3.amazonaws.com
+        eventCategory: Data
+    selection_response_kms_key:
+        responseElements.x-amz-server-side-encryption-aws-kms-key-id|startswith: 'arn:aws:kms:'
+    filter_authorized_response_key_account:
+        responseElements.x-amz-server-side-encryption-aws-kms-key-id|contains|expand: '%authorized_kms_account_ids_c33%'
+    condition: selection_event and selection_response_kms_key and not filter_authorized_response_key_account
+falsepositives:
+    - Cross-account KMS usage that is approved but not allowlisted.
+level: low

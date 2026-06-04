@@ -1,0 +1,35 @@
+﻿title: AWS S3 C37 - Anonymous Object Request
+id: 0cf5620e-5a2c-569d-8052-a6c5b42b7ef6
+status: test
+description: Monitor and investigate anonymous requests to objects (e.g., using CloudTrail S3 data events where the userIdentity indicates an anonymous caller).
+testing: Make an anonymous call; it should be detected.
+notes: |
+    Selection uses the pair CloudTrail emits for an anonymous S3 request: `userIdentity.type: AWSAccount` AND `userIdentity.accountId: anonymous` (lowercase literal string). The type+accountId pair is authoritative; an `arn|exists: false` check would create a false-positive risk because some federated / assumed-role events also omit `arn`.
+references:
+    - https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudtrail-request-identification.html
+    - https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudtrail-logging-s3-info.html
+    - https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+author: TrustOnCloud
+date: 2026-02-15
+modified: 2026-03-11
+tags:
+    - trustoncloud.aws.s3
+    - trustoncloud.control.s3.c37
+logsource:
+    product: aws
+    service: cloudtrail
+detection:
+    selection_event:
+        eventSource: s3.amazonaws.com
+        eventCategory: Data
+        resources.type|contains: AWS::S3::Object
+    selection_anonymous_account:
+        userIdentity.type: AWSAccount
+        userIdentity.accountId: anonymous
+    condition: selection_event and selection_anonymous_account
+falsepositives:
+    - Deliberate public object access from approved public buckets.
+level: low
+
+
+

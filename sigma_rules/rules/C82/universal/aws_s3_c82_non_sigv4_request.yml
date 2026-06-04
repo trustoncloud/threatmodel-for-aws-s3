@@ -1,0 +1,37 @@
+﻿title: AWS S3 C82 - Non-SigV4 Request
+id: 2a0a5a29-4d42-5095-9ecb-034ec1208026
+status: test
+description: Monitor and investigate any requests not using SigV4 (e.g., via CloudTrail S3 when the additionalEventData.SignatureVersion is different from "SigV4").
+testing: Make a non-SigV4 AWS API call; it should be detected.
+notes: |
+    Fires on any non-SigV4 / non-SigV4A signature value.
+references:
+    - https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-authenticating-requests.html
+    - https://docs.aws.amazon.com/general/latest/gr/signature-version-4a.html
+    - https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+author: TrustOnCloud
+date: 2026-02-15
+modified: 2026-03-23
+tags:
+    - trustoncloud.aws.s3
+    - trustoncloud.control.s3.c82
+logsource:
+    product: aws
+    service: cloudtrail
+detection:
+    selection:
+        eventSource: s3.amazonaws.com
+        eventCategory: Data
+        additionalEventData.SignatureVersion|exists: true
+    filter_sigv4:
+        additionalEventData.SignatureVersion:
+            - SigV4
+            - SigV4A
+    condition: selection and not filter_sigv4
+falsepositives:
+    - Legacy integrations that still rely on older signature versions.
+level: informational
+
+
+
+

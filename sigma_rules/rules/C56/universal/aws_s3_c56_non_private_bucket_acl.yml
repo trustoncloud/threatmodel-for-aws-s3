@@ -1,0 +1,49 @@
+﻿title: AWS S3 C56 - Non-Private Bucket ACL
+id: d1743b0b-fa19-505e-b195-50d19ada7c83
+status: test
+description: Monitor changes to bucket ACLs to ensure they stay private (e.g., using the CloudTrail event PutBucketAcl and its field requestParameters.x-amz-acl, which should either be "private" or not exist).
+testing: Make a call to have a bucket ACL other than private; it should be detected.
+notes: |
+    Universal mode fires when any ACL grant signal is present (canned ACL header, grant-* headers, or AccessControlPolicy body) AND the canned ACL value is not `private`. The `not filter_private_acl` clause handles the "should be private or not exist" requirement.
+references:
+    - https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutBucketAcl.html
+    - https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html
+    - https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+author: TrustOnCloud
+date: 2026-02-15
+modified: 2026-03-23
+tags:
+    - trustoncloud.aws.s3
+    - trustoncloud.control.s3.c56
+logsource:
+    product: aws
+    service: cloudtrail
+detection:
+    selection_event:
+        eventSource: s3.amazonaws.com
+        eventName: PutBucketAcl
+        eventCategory: Management
+    selection_acl_signal_canned:
+        requestParameters.x-amz-acl|exists: true
+    selection_acl_signal_grant_read:
+        requestParameters.x-amz-grant-read|exists: true
+    selection_acl_signal_grant_read_acp:
+        requestParameters.x-amz-grant-read-acp|exists: true
+    selection_acl_signal_grant_write:
+        requestParameters.x-amz-grant-write|exists: true
+    selection_acl_signal_grant_write_acp:
+        requestParameters.x-amz-grant-write-acp|exists: true
+    selection_acl_signal_grant_full_control:
+        requestParameters.x-amz-grant-full-control|exists: true
+    selection_acl_signal_policy_body:
+        requestParameters.AccessControlPolicy|exists: true
+    filter_private_acl:
+        requestParameters.x-amz-acl: private
+    condition: selection_event and 1 of selection_acl_signal_* and not filter_private_acl
+falsepositives:
+    - Approved ACL-based bucket sharing.
+level: low
+
+
+
+

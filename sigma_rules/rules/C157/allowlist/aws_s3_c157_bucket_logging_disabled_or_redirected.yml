@@ -1,0 +1,40 @@
+﻿title: AWS S3 C157 - Bucket Logging Disabled Or Redirected
+id: 706b0edf-4abe-579b-8537-32ba69d0738e
+status: test
+description: Monitor PutBucketLogging to detect bucket server access logging changes, including deactivation and bucket changes (i.e., using the CloudTrail event "PutBucketLogging" and the "requestParameters.BucketLoggingStatus" field to examine the lack of the "LoggingEnabled" key or an unauthorized bucket in "requestParameters.BucketLoggingStatus.LoggingEnabled.TargetBucket").
+testing: Make a call to 1) disable bucket logging, or 2) change to an unauthorized bucket; it should be detected.
+notes: |
+    Fires on (logging disabled — no LoggingEnabled key) OR (logging redirected to a target bucket not in `%authorized_logging_buckets_c157%`).
+references:
+    - https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutBucketLogging.html
+    - https://docs.aws.amazon.com/AmazonS3/latest/userguide/enable-server-access-logging.html
+    - https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+author: TrustOnCloud
+date: 2026-02-15
+modified: 2026-03-23
+tags:
+    - trustoncloud.aws.s3
+    - trustoncloud.control.s3.c157
+logsource:
+    product: aws
+    service: cloudtrail
+detection:
+    selection_event:
+        eventSource: s3.amazonaws.com
+        eventName: PutBucketLogging
+        eventCategory: Management
+        requestParameters.bucketName|exists: true
+    selection_logging_disabled:
+        requestParameters.BucketLoggingStatus.LoggingEnabled|exists: false
+    selection_target_present:
+        requestParameters.BucketLoggingStatus.LoggingEnabled.TargetBucket|exists: true
+    filter_authorized_target_bucket:
+        requestParameters.BucketLoggingStatus.LoggingEnabled.TargetBucket|expand: '%authorized_logging_buckets_c157%'
+    condition: (selection_event and selection_logging_disabled) or (selection_event and selection_target_present and not filter_authorized_target_bucket)
+falsepositives:
+    - Legitimate logging destination updates not yet allowlisted.
+level: informational
+
+
+
+

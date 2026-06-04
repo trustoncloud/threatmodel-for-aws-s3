@@ -1,0 +1,42 @@
+﻿title: AWS S3 C148 - SSE-C Required Bucket Without Valid SSE-C
+id: be97d849-d7c7-5f77-ab84-6825a1f0b1f3
+status: test
+description: For buckets (or paths) requiring SSE-C, monitor that only authorized encryption is used on each bucket or path (using CloudTrail S3 data events in requestParameters.bucketName and response.x-amz-server-side-encryption-customer-algorithm).
+testing: Make a request to a bucket (or path) requiring SSE-C without the proper encryption; it should be detected.
+notes: |
+    The valid algorithm value(s) are parameterized via `%valid_sse_c_algorithms_c148%` (default `[AES256]`) so customers can extend without a rule change if AWS ships a new SSE-C algorithm. Today AES256 is the only documented value.
+    Detection reads `responseElements.x-amz-server-side-encryption-customer-algorithm`.
+references:
+    - https://docs.aws.amazon.com/AmazonS3/latest/userguide/specifying-s3-c-encryption.html
+    - https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html
+    - https://docs.aws.amazon.com/AmazonS3/latest/API/API_CopyObject.html
+    - https://docs.aws.amazon.com/AmazonS3/latest/API/API_CreateMultipartUpload.html
+    - https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+author: TrustOnCloud
+date: 2026-02-15
+modified: 2026-03-23
+tags:
+    - trustoncloud.aws.s3
+    - trustoncloud.control.s3.c148
+logsource:
+    product: aws
+    service: cloudtrail
+detection:
+    selection_event:
+        eventSource: s3.amazonaws.com
+        eventCategory: Data
+        eventName:
+            - PutObject
+            - CopyObject
+            - CreateMultipartUpload
+        requestParameters.bucketName|expand: '%sse_c_required_buckets_c148%'
+    filter_valid_sse_c:
+        responseElements.x-amz-server-side-encryption-customer-algorithm|expand: '%valid_sse_c_algorithms_c148%'
+    condition: selection_event and not filter_valid_sse_c
+falsepositives:
+    - Buckets added to SSE-C policy scope but not reflected in the rule list.
+level: low
+
+
+
+

@@ -1,0 +1,44 @@
+﻿title: AWS S3 C160 - CreateAccessPoint Unauthorized Bucket Or Account
+id: d42564db-d682-59c8-846a-29e962ad8857
+status: test
+description: Monitor CreateAccessPoint to detect unauthorized buckets or AWS accounts (i.e., using CloudTrail event CreateAccessPoint and its fields "requestParameters.CreateAccessPointRequest.Bucket" and "requestParameters.CreateAccessPointRequest.BucketAccountId").
+testing: Call the API to create a cross-account access point with an unauthorized 1) bucket or 2) an authorized bucket in an unauthorized AWS account; it should be detected.
+notes: |
+    Fires on `CreateAccessPoint` (or `CreateMultiRegionAccessPoint`) when the target bucket isn't in `%authorized_buckets_c160%`, or when the bucket account isn't in `%authorized_account_ids_c160%`.
+references:
+    - https://docs.aws.amazon.com/AmazonS3/latest/API/API_control_CreateAccessPoint.html
+    - https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-points.html
+    - https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+author: TrustOnCloud
+date: 2026-02-15
+modified: 2026-03-23
+tags:
+    - trustoncloud.aws.s3
+    - trustoncloud.control.s3.c160
+logsource:
+    product: aws
+    service: cloudtrail
+detection:
+    selection_event:
+        eventSource:
+            - s3.amazonaws.com
+            - s3control.amazonaws.com
+        eventName:
+            - CreateAccessPoint
+            - CreateMultiRegionAccessPoint
+        eventCategory: Management
+        requestParameters.CreateAccessPointRequest.Bucket|exists: true
+    selection_bucket_account_present:
+        requestParameters.CreateAccessPointRequest.BucketAccountId|exists: true
+    filter_authorized_bucket:
+        requestParameters.CreateAccessPointRequest.Bucket|expand: '%authorized_buckets_c160%'
+    filter_authorized_bucket_account:
+        requestParameters.CreateAccessPointRequest.BucketAccountId|expand: '%authorized_account_ids_c160%'
+    condition: (selection_event and not filter_authorized_bucket) or (selection_event and selection_bucket_account_present and not filter_authorized_bucket_account)
+falsepositives:
+    - Recently approved cross-account access points missing from allowlists.
+level: medium
+
+
+
+
