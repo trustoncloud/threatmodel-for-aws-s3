@@ -1,7 +1,7 @@
 # customer.aws.s3.example.yml — AWS S3 variable file for sigma rules.
 #
 # Supplies every variable referenced by the AWS S3 rule library. 
-# Passthis single file at conversion time:
+# Pass this single file at conversion time.
 #
 # Copy this file and replace every value with your own bucket names, 
 # account IDs, regions, etc. 
