@@ -1,0 +1,47 @@
+﻿title: AWS S3 C43 - Path-Style S3 Request
+id: e4d30382-0c82-5127-be9f-40f9f295522a
+status: test
+description: Monitor that all S3 connections are made with the virtual-hosted model (e.g., via CloudTrail S3 requestParameters.Host).
+testing: Make a path-style request to S3; it should be detected.
+notes: |
+    Fires on every path-style request except those by AWS service principals (`userIdentity.type: AWSService`) — internal services (S3 replication, cross-region) issue path-style calls for compatibility and would otherwise flood the alerts. Use allowlist mode to also suppress legitimate customer-side path-style users. Both `requestParameters.Host` and `.host` are checked (SIEM case-normalization varies).
+references:
+    - https://docs.aws.amazon.com/AmazonS3/latest/userguide/VirtualHosting.html
+    - https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudtrail-logging-s3-info.html
+    - https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+author: TrustOnCloud
+date: 2026-02-15
+modified: 2026-03-11
+tags:
+    - trustoncloud.aws.s3
+    - trustoncloud.control.s3.c43
+logsource:
+    product: aws
+    service: cloudtrail
+detection:
+    selection_event:
+        eventSource: s3.amazonaws.com
+        eventCategory: Data
+        resources.type|contains: AWS::S3::Object
+    selection_path_style_host_upper_starts:
+        requestParameters.Host|startswith:
+            - 's3.'
+            - 's3-'
+    selection_path_style_host_upper_ends:
+        requestParameters.Host|endswith: '.amazonaws.com'
+    selection_path_style_host_lower_starts:
+        requestParameters.host|startswith:
+            - 's3.'
+            - 's3-'
+    selection_path_style_host_lower_ends:
+        requestParameters.host|endswith: '.amazonaws.com'
+    filter_aws_service:
+        userIdentity.type: AWSService
+    condition: selection_event and ((selection_path_style_host_upper_starts and selection_path_style_host_upper_ends) or (selection_path_style_host_lower_starts and selection_path_style_host_lower_ends)) and not filter_aws_service
+falsepositives:
+    - Legacy applications still using path-style access.
+level: informational
+
+
+
+

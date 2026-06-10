@@ -1,0 +1,56 @@
+title: AWS S3 C115 - PutObject With ACL Header To External Bucket
+id: f0fb5508-3629-4d55-8770-10b399776885
+status: test
+description: For all external buckets with bucket-owner-full-control ACL requirements but without S3 Object Ownership handover, monitor that the PutObject operation does not include the ACL header.
+testing: Make a request to an external bucket with a bucket-owner-full-control ACL requirement but without an S3 Object Ownership handover requirement; it should be detected.
+notes: |
+    Universal mode excludes AWS services (e.g. CloudTrail, Config) that legitimately use `bucket-owner-full-control` when delivering objects into customer buckets, and fires on every other caller using a banned ACL header. Strict-by-default; no further tuning is needed. Customers who need to suppress trusted partner / sister-org accounts should deploy the allowlist mode instead and curate the `legitimate_account_ids_c115` variable.
+references:
+    - https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html
+    - https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html
+    - https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+author: TrustOnCloud
+date: 2026-05-21
+tags:
+    - trustoncloud.aws.s3
+    - trustoncloud.control.s3.c115
+logsource:
+    product: aws
+    service: cloudtrail
+detection:
+    selection_event:
+        eventSource: s3.amazonaws.com
+        eventName:
+            - PutObject
+            - CopyObject
+            - CreateMultipartUpload
+        eventCategory: Data
+    selection_acl_header_canned:
+        requestParameters.x-amz-acl:
+            - bucket-owner-full-control
+            - public-read
+            - public-read-write
+            - authenticated-read
+    selection_acl_header_grant_read:
+        requestParameters.x-amz-grant-read|contains:
+            - AllUsers
+            - AuthenticatedUsers
+    selection_acl_header_grant_read_acp:
+        requestParameters.x-amz-grant-read-acp|contains:
+            - AllUsers
+            - AuthenticatedUsers
+    selection_acl_header_grant_write_acp:
+        requestParameters.x-amz-grant-write-acp|contains:
+            - AllUsers
+            - AuthenticatedUsers
+    selection_acl_header_grant_full_control:
+        requestParameters.x-amz-grant-full-control|contains:
+            - AllUsers
+            - AuthenticatedUsers
+    filter_aws_service:
+        userIdentity.type: AWSService
+    condition: selection_event and (selection_acl_header_canned or 1 of selection_acl_header_grant_*) and not filter_aws_service
+falsepositives:
+    - Internal traffic that legitimately uses ACL headers — switch to the allowlist mode and curate `legitimate_account_ids_c115` if this is your normal pattern.
+    - Buckets configured with Object Ownership = BucketOwnerEnforced reject the ACL header at the API; if everything is BucketOwnerEnforced, this rule is largely redundant with the bucket-policy enforcement (defense in depth).
+level: medium

@@ -1,0 +1,34 @@
+﻿title: AWS S3 C85 - Request Without Authorization Header
+id: 2d6d0343-8a48-5ecc-b3f2-a15c68ea4e9e
+status: test
+description: Monitor and investigate all requests that do not use the HTTP authorization header (e.g., via CloudTrail S3 events where the additionalEventData.AuthenticationMethod is different from "AuthHeader").
+testing: Make 1) a presigned AWS API call and 2) a POST request without the HTTP authorization header; it should be detected.
+notes: |
+    Fires on any AuthenticationMethod value that isn't `AuthHeader` (e.g. QueryString — presigned URLs; POST — browser uploads; Anonymous).
+references:
+    - https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudtrail-logging-understanding-s3-entries.html
+    - https://docs.aws.amazon.com/prescriptive-guidance/latest/presigned-url-best-practices/identifying-requests.html
+    - https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+author: TrustOnCloud
+date: 2026-02-15
+modified: 2026-03-23
+tags:
+    - trustoncloud.aws.s3
+    - trustoncloud.control.s3.c85
+logsource:
+    product: aws
+    service: cloudtrail
+detection:
+    selection:
+        eventSource: s3.amazonaws.com
+        eventCategory: Data
+        additionalEventData.AuthenticationMethod|exists: true
+    filter_auth_header:
+        additionalEventData.AuthenticationMethod: AuthHeader
+    condition: selection and not filter_auth_header
+falsepositives:
+    - Approved presigned URL or POST-based access workflows.
+level: low
+
+
+

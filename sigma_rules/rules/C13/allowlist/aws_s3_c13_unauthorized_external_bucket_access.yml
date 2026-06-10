@@ -1,0 +1,38 @@
+﻿title: AWS S3 C13 - Unauthorized External Bucket Access
+id: 31c84e85-6e51-5005-bfdf-0b31c4fc8077
+status: test
+description: Monitor that only authorized external buckets are used (e.g., via CloudTrail S3 data events in resources[].accountId and resources[].ARN). Both account ID and bucket name must be verified.
+testing: Make a call to an unauthorized bucket; it should be detected.
+notes: |
+    The `resources` field in CloudTrail S3 data events is an array; this rule assumes the SIEM ingestion preserves the array shape so `resources.accountId` / `resources.ARN` resolve. Condition uses `not (filter_accounts and filter_buckets)`.
+references:
+    - https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+    - https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudtrail-logging-s3-info.html
+author: TrustOnCloud
+date: 2026-02-15
+modified: 2026-03-11
+tags:
+    - trustoncloud.aws.s3
+    - trustoncloud.control.s3.c13
+logsource:
+    product: aws
+    service: cloudtrail
+detection:
+    selection:
+        eventSource: s3.amazonaws.com
+        eventCategory: Data
+        resources.accountId|exists: true
+        resources.ARN|exists: true
+        resources.type|contains: AWS::S3::Object
+    filter_authorized_accounts:
+        resources.accountId|expand: '%authorized_external_account_ids_c13%'
+    filter_authorized_buckets:
+        resources.ARN|contains|expand: '%authorized_external_buckets_c13%'
+    condition: selection and not (filter_authorized_accounts and filter_authorized_buckets)
+falsepositives:
+    - Newly approved external accounts or buckets that were not added to allowlists.
+level: medium
+
+
+
+

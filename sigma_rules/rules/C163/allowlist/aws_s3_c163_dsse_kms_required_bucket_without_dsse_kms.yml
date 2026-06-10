@@ -1,0 +1,41 @@
+﻿title: AWS S3 C163 - DSSE-KMS Required Bucket Without DSSE-KMS
+id: 81601a6a-752a-5818-b86d-5e55f0881fcf
+status: test
+description: Monitor requests not using DSSE-KMS when required (e.g., using CloudTrail log event name(s), CloudTrail S3 data events with field(s) requestParameter.bucketName, and "response.x-amz-server-side-encryption-aws").
+testing: Make a request not using DSSE-KMS on a required S3 bucket; it should be detected.
+notes: |
+    Fires when a write to a DSSE-KMS-required bucket does not result in DSSE-KMS encryption being applied. Reads the response-side `responseElements.x-amz-server-side-encryption` field — the encryption mode actually applied to the object.
+references:
+    - https://docs.aws.amazon.com/AmazonS3/latest/userguide/specifying-dsse-encryption.html
+    - https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html
+    - https://docs.aws.amazon.com/AmazonS3/latest/API/API_CopyObject.html
+    - https://docs.aws.amazon.com/AmazonS3/latest/API/API_CreateMultipartUpload.html
+    - https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+author: TrustOnCloud
+date: 2026-02-15
+modified: 2026-03-23
+tags:
+    - trustoncloud.aws.s3
+    - trustoncloud.control.s3.c163
+logsource:
+    product: aws
+    service: cloudtrail
+detection:
+    selection_event:
+        eventSource: s3.amazonaws.com
+        eventCategory: Data
+        eventName:
+            - PutObject
+            - CopyObject
+            - CreateMultipartUpload
+        requestParameters.bucketName|expand: '%dsse_required_buckets_c163%'
+    filter_dsse_kms_applied:
+        responseElements.x-amz-server-side-encryption: aws:kms:dsse
+    condition: selection_event and not filter_dsse_kms_applied
+falsepositives:
+    - Buckets that are DSSE-KMS-enforced but missing from required bucket list.
+level: informational
+
+
+
+

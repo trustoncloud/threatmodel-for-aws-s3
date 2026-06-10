@@ -1,0 +1,45 @@
+title: AWS S3 C56 - Non-Private Bucket ACL
+id: 56176a70-d5bc-4ba5-b21d-32d0b1659158
+status: test
+description: Monitor changes to bucket ACLs to ensure they stay private (e.g., using the CloudTrail event PutBucketAcl and its field requestParameters.x-amz-acl, which should either be "private" or not exist).
+testing: Make a call to have a bucket ACL other than private; it should be detected.
+notes: |
+    Fires when an ACL or grantee value matches the denied lists (`%denied_bucket_acls_c56%`, `%denied_bucket_acl_grantees_c56%`) OR the AccessControlPolicy XML body grants to AllUsers / AuthenticatedUsers.
+references:
+    - https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutBucketAcl.html
+    - https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html
+    - https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+author: TrustOnCloud
+date: 2026-02-15
+modified: 2026-03-24
+tags:
+    - trustoncloud.aws.s3
+    - trustoncloud.control.s3.c56
+logsource:
+    product: aws
+    service: cloudtrail
+detection:
+    selection_event:
+        eventSource: s3.amazonaws.com
+        eventName: PutBucketAcl
+        eventCategory: Management
+    selection_deny_acl:
+        requestParameters.x-amz-acl|expand: '%denied_bucket_acls_c56%'
+    selection_deny_grant_read:
+        requestParameters.x-amz-grant-read|contains|expand: '%denied_bucket_acl_grantees_c56%'
+    selection_deny_grant_read_acp:
+        requestParameters.x-amz-grant-read-acp|contains|expand: '%denied_bucket_acl_grantees_c56%'
+    selection_deny_grant_write:
+        requestParameters.x-amz-grant-write|contains|expand: '%denied_bucket_acl_grantees_c56%'
+    selection_deny_grant_write_acp:
+        requestParameters.x-amz-grant-write-acp|contains|expand: '%denied_bucket_acl_grantees_c56%'
+    selection_deny_grant_full_control:
+        requestParameters.x-amz-grant-full-control|contains|expand: '%denied_bucket_acl_grantees_c56%'
+    selection_deny_acl_body:
+        requestParameters.AccessControlPolicy|contains:
+            - 'AllUsers'
+            - 'AuthenticatedUsers'
+    condition: selection_event and (selection_deny_acl or 1 of selection_deny_grant_* or selection_deny_acl_body)
+falsepositives:
+    - Approved sharing models that intentionally use listed ACLs or grantees.
+level: low

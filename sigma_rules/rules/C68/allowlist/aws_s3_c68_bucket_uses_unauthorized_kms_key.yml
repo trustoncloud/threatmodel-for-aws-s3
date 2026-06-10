@@ -1,0 +1,52 @@
+title: AWS S3 C68 - Bucket Uses Unauthorized KMS Key
+id: 18db526e-e087-5852-b2e6-35e264fa4dd8
+status: test
+description: Monitor that only authorized KMS keys are used for each bucket (using CloudTrail S3 data events in "requestParameters.bucketName" and "response.x-amz-server-side-encryption-aws-kms-key-id").
+testing: Make a request encrypted with an unauthorized KMS key; it should be detected.
+notes: |
+    Each `filter_pair_N` block binds one bucket to one KMS key ARN — both must match within the block, so key B on bucket A fires even if key B is authorized elsewhere. 5 slots ship by default; fill `c68_pairN_bucket` / `c68_pairN_key` in your variable file. To change the slot count (add or remove pairs), edit both the rule (`filter_pair_N` blocks) and the variable file together so they stay in sync. `c68_pairN_key` must be the full KMS key ARN (e.g. `arn:aws:kms:us-east-1:111111111111:key/<uuid>`) because the rule reads the response field, which carries the full ARN.
+references:
+    - https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html
+    - https://docs.aws.amazon.com/AmazonS3/latest/API/API_CopyObject.html
+    - https://docs.aws.amazon.com/AmazonS3/latest/API/API_CreateMultipartUpload.html
+    - https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingKMSEncryption.html
+    - https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+author: TrustOnCloud
+date: 2026-02-15
+modified: 2026-05-23
+tags:
+    - trustoncloud.aws.s3
+    - trustoncloud.control.s3.c68
+logsource:
+    product: aws
+    service: cloudtrail
+detection:
+    selection_event:
+        eventSource: s3.amazonaws.com
+        eventCategory: Data
+        eventName:
+            - PutObject
+            - CopyObject
+            - CreateMultipartUpload
+        requestParameters.bucketName|exists: true
+    selection_kms_key_in_use:
+        responseElements.x-amz-server-side-encryption-aws-kms-key-id|startswith: 'arn:aws:kms:'
+    filter_pair_1:
+        requestParameters.bucketName|expand: '%c68_pair1_bucket%'
+        responseElements.x-amz-server-side-encryption-aws-kms-key-id|contains|expand: '%c68_pair1_key%'
+    filter_pair_2:
+        requestParameters.bucketName|expand: '%c68_pair2_bucket%'
+        responseElements.x-amz-server-side-encryption-aws-kms-key-id|contains|expand: '%c68_pair2_key%'
+    filter_pair_3:
+        requestParameters.bucketName|expand: '%c68_pair3_bucket%'
+        responseElements.x-amz-server-side-encryption-aws-kms-key-id|contains|expand: '%c68_pair3_key%'
+    filter_pair_4:
+        requestParameters.bucketName|expand: '%c68_pair4_bucket%'
+        responseElements.x-amz-server-side-encryption-aws-kms-key-id|contains|expand: '%c68_pair4_key%'
+    filter_pair_5:
+        requestParameters.bucketName|expand: '%c68_pair5_bucket%'
+        responseElements.x-amz-server-side-encryption-aws-kms-key-id|contains|expand: '%c68_pair5_key%'
+    condition: selection_event and selection_kms_key_in_use and not 1 of filter_pair_*
+falsepositives:
+    - Valid bucket-to-key mapping not yet added to the `c68_pairN_bucket` / `c68_pairN_key` variables.
+level: low

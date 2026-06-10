@@ -1,0 +1,31 @@
+title: AWS S3 C82 - Non-SigV4 Request
+id: 73daf1f9-552d-4eab-afcd-a7955d77f941
+status: test
+description: Monitor and investigate any requests not using SigV4 (e.g., via CloudTrail S3 when the additionalEventData.SignatureVersion is different from "SigV4").
+testing: Make a non-SigV4 AWS API call; it should be detected.
+notes: |
+    Denylist mode fires only when the signature version matches a value in `%denied_signature_versions_c82%` (e.g. SigV1, SigV2).
+references:
+    - https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-authenticating-requests.html
+    - https://docs.aws.amazon.com/general/latest/gr/signature-version-4a.html
+    - https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+author: TrustOnCloud
+date: 2026-02-15
+modified: 2026-03-24
+tags:
+    - trustoncloud.aws.s3
+    - trustoncloud.control.s3.c82
+logsource:
+    product: aws
+    service: cloudtrail
+detection:
+    selection:
+        eventSource: s3.amazonaws.com
+        eventCategory: Data
+        additionalEventData.SignatureVersion|exists: true
+    selection_deny_signature_version:
+        additionalEventData.SignatureVersion|expand: '%denied_signature_versions_c82%'
+    condition: selection and selection_deny_signature_version
+falsepositives:
+    - Approved legacy or test integrations explicitly using listed signature versions.
+level: informational

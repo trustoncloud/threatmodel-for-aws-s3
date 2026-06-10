@@ -1,0 +1,33 @@
+﻿title: AWS S3 C4 - HTTP Requests Without TLS Cipher Suite
+id: 3098b3b7-c18b-578b-902e-8b220afa8235
+status: test
+description: Monitor and investigate all requests made with HTTP (e.g., via CloudTrail S3 data events with the lack of additionalEventData.CipherSuite).
+testing: Make an unencrypted AWS API call from one of your VPCs with VPC endpoint; it should be detected.
+notes: |
+    Universal mode detects only the no-TLS-metadata case (both `additionalEventData.CipherSuite` and `tlsDetails.cipherSuite` are missing).
+references:
+    - https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+    - https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudtrail-logging-s3-info.html
+author: TrustOnCloud
+date: 2026-02-15
+tags:
+    - trustoncloud.aws.s3
+    - trustoncloud.control.s3.c4
+logsource:
+    product: aws
+    service: cloudtrail
+detection:
+    selection_s3:
+        eventSource: s3.amazonaws.com
+        eventCategory: Data
+    selection_no_legacy_cipher_field:
+        additionalEventData.CipherSuite|exists: false
+    selection_no_tls_details:
+        tlsDetails.cipherSuite|exists: false
+    condition: selection_s3 and selection_no_legacy_cipher_field and selection_no_tls_details
+falsepositives:
+    - Some AWS service-originated events may omit one or more transport metadata fields.
+level: low
+
+
+
