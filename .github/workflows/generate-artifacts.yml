@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  DRAWIO_VERSION: "24.7.17"
+  DRAWIO_VERSION: "28.1.2"
 
 permissions:
   id-token: write
