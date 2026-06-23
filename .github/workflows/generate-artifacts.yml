@@ -73,7 +73,7 @@ jobs:
           fi
 
       - name: Upload DFD XML artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: dfd-xml
           path: ${{ env.XML_NAME }}
@@ -83,7 +83,7 @@ jobs:
           python -c "import time,datetime; print('RELEASE_TAG=%s-%d'%(datetime.datetime.utcnow().strftime('%Y%m%d'), int(time.time())))" >> $GITHUB_ENV
 
       - name: Create release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ env.RELEASE_TAG }}
           name: ${{ env.RELEASE_TAG }}
