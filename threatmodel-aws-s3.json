@@ -125,7 +125,8 @@
         "S3.C168",
         "S3.C169",
         "S3.C14",
-        "S3.C1"
+        "S3.C1",
+        "S3.C177"
       ],
       "IP1": [
         "S3.C26",
@@ -223,7 +224,10 @@
         "S3.C120",
         "S3.C139",
         "S3.C121",
-        "S3.C122"
+        "S3.C122",
+        "S3.C174",
+        "S3.C175",
+        "S3.C176"
       ],
       "RP2": [
         "S3.C23",
@@ -334,7 +338,7 @@
           "class": "S3.FC1"
         }
       ],
-      "description": "To upload your data into your AWS account, you must create an S3 bucket in one of the AWS Regions.",
+      "description": "To upload your data into your AWS account, you must create an S3 bucket in one of the AWS Regions. General purpose buckets are created in the shared global namespace by default, or in your account regional namespace, a reserved subdivision of the global namespace in which only your account can create buckets and whose names can never be recreated by another account.",
       "long_description": "",
       "order": 1
     },
@@ -738,7 +742,7 @@
     "S3.T1": {
       "feature_class": "S3.FC5",
       "name": "Bucket takeover to gather data",
-      "description": "Bucket names are globally unique and can be recreated after 1 hour from deletion in another AWS account. An attacker can recreate the same bucket name of a deleted bucket you used to own to collect any new data uploaded by a non-updated party (<a href=\"https://labs.watchtowr.com/8-million-requests-later-we-made-the-solarwinds-supply-chain-attack-look-amateur/\">ref</a>), do a DNS takeover (using a non-deleted CNAME / CloudFront origin to the bucket), or use remaining permissions to exfiltrate data.",
+      "description": "Global general purpose bucket names are globally unique and can be recreated after 1 hour from deletion in another AWS account. An attacker can recreate the same bucket name of a deleted bucket you used to own to collect any new data uploaded by a non-updated party (<a href=\"https://labs.watchtowr.com/8-million-requests-later-we-made-the-solarwinds-supply-chain-attack-look-amateur/\">ref</a>), do a DNS takeover (using a non-deleted CNAME / CloudFront origin to the bucket), or use remaining permissions to exfiltrate data.",
       "access": {
         "OPTIONAL": "s3:DeleteBucket"
       },
@@ -978,7 +982,7 @@
     "S3.T17": {
       "feature_class": "S3.FC1",
       "name": "Destroy or modify primary data",
-      "description": "S3 provides high durability by design (11 9s). However, data can still be deleted by the customer. An attacker (or someone by negligence) can use their access to destroy (or modify) primary data located on S3, affecting the ability of the business to operate (for example, <a href=\"https://www.networkcomputing.com/cloud-networking/code-spaces-a-lesson-in-cloud-backup\">Code Spaces</a>).",
+      "description": "S3 provides high durability by design (11 9s). However, data can still be deleted by the customer. An attacker (or someone by negligence) can use their access to destroy (or modify) primary data stored on S3, affecting the ability of the business to operate (for example, <a href=\"https://www.reddit.com/r/programming/comments/28gvo6/code_spaces_destroyed_by_extortion_hacker_company/\">Code Spaces</a>).",
       "access": {
         "AND": [
           {
@@ -1202,7 +1206,7 @@
     "S3.T31": {
       "feature_class": "S3.FC1",
       "name": "Upload to an authorized external bucket but in an incorrect AWS account",
-      "description": "Bucket names are globally unique. An attacker can take over a legitimate external bucket and deceive you into sending data to their bucket.",
+      "description": "Global general purpose bucket names are globally unique. An attacker can take over a legitimate external bucket and deceive you into sending data to their bucket.",
       "access": {
         "UNIQUE": "s3:PutObject"
       },
@@ -1858,9 +1862,10 @@
       "retired": "false"
     },
     "S3.CO17": {
-      "description": "Protect primary data against loss",
+      "description": "Ensure durability and recoverability of primary data",
       "scf": [
         "BCD-11",
+        "BCD-13",
         "MON-03",
         "MON-08"
       ],
@@ -1929,7 +1934,7 @@
       "retired": "false"
     },
     "S3.CO26": {
-      "description": "Scan objects used for input/output of a workflow for malware",
+      "description": "Verify the safety of objects ingested and produced by workflows",
       "scf": [
         "END-04"
       ],
@@ -2053,6 +2058,14 @@
       "scf": [
         "IAC-02",
         "IAC-03"
+      ],
+      "retired": "false"
+    },
+    "S3.CO41": {
+      "description": "Restrict general purpose bucket creation to the account regional namespace",
+      "scf": [
+        "AST-02",
+        "DCH-15"
       ],
       "retired": "false"
     }
@@ -2539,7 +2552,7 @@
       "retired": "false",
       "assured_by": "",
       "depends_on": "",
-      "description": "Track all buckets you don't control that host your objects, define their data classification, identify their respective owners (and AWS account ID), determine their ObjectACL requirements (including S3 Object Ownership), and get assurance of their protection (e.g., through contractual agreement, verified by assurance programs, or using this ThreatModel).",
+      "description": "Track all buckets you don't control that host your objects, define their data classification, identify their respective owners (and AWS account ID), require the use of <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/gpbucketnamespaces.html#account-regional-gp-buckets\">account regional namespaces</a>, determine their ObjectACL requirements (including S3 Object Ownership), and get assurance of their protection (e.g., through contractual agreement, verified by assurance programs, or using this ThreatModel).",
       "testing": "Request the list of all external buckets authorized to host your objects, their respective owners (and AWS account ID), their ObjectACL requirements (including S3 Object Ownership), their data classification, and the mechanism used to ensure the security of those buckets.",
       "effort": "Medium",
       "mitigate": [
@@ -6464,7 +6477,7 @@
       "retired": "false",
       "assured_by": "",
       "depends_on": "",
-      "description": "Use SDK with SigV4 enabled (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/API/specify-signature-version.html\">ref</a>).",
+      "description": "Use the SDK with SigV4 enabled (<a href=\"https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_sigv.html\">ref</a>).",
       "testing": "Request the mechanism ensuring the use of SDK with SigV4 enabled.",
       "effort": "Low",
       "mitigate": [
@@ -6492,7 +6505,7 @@
       "retired": "false",
       "assured_by": "",
       "depends_on": "",
-      "description": "Block all requests not using HTTP authorization header, i.e., presigned via query strings or POST (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-authenticating-requests.html\">ref</a>) (e.g., using an SCP, bucket policies, or centrally in an RCP applied to the OU or AWS account on all buckets with deny on \"StringNotEquals\":{\"s3:authType\": \"REST-HEADER\"}). Note that it blocks uploads via the console, as well.",
+      "description": "Block all requests not using the HTTP authorization header, i.e., presigned via query strings or POST (<a href=\"https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_sigv.html\">ref</a>) (e.g., using an SCP, bucket policies, or centrally in an RCP applied to the OU or AWS account on all buckets with deny on \"StringNotEquals\":{\"s3:authType\": \"REST-HEADER\"}). Note that this blocks uploads via the console as well.",
       "testing": "Make a request without using the HTTP authorization header; it should be denied.",
       "effort": "Low",
       "mitigate": [
@@ -9175,7 +9188,7 @@
       "assured_by": "",
       "depends_on": "",
       "description": "Verify only authorized S3 buckets and their AWS accounts for cross-account access points are used.",
-      "testing": "Deploy a cross-account access point with an unauthorized 1) bucket or 2) an authorized bucket in an unauthorized AWS account; it should be detected.",
+      "testing": "Deploy a cross-account access point with 1) an unauthorized bucket or 2) an authorized bucket in an unauthorized AWS account; it should be detected.",
       "effort": "Medium",
       "mitigate": [],
       "feature_class": [
@@ -9735,6 +9748,109 @@
       "weighted_priority_score": 4,
       "queryable_objective_id": 13,
       "queryable_id": 173
+    },
+    "S3.C174": {
+      "coso": "Directive",
+      "nist_csf": "Protect",
+      "objective": "S3.CO41",
+      "retired": "false",
+      "assured_by": "S3.C177",
+      "depends_on": "",
+      "description": "Ensure general purpose buckets are created with account regional namespaces (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/gpbucketnamespaces.html#account-regional-gp-buckets\">ref</a>).",
+      "testing": "Request 1) the mechanism ensuring general purpose buckets are created with account regional namespaces, 2) its records of execution for all new general purpose buckets, and 3) the plan to move any older general purpose buckets.",
+      "effort": "Medium",
+      "mitigate": [
+        {
+          "threat": "S3.T1",
+          "impact": "High",
+          "priority": 3.0,
+          "max_dependency": null,
+          "priority_overall": 3.0,
+          "cvss": "Medium"
+        }
+      ],
+      "feature_class": [
+        "S3.FC5"
+      ],
+      "weighted_priority": "Medium",
+      "weighted_priority_score": 2,
+      "queryable_objective_id": 41,
+      "queryable_id": 174
+    },
+    "S3.C175": {
+      "coso": "Preventative",
+      "nist_csf": "Protect",
+      "objective": "S3.CO41",
+      "retired": "false",
+      "assured_by": "",
+      "depends_on": "",
+      "description": "Prevent the creation of general purpose buckets without account regional namespace (e.g., by using an SCP, RCP, and/or an IAM policy on s3:CreateBucket with a deny statement when the condition \"s3:x-amz-bucket-namespace\" is not \"account-regional\").",
+      "testing": "Create a general purpose bucket without account regional namespace; it should be denied.",
+      "effort": "Low",
+      "mitigate": [
+        {
+          "threat": "S3.T1",
+          "impact": "Very High",
+          "priority": 4.0,
+          "max_dependency": null,
+          "priority_overall": 4.0,
+          "cvss": "Medium"
+        }
+      ],
+      "feature_class": [
+        "S3.FC5"
+      ],
+      "weighted_priority": "High",
+      "weighted_priority_score": 3,
+      "queryable_objective_id": 41,
+      "queryable_id": 175
+    },
+    "S3.C176": {
+      "coso": "Detective",
+      "nist_csf": "Detect",
+      "objective": "S3.CO41",
+      "retired": "false",
+      "assured_by": "",
+      "depends_on": "",
+      "description": "Monitor for general purpose buckets with global namespaces (e.g., using CloudTrail log event CreateBucket with field requestParameters.bucketName not ending with \"-{accountId}-{regionId}-an\").",
+      "testing": "Create a general purpose bucket with a global namespace; it should be detected.",
+      "effort": "Low",
+      "mitigate": [
+        {
+          "threat": "S3.T1",
+          "impact": "Medium",
+          "priority": 2.0,
+          "max_dependency": null,
+          "priority_overall": 2.0,
+          "cvss": "Medium"
+        }
+      ],
+      "feature_class": [
+        "S3.FC5"
+      ],
+      "weighted_priority": "Medium",
+      "weighted_priority_score": 2,
+      "queryable_objective_id": 41,
+      "queryable_id": 176
+    },
+    "S3.C177": {
+      "coso": "Assurance",
+      "nist_csf": "Detect",
+      "objective": "S3.CO41",
+      "retired": "false",
+      "assured_by": "",
+      "depends_on": "",
+      "description": "Verify all general purpose buckets use account regional namespace.",
+      "testing": "Deploy a general purpose bucket without account regional namespace; it should be detected.",
+      "effort": "Medium",
+      "mitigate": [],
+      "feature_class": [
+        "S3.FC5"
+      ],
+      "weighted_priority": "Medium",
+      "weighted_priority_score": 2,
+      "queryable_objective_id": 41,
+      "queryable_id": 177
     }
   },
   "actions": {
@@ -11312,7 +11428,7 @@
       "action_id_int": 143
     },
     "S3.A144": {
-      "action_description": "Creates or replaces resource policy for an Object Lambda Access Point.",
+      "action_description": "Creates or replaces a resource policy for an Object Lambda Access Point.",
       "api": "PutAccessPointPolicyForObjectLambda",
       "endpoint": "s3-control",
       "feature_class": "S3.FC32",
