@@ -1,1 +1,42 @@
+# NOTE: the published artefacts are tracked on purpose and must stay unignored:
+# threatmodel-aws-s3.{json,docx,pdf}, threatmodel-aws-s3-dfd-drawio.xml, img/,
+# sigma_rules/, wiz_custom_rules/. The generate-artifacts workflow commits img/
+# and the DFD XML, so never add patterns that would swallow them.
+
+# Aider
 .aider*
+
+# Claude Code agent artifacts (per-agent worktrees, transcripts, local state)
+.claude/
+settings.local.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Scratch and local working files (venvs, one-off scripts, test output)
+tmp/
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archives
+*.zip
