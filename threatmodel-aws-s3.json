@@ -6,7 +6,7 @@
     "other_covered_services": [
       "Amazon S3 Glacier"
     ],
-    "version": "20240423",
+    "version": "20260925",
     "scf_version": "2024.1.1",
     "license": "ThreatModel for Amazon Simple Storage Service (Amazon S3), by TrustOnCloud, under a Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0). Find latest source at https://github.com/trustoncloud/threatmodel-for-aws-s3",
     "source": "https://github.com/trustoncloud/threatmodel-for-aws-s3"
@@ -276,6 +276,7 @@
       "class_relationship": [],
       "description": "You can upload, download, and delete virtually any number of objects to an external S3 bucket for which you are authorized.",
       "long_description": "You can upload, download, and delete virtually any number of objects to an external S3 bucket for which you are authorized. Amazon S3 Access Control Lists (ACLs) enable you to manage access to objects. Each object has an ACL attached to it as a sub-resource. It defines which AWS accounts or groups are granted access and the type of access. When a request is received against a resource, Amazon S3 checks the corresponding ACL to ensure the requester has the necessary access permissions (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#permissions\">ref</a>).",
+      "retired": false,
       "order": 0
     },
     "S3.FC2": {
@@ -292,6 +293,7 @@
       ],
       "description": "You can tag objects (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-tagging.html\">ref</a>).",
       "long_description": "",
+      "retired": false,
       "order": 26
     },
     "S3.FC3": {
@@ -308,6 +310,7 @@
       ],
       "description": "You can version your objects (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/versioning-workflows.html\">ref</a>).",
       "long_description": "",
+      "retired": false,
       "order": 28
     },
     "S3.FC4": {
@@ -328,6 +331,7 @@
       ],
       "description": "You can tag each version of an object (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-tagging.html\">ref</a>).",
       "long_description": "",
+      "retired": false,
       "order": 32
     },
     "S3.FC5": {
@@ -340,6 +344,7 @@
       ],
       "description": "To upload your data into your AWS account, you must create an S3 bucket in one of the AWS Regions. General purpose buckets are created in the shared global namespace by default, or in your account regional namespace, a reserved subdivision of the global namespace in which only your account can create buckets and whose names can never be recreated by another account.",
       "long_description": "",
+      "retired": false,
       "order": 1
     },
     "S3.FC6": {
@@ -356,6 +361,7 @@
       ],
       "description": "Versioning is a means of keeping multiple variants of an object in the same bucket (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html\">ref</a>).",
       "long_description": "Versioning is a means of keeping multiple variants of an object in the same bucket. You can use versioning to preserve, retrieve, and restore every version of every object stored in your Amazon S3 bucket. With versioning, you can easily recover from unintended user actions and application failures (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html\">ref</a>).",
+      "retired": false,
       "order": 29
     },
     "S3.FC7": {
@@ -368,6 +374,7 @@
       ],
       "description": "You can tag buckets (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/CostAllocTagging.html\">ref</a>).",
       "long_description": "",
+      "retired": false,
       "order": 2
     },
     "S3.FC8": {
@@ -380,6 +387,7 @@
       ],
       "description": "Amazon S3 Access Control Lists (ACLs) enable you to manage access to buckets (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#permissions\">ref</a>).",
       "long_description": "<b>[NOT RECOMMENDED]</b> Amazon S3 Access Control Lists (ACLs) enable you to manage access to buckets. Each bucket has an ACL attached to it as a sub-resource. It defines which AWS accounts or groups are granted access and the type of access. When a request is received against a resource, Amazon S3 checks the corresponding ACL to ensure the requester has the necessary access permissions (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#permissions\">ref</a>).",
+      "retired": false,
       "order": 3
     },
     "S3.FC9": {
@@ -396,6 +404,7 @@
       ],
       "description": "Amazon S3 Access Control Lists (ACLs) enable you to manage access to object versions (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#permissions\">ref</a>).",
       "long_description": "",
+      "retired": false,
       "order": 31
     },
     "S3.FC10": {
@@ -408,6 +417,7 @@
       ],
       "description": "For your bucket, you can add a bucket policy to grant other AWS accounts or IAM users permissions for the bucket and the objects in it. Any object permissions apply only to the objects that the bucket owner creates.",
       "long_description": "",
+      "retired": false,
       "order": 4
     },
     "S3.FC11": {
@@ -420,6 +430,7 @@
       ],
       "description": "You can analyze storage access patterns to decide the storage class (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/analytics-storage-class.html\">ref</a>).",
       "long_description": "",
+      "retired": false,
       "order": 6
     },
     "S3.FC12": {
@@ -432,6 +443,7 @@
       ],
       "description": "You can create a report on your storage, including object metadata or versions (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/configure-inventory.html\">ref</a>).",
       "long_description": "",
+      "retired": false,
       "order": 7
     },
     "S3.FC13": {
@@ -444,6 +456,7 @@
       ],
       "description": "You can manage the lifecycle of your data to reduce storage costs (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html\">ref</a>).",
       "long_description": "",
+      "retired": false,
       "order": 8
     },
     "S3.FC14": {
@@ -456,6 +469,7 @@
       ],
       "description": "You can configure metrics to get additional insights into your usage (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudwatch-monitoring.html\">ref</a>).",
       "long_description": "",
+      "retired": false,
       "order": 9
     },
     "S3.FC15": {
@@ -468,6 +482,7 @@
       ],
       "description": "Replication enables the automatic and asynchronous copying of objects from one bucket to another bucket (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication.html\">ref</a>).",
       "long_description": "Replication enables automatic and asynchronous copying of objects from one bucket to another. It can be cross-region or within the same region. Buckets configured for replication can be in the same AWS account or in different accounts. It is usually used for backing up S3 data, data centralization, or for multi-region applications.",
+      "retired": false,
       "order": 30
     },
     "S3.FC16": {
@@ -480,6 +495,7 @@
       ],
       "description": "You can host a static website on Amazon S3. On a static website, individual web pages include static content. They might also contain client-side scripts (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html\">ref</a>).",
       "long_description": "",
+      "retired": false,
       "order": 10
     },
     "S3.FC17": {
@@ -492,6 +508,7 @@
       ],
       "description": "You can use S3 Object Lock to store objects using a write-once-read-many (WORM) model (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html#object-lock-retention-modes\">ref</a>). Creating a bucket with S3 Object Lock will enable versioning even without permissions.",
       "long_description": "",
+      "retired": false,
       "order": 11
     },
     "S3.FC18": {
@@ -504,6 +521,7 @@
       ],
       "description": "You can use Transfer Acceleration to improve the performance of long-distance transfers (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/transfer-acceleration.html\">ref</a>).",
       "long_description": "",
+      "retired": false,
       "order": 13
     },
     "S3.FC19": {
@@ -520,6 +538,7 @@
       ],
       "description": "Server access logging provides detailed records of the requests made to a bucket.",
       "long_description": "Server access logging provides detailed records for the requests made to a bucket. CloudTrail S3 data events are preferred due to the more reliable delivery timing, consistency, supporting KMS encryption, and S3 Object Lock (<a href=\"https://www.netskope.com/blog/aws-s3-logjam-server-access-logging-vs-object-level-logging\">full comparison</a>); however, the website endpoint is not recorded on S3 data events, some SIEM modules might be more feature-rich with S3 access logs, and access logging is free besides storage.",
+      "retired": false,
       "order": 5
     },
     "S3.FC20": {
@@ -532,6 +551,7 @@
       ],
       "description": "You can receive notifications when certain events happen in your bucket.",
       "long_description": "You can receive notifications when certain events happen in your bucket. Notifications can be sent cross-account (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventNotifications.html\">ref</a>).",
+      "retired": false,
       "order": 14
     },
     "S3.FC21": {
@@ -548,6 +568,7 @@
       ],
       "description": "You can use the BitTorrent protocol to retrieve objects (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObjectTorrent.html\">ref</a>).",
       "long_description": "<b>[NOT RECOMMENDED]</b> You can use the BitTorrent protocol to retrieve objects (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObjectTorrent.html\">ref</a>). It is only available in the AWS Regions launched before May 30, 2016. The seed rate is 100 KB. After April 29, 2022, BitTorrent clients will no longer connect to Amazon S3.",
+      "retired": false,
       "order": 33
     },
     "S3.FC22": {
@@ -560,6 +581,7 @@
       ],
       "description": "You can create a CORS configuration with rules that identify the origins you will allow to access your bucket, the operations (HTTP methods) supported for each origin, and other operation-specific information.",
       "long_description": "<b>[NOT RECOMMENDED]</b> To configure your bucket to allow cross-origin requests, you create a CORS configuration, which is an XML document with rules that identify the origins that you will allow to access your bucket, the operations (HTTP methods) that will support for each origin, and other operation-specific information. This feature class is NOT RECOMMENDED to be activated since it is all HTTP. Prefer the use of CDN (e.g., CloudFront), API Gateway, and/or WAF fronting S3 buckets.",
+      "retired": false,
       "order": 15
     },
     "S3.FC23": {
@@ -572,6 +594,7 @@
       ],
       "description": "You can set default encryption on a bucket so that all new objects are encrypted when stored in the bucket.",
       "long_description": "",
+      "retired": false,
       "order": 16
     },
     "S3.FC24": {
@@ -584,6 +607,7 @@
       ],
       "description": "S3 Block Public Access (bucket) provides controls at the individual S3 bucket level to ensure objects never have public access.",
       "long_description": "",
+      "retired": false,
       "order": 17
     },
     "S3.FC25": {
@@ -596,6 +620,7 @@
       ],
       "description": "S3 Block Public Access (account) provides controls across an entire AWS account to ensure objects never have public access.",
       "long_description": "",
+      "retired": false,
       "order": 18
     },
     "S3.FC26": {
@@ -608,6 +633,7 @@
       ],
       "description": "Access points are named network endpoints that are attached to buckets, which you can use to perform S3 object operations.",
       "long_description": "Access points are named network endpoints that are attached to buckets that you can use to perform S3 object operations. Only certain operations and AWS services are compatible (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-access-points.html\">ref</a>). S3 access points aren't currently compatible with Amazon CloudWatch metrics.",
+      "retired": false,
       "order": 19
     },
     "S3.FC27": {
@@ -624,6 +650,7 @@
       ],
       "description": "S3 Batch Operations performs large-scale Batch Operations on Amazon S3 objects.",
       "long_description": "",
+      "retired": false,
       "order": 34
     },
     "S3.FC28": {
@@ -631,6 +658,7 @@
       "class_relationship": [],
       "description": "Others can use their S3 service to impact you in some way.",
       "long_description": "",
+      "retired": false,
       "order": 35
     },
     "S3.FC29": {
@@ -643,6 +671,7 @@
       ],
       "description": "A legal hold provides the same protection as a retention period but has no expiration date. S3 Object Lock must be activated on the bucket.",
       "long_description": "A legal hold provides the same protection as a retention period, but it has no expiration date. Instead, a legal hold remains in place until you explicitly remove it. Legal holds are independent of retention periods.",
+      "retired": false,
       "order": 12
     },
     "S3.FC30": {
@@ -659,6 +688,7 @@
       ],
       "description": "S3 Object Ownership enables bucket owners to automatically assume ownership of objects uploaded to their buckets by other AWS accounts.",
       "long_description": "Enables bucket owners to automatically assume ownership of objects uploaded to their buckets by other AWS accounts. When an object is put with an ACL of \"bucket-owner-full-control\", the object will be fully owned by the target bucket owner. If the ACL is added later, ownership is retained by the object owner (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html\">ref</a>).",
+      "retired": false,
       "order": 25
     },
     "S3.FC31": {
@@ -671,6 +701,7 @@
       ],
       "description": "S3 Storage Lens provides a single view of object storage use and activity across your entire S3 storage.",
       "long_description": "",
+      "retired": false,
       "order": 21
     },
     "S3.FC32": {
@@ -683,6 +714,7 @@
       ],
       "description": "S3 Object Lambda enables users to apply their custom code to process the output of a standard S3 request by automatically invoking a Lambda function.",
       "long_description": "",
+      "retired": false,
       "order": 20
     },
     "S3.FC33": {
@@ -695,6 +727,7 @@
       ],
       "description": "S3 Multi-Region Access Points provide a single global endpoint to access a dataset that spans multiple S3 buckets in different AWS Regions or in different AWS accounts.",
       "long_description": "",
+      "retired": false,
       "order": 23
     },
     "S3.FC34": {
@@ -707,6 +740,7 @@
       ],
       "description": "When you configure your Storage Lens group, you can optionally add AWS resource tags to the group.",
       "long_description": "",
+      "retired": false,
       "order": 22
     },
     "S3.FC35": {
@@ -719,6 +753,7 @@
       ],
       "description": "In AWS Fault Injection Service, the action aws:s3:bucket-pause-replication can pause S3 replication from the experiment AWS Region to the destination AWS Region for the targeted buckets. Review FIS ThreatModel for more information.",
       "long_description": "",
+      "retired": false,
       "order": 24
     },
     "S3.FC36": {
@@ -735,6 +770,7 @@
       ],
       "description": "ABAC for general purpose buckets is an Amazon S3 feature that allows access decisions to be made based on matching attributes such as tags between IAM principals and S3 buckets.",
       "long_description": "",
+      "retired": false,
       "order": 27
     }
   },
@@ -749,14 +785,14 @@
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0009,T1586",
       "cvss": "CVSS:3.1/AV:N/AC:L/PR:H/UI:R/S:U/C:H/I:L/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 5.2
     },
     "S3.T2": {
       "feature_class": "S3.FC15",
       "name": "Unauthorized access to data or loss of control of SSE-C encrypted data via bucket replication",
-      "description": "Replication allows you to replicate objects and their metadata and change ownership. The configuration only focuses on new objects (old objects replication requires S3 Batch Replication). An attacker can configure replication on a versioned bucket to replicate objects (or their metadata or tagging) in a bucket they control to exfiltrate data. As objects encrypted via SSE-C are also replicated without additional configuration or access requirements, an attacker can then decrypt them in their own bucket if they have the SSE-C key.",
+      "description": "Replication allows you to replicate objects and their metadata and change ownership. The configuration only focuses on new objects (old object replication requires S3 Batch Replication). An attacker can configure replication on a versioned bucket to replicate objects (or their metadata or tagging) in a bucket they control to exfiltrate data. As objects encrypted via SSE-C are also replicated without additional configuration or access requirements, an attacker can then decrypt them in their own bucket if they have the SSE-C key.",
       "access": {
         "AND": [
           "s3:PutReplicationConfiguration",
@@ -766,7 +802,7 @@
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0010,T1048",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:H/UI:N/S:U/C:H/I:N/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 4.5
     },
@@ -780,7 +816,7 @@
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0010,T1567",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 5.7
     },
@@ -794,7 +830,7 @@
       "hlgoal": "DataManipulation",
       "mitre_attack": "TA0040,T1486",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:H/UI:N/S:U/C:L/I:H/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 5.2
     },
@@ -808,7 +844,7 @@
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0009,T1074",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 5.7
     },
@@ -825,7 +861,7 @@
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0005,T1562",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:H/UI:N/S:U/C:L/I:H/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 5.2
     },
@@ -844,7 +880,7 @@
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0010,T1537",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 5.7
     },
@@ -863,7 +899,7 @@
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0010,T1537",
       "cvss": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 5.5
     },
@@ -875,7 +911,7 @@
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0010,T1537",
       "cvss": "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 6.2
     },
@@ -887,7 +923,7 @@
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0010,T1537",
       "cvss": "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 6.2
     },
@@ -901,7 +937,7 @@
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0009,T1074",
       "cvss": "CVSS:3.1/AV:L/AC:L/PR:H/UI:N/S:U/C:H/I:N/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 4.4
     },
@@ -913,7 +949,7 @@
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0009,T1557",
       "cvss": "CVSS:3.1/AV:P/AC:H/PR:N/UI:R/S:U/C:H/I:L/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 4.6
     },
@@ -925,7 +961,7 @@
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0009,T1557",
       "cvss": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Low",
       "cvss_score": 3.1
     },
@@ -939,21 +975,21 @@
       "hlgoal": "LaunchAttack",
       "mitre_attack": "TA0001,T1195",
       "cvss": "CVSS:3.1/AV:A/AC:H/PR:L/UI:R/S:C/C:H/I:H/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "High",
       "cvss_score": 7.3
     },
     "S3.T15": {
       "feature_class": "S3.FC16",
       "name": "Embed client-side script malware in a bucket website",
-      "description": "S3 website enables users to be served client-side scripts (e.g., JavaScript). An attacker can upload a client-side script with malware (e.g., cryptomining) to the visitors.",
+      "description": "S3 website enables users to be served client-side scripts (e.g., JavaScript). An attacker can upload a client-side script with malware (e.g., cryptomining) to visitors.",
       "access": {
         "UNIQUE": "s3:PutObject"
       },
       "hlgoal": "FinancialGain",
       "mitre_attack": "TA0002,T1203",
       "cvss": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 5.5
     },
@@ -975,7 +1011,7 @@
       "hlgoal": "FinancialGain",
       "mitre_attack": "TA0040,T1486",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:L",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 6.3
     },
@@ -1005,7 +1041,7 @@
       "hlgoal": "DoS",
       "mitre_attack": "TA0040,T1485",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:H/UI:N/S:U/C:N/I:H/A:H",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 6.1
     },
@@ -1034,25 +1070,25 @@
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0010,T1020",
       "cvss": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Low",
       "cvss_score": 3.3
     },
     "S3.T19": {
       "feature_class": "S3.FC28",
       "name": "Recon of AWS root account emails using the email ACL grantee feature",
-      "description": "S3 allows you to add root account emails to an ACL (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#specifying-grantee\">ref</a>, note that it will be discontinued on Oct 1st, 2025), and also resolve the given canonical ID into an AWS account ID (via a bucket policy, which automatically resolves a canonical ID into an ARN). An attacker can use trial-and-error to discover existing AWS root account emails and related AWS account IDs (even if you do not use the region where the feature is available), and use this information to launch another attack (e.g., phishing).",
+      "description": "S3 allows you to add root account emails to an ACL (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#specifying-grantee\">ref</a>, note that it will be discontinued on Oct 1st, 2025), and also resolve the given canonical ID into an AWS account ID (via a bucket policy, which automatically resolves a canonical ID into an ARN). An attacker can use trial and error to discover existing AWS root account emails and related AWS account IDs (even if you do not use the region where the feature is available), and use this information to launch another attack (e.g., phishing).",
       "access": {},
       "hlgoal": "LaunchAttack",
       "mitre_attack": "TA0043,T1589",
       "cvss": "CVSS:3.1/AV:P/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Low",
       "cvss_score": 2.0
     },
     "S3.T20": {
       "feature_class": "S3.FC10",
-      "name": "Use CloudFront to access a private bucket",
+      "name": "Access a private bucket by using CloudFront",
       "description": "CloudFront distributions can use S3 buckets or access points as their origin. An attacker can connect a CloudFront distribution to a private S3 bucket to gain access to it. Note: S3 resource policies can allow a \"cloudfront.amazonaws.com\" principal, which could allow any distribution if not restricted.",
       "access": {
         "OPTIONAL": {
@@ -1066,7 +1102,7 @@
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0005,T1562",
       "cvss": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 5.5
     },
@@ -1080,7 +1116,7 @@
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0005,T1562",
       "cvss": "CVSS:3.1/AV:A/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 5.8
     },
@@ -1092,7 +1128,7 @@
       "hlgoal": "FinancialDrain",
       "mitre_attack": "TA0040,T1496",
       "cvss": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 5.3
     },
@@ -1104,7 +1140,7 @@
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0009,T1056",
       "cvss": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Low",
       "cvss_score": 3.1
     },
@@ -1116,7 +1152,7 @@
       "hlgoal": "LaunchAttack",
       "mitre_attack": "TA0043,T1589",
       "cvss": "CVSS:3.1/AV:P/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Low",
       "cvss_score": 2.0
     },
@@ -1130,7 +1166,7 @@
       "hlgoal": "DataManipulation",
       "mitre_attack": "TA0040,T1485",
       "cvss": "CVSS:3.1/AV:L/AC:L/PR:H/UI:N/S:U/C:N/I:H/A:L",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 5.1
     },
@@ -1144,7 +1180,7 @@
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0010,T1020",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:H/UI:R/S:U/C:H/I:N/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 4.3
     },
@@ -1156,7 +1192,7 @@
       "hlgoal": "DataManipulation",
       "mitre_attack": "TA0040,T1565",
       "cvss": "CVSS:3.1/AV:L/AC:H/PR:H/UI:R/S:U/C:N/I:L/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Low",
       "cvss_score": 1.8
     },
@@ -1173,7 +1209,7 @@
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0009,T1056",
       "cvss": "CVSS:3.1/AV:L/AC:H/PR:H/UI:R/S:U/C:H/I:L/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 4.6
     },
@@ -1185,7 +1221,7 @@
       "hlgoal": "LaunchAttack",
       "mitre_attack": "TA0040,T1496",
       "cvss": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 4.2
     },
@@ -1199,7 +1235,7 @@
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0009,T1530,T1119",
       "cvss": "CVSS:3.1/AV:L/AC:L/PR:H/UI:N/S:U/C:H/I:N/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 4.4
     },
@@ -1213,7 +1249,7 @@
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0010,T1537,T1567",
       "cvss": "CVSS:3.1/AV:A/AC:H/PR:H/UI:R/S:U/C:H/I:N/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 4.0
     },
@@ -1225,7 +1261,7 @@
       "hlgoal": "LaunchAttack",
       "mitre_attack": "TA0043,T1590",
       "cvss": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:N/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 4.3
     },
@@ -1242,7 +1278,7 @@
       "hlgoal": "LaunchAttack",
       "mitre_attack": "TA0004,T1548",
       "cvss": "CVSS:3.1/AV:A/AC:H/PR:L/UI:N/S:C/C:L/I:L/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 4.4
     },
@@ -1254,7 +1290,7 @@
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0009,T1557",
       "cvss": "CVSS:3.1/AV:P/AC:H/PR:N/UI:R/S:U/C:H/I:L/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 4.6
     },
@@ -1268,7 +1304,7 @@
       "hlgoal": "LaunchAttack",
       "mitre_attack": "TA0011,T1102",
       "cvss": "CVSS:3.1/AV:L/AC:H/PR:H/UI:N/S:U/C:N/I:L/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Low",
       "cvss_score": 1.9
     },
@@ -1282,7 +1318,7 @@
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0005,T1562",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:H/UI:R/S:U/C:H/I:H/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 5.9
     },
@@ -1296,7 +1332,7 @@
       "hlgoal": "LaunchAttack",
       "mitre_attack": "TA0005,T1562",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:H/UI:N/S:C/C:N/I:H/A:L",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 6.9
     },
@@ -1310,19 +1346,19 @@
       "hlgoal": "LaunchAttack",
       "mitre_attack": "TA0004,T1548",
       "cvss": "CVSS:3.1/AV:A/AC:H/PR:H/UI:N/S:U/C:H/I:H/A:H",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 6.4
     },
     "S3.T39": {
       "feature_class": "S3.FC5",
       "name": "Exfiltrate data by using compromised IAM credentials from the Internet",
-      "description": "IAM credentials can be compromised (directly or using <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html\">presigned URL</a>). An attacker can use a compromised but authorized IAM credential to download your object from an internal bucket via the public endpoint (using or not their own VPC endpoint).",
+      "description": "IAM credentials can be compromised (directly or using a <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html\">presigned URL</a>). An attacker can use a compromised but authorized IAM credential to download your object from an internal bucket via the public endpoint (using or not using their own VPC endpoint).",
       "access": {},
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0010,T1567",
       "cvss": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "High",
       "cvss_score": 7.5
     },
@@ -1336,21 +1372,21 @@
       "hlgoal": "FinancialDrain",
       "mitre_attack": "TA0042,T1586",
       "cvss": "CVSS:3.0/AV:L/AC:L/PR:H/UI:N/S:U/C:N/I:L/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Low",
       "cvss_score": 2.3
     },
     "S3.T41": {
       "feature_class": "S3.FC20",
       "name": "Exfiltrate data via event notification",
-      "description": "Event notification sends the key to any configured SQS, SNS, or Lambda (cross-account), or EventBridge (same account). An attacker can use the name of objects (1 KB) to exfiltrate data.",
+      "description": "Event notification sends the key to any configured SQS, SNS, or Lambda (cross-account), or EventBridge (same account). An attacker can use the names of objects (1 KB) to exfiltrate data.",
       "access": {
         "UNIQUE": "s3:PutBucketNotification"
       },
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0010,T1537,T1020",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:H/UI:N/S:U/C:L/I:N/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Low",
       "cvss_score": 2.4
     },
@@ -1364,7 +1400,7 @@
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0010,T1020",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:H/UI:N/S:U/C:L/I:N/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Low",
       "cvss_score": 2.4
     },
@@ -1378,7 +1414,7 @@
       "hlgoal": "DataManipulation",
       "mitre_attack": "TA0040,T1531",
       "cvss": "CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "High",
       "cvss_score": 7.1
     },
@@ -1395,7 +1431,7 @@
       "hlgoal": "DataManipulation",
       "mitre_attack": "TA0040,T1565",
       "cvss": "CVSS:3.1/AV:A/AC:H/PR:H/UI:N/S:C/C:H/I:L/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 6.2
     },
@@ -1412,7 +1448,7 @@
       "hlgoal": "DataTheft",
       "mitre_attack": "TA0010,T1020",
       "cvss": "CVSS:3.1/AV:A/AC:H/PR:H/UI:N/S:U/C:H/I:H/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 5.7
     },
@@ -1426,7 +1462,7 @@
       "hlgoal": "FinancialDrain",
       "mitre_attack": "TA0042,T1586",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:H/UI:N/S:U/C:N/I:L/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Low",
       "cvss_score": 2.4
     },
@@ -1440,7 +1476,7 @@
       "hlgoal": "LaunchAttack",
       "mitre_attack": "TA0040,T1490",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:H/UI:N/S:U/C:N/I:L/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Low",
       "cvss_score": 2.4
     },
@@ -1454,7 +1490,7 @@
       "hlgoal": "LaunchAttack",
       "mitre_attack": "TA0040,T1490",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:H/UI:N/S:U/C:N/I:L/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Low",
       "cvss_score": 2.4
     },
@@ -1468,21 +1504,21 @@
       "hlgoal": "DoS",
       "mitre_attack": "TA0040,T1531",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:H/UI:R/S:U/C:N/I:N/A:L",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Low",
       "cvss_score": 2.1
     },
     "S3.T51": {
       "feature_class": "S3.FC19",
       "name": "Evade detection by disabling S3 access logs via a bucket ACL change",
-      "description": "S3 access logs can be used by SIEM to detect abnormal behaviors. An attacker can disable S3 access logs via bucket ACL changes on the logging destination bucket to evade detection.",
+      "description": "S3 access logs can be used by SIEM to detect abnormal behavior. An attacker can disable S3 access logs via bucket ACL changes on the logging destination bucket to evade detection.",
       "access": {
         "UNIQUE": "s3:PutBucketAcl"
       },
       "hlgoal": "LaunchAttack",
       "mitre_attack": "TA0005,T1564",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:H/UI:N/S:U/C:N/I:L/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Low",
       "cvss_score": 2.4
     },
@@ -1496,7 +1532,7 @@
       "hlgoal": "LaunchAttack",
       "mitre_attack": "TA0005,T1562",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:H/UI:N/S:U/C:N/I:H/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 4.5
     },
@@ -1510,7 +1546,7 @@
       "hlgoal": "LaunchAttack",
       "mitre_attack": "TA0005,T1562",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:H/UI:N/S:U/C:N/I:H/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 4.5
     },
@@ -1528,7 +1564,7 @@
       "hlgoal": "LaunchAttack",
       "mitre_attack": "TA0005,T1562",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:H/UI:N/S:C/C:N/I:H/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 6.2
     },
@@ -1542,7 +1578,7 @@
       "hlgoal": "LaunchAttack",
       "mitre_attack": "TA0005,T1562",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:H/UI:N/S:C/C:N/I:H/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 6.2
     },
@@ -1559,7 +1595,7 @@
       "hlgoal": "LaunchAttack",
       "mitre_attack": "TA0009,T1530",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:H/UI:R/S:C/C:N/I:H/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 5.7
     },
@@ -1571,14 +1607,14 @@
       "hlgoal": "LaunchAttack",
       "mitre_attack": "TA0003,T1098",
       "cvss": "CVSS:3.1/AV:L/AC:H/PR:H/UI:N/S:U/C:L/I:L/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Low",
       "cvss_score": 3.0
     },
     "S3.T58": {
       "feature_class": "S3.FC19",
       "name": "Evade detection by disabling S3 access logs via bucket policy change or removal",
-      "description": "S3 access logs can be used by SIEM to detect abnormal behaviors. An attacker can disable S3 access logs via bucket policy changes on the logging destination bucket to evade detection.",
+      "description": "S3 access logs can be used by SIEM to detect abnormal behavior. An attacker can disable S3 access logs via bucket policy changes on the logging destination bucket to evade detection.",
       "access": {
         "OR": [
           "s3:PutBucketPolicy",
@@ -1588,7 +1624,7 @@
       "hlgoal": "LaunchAttack",
       "mitre_attack": "TA0005,T1564",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:H/UI:N/S:U/C:N/I:L/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Low",
       "cvss_score": 2.4
     },
@@ -1602,7 +1638,7 @@
       "hlgoal": "LaunchAttack",
       "mitre_attack": "TA0005,T1564",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:H/UI:N/S:U/C:N/I:L/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Low",
       "cvss_score": 2.4
     },
@@ -1616,7 +1652,7 @@
       "hlgoal": "LaunchAttack",
       "mitre_attack": "TA0010,T1537",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:H/UI:N/S:U/C:N/I:H/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 4.5
     },
@@ -1640,13 +1676,13 @@
       "hlgoal": "FinancialDrain",
       "mitre_attack": "TA0040,T1586",
       "cvss": "CVSS:3.1/AV:A/AC:H/PR:H/UI:N/S:U/C:N/I:H/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 4.2
     },
     "S3.T62": {
       "feature_class": "S3.FC1",
-      "name": "Recon on the security boundaries and resource names through detailed access denial messages",
+      "name": "Recon the security boundaries and resource names through detailed access denial messages",
       "description": "Enhanced access-denied messages include detailed response fields about which condition or permission prevented access. They are available only within the same AWS account or within AWS Organizations. An attacker can repeatedly attempt to access buckets with different parameters or identities and gather specific reasons for denial or existing resource names (using the presence or absence of the enhanced access-denied messages), leading to the discovery of deployed security configurations and buckets in AWS Organizations.",
       "access": {
         "UNIQUE": "any:any"
@@ -1654,21 +1690,21 @@
       "hlgoal": "LaunchAttack",
       "mitre_attack": "TA0007,T1518,T1580,T1619",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Low",
       "cvss_score": 3.5
     },
     "S3.T63": {
       "feature_class": "S3.FC23",
       "name": "Disrupting object writes by disabling customer-managed encryption on a bucket using SSE-C",
-      "description": "Server-side encryption with customer-provided keys [SSE-C] can be blocked on individual general purpose buckets [will be the default from April 2026]. An attacker can change the encryption configuration to disable SSE-C on a bucket using it, resulting in objects failing to be written.",
+      "description": "Server-side encryption with customer-provided keys [SSE-C] can be blocked on individual general purpose buckets (default for new AWS accounts, or AWS accounts without SSE-C-encrypted objects). An attacker can change the encryption configuration to disable SSE-C on a bucket using it, resulting in objects failing to be written.",
       "access": {
         "UNIQUE": "s3:PutEncryptionConfiguration"
       },
       "hlgoal": "DoS",
       "mitre_attack": "TA0040,T1531",
       "cvss": "CVSS:3.1/AV:A/AC:L/PR:H/UI:N/S:U/C:N/I:L/A:L",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Low",
       "cvss_score": 3.5
     },
@@ -1687,7 +1723,7 @@
       "hlgoal": "LaunchAttack",
       "mitre_attack": "TA0004",
       "cvss": "CVSS:3.1/AV:A/AC:H/PR:H/UI:R/S:C/C:H/I:L/A:N",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Medium",
       "cvss_score": 5.9
     },
@@ -1701,7 +1737,7 @@
       "hlgoal": "DoS",
       "mitre_attack": "TA0040",
       "cvss": "CVSS:3.1/AV:A/AC:H/PR:H/UI:R/S:U/C:N/I:L/A:L",
-      "retired": "false",
+      "retired": false,
       "cvss_severity": "Low",
       "cvss_score": 2.9
     }
@@ -1714,7 +1750,7 @@
         "CRY-04",
         "NET-12"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO2": {
       "description": "Block S3 endpoints in your corporate perimeter security",
@@ -1724,7 +1760,7 @@
         "NET-03",
         "NET-06"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO3": {
       "description": "Enable S3 data events in AWS CloudTrail",
@@ -1733,7 +1769,7 @@
         "MON-04",
         "MON-08"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO4": {
       "description": "Monitor S3 with Amazon GuardDuty and Macie",
@@ -1743,7 +1779,7 @@
         "MON-05",
         "MON-08"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO5": {
       "description": "Identify and ensure the protection of all external buckets hosting your objects",
@@ -1755,7 +1791,7 @@
         "DCH-13",
         "DCH-24"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO6": {
       "description": "Model the threats on all AWS services accessing S3",
@@ -1764,7 +1800,7 @@
         "RSK-06",
         "TPM-03"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO7": {
       "description": "Limit and monitor access via S3 VPC endpoints",
@@ -1776,7 +1812,7 @@
         "NET-09",
         "NET-10"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO8": {
       "description": "Limit the IAM entities allowed to use the IAM actions required to execute attacks",
@@ -1790,15 +1826,15 @@
         "MON-03",
         "MON-16"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO9": {
-      "description": "Block requests with KMS keys from unauthorized AWS accounts",
+      "description": "Block requests using KMS keys from unauthorized AWS accounts",
       "scf": [
         "CFG-08",
         "CRY-09"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO10": {
       "description": "Block changes to make an object public via object ACL",
@@ -1806,7 +1842,7 @@
         "CFG-08",
         "IAC-20"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO11": {
       "description": "Prevent deletion of buckets",
@@ -1814,7 +1850,7 @@
         "BCD-11",
         "DCH-21"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO12": {
       "description": "Enforce secure SDLC processes",
@@ -1825,21 +1861,21 @@
         "TDA-09",
         "TDA-20"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO13": {
       "description": "Block direct public access",
       "scf": [
         "DCH-15"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO14": {
       "description": "Block bucket ACL",
       "scf": [
         "IAC-02"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO15": {
       "description": "Identify and ensure the protection of all internal buckets hosting your objects",
@@ -1849,7 +1885,7 @@
         "DCH-14",
         "DCH-24"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO16": {
       "description": "Enforce encryption at rest",
@@ -1859,7 +1895,7 @@
         "CRY-09",
         "DCH-01"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO17": {
       "description": "Ensure durability and recoverability of primary data",
@@ -1869,7 +1905,7 @@
         "MON-03",
         "MON-08"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO18": {
       "description": "Encrypt or tokenize critical data",
@@ -1879,7 +1915,7 @@
         "DCH-01",
         "DCH-23"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO19": {
       "description": "Have a process to apply legal holds",
@@ -1887,7 +1923,7 @@
         "CPL-01",
         "DCH-18"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO20": {
       "description": "Protect data integrity using S3 Object Lock",
@@ -1896,49 +1932,49 @@
         "DCH-18",
         "IAC-20"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO21": {
       "description": "Remove incomplete multipart uploads",
       "scf": [
         "AST-08"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO22": {
       "description": "Block deprecated actions",
       "scf": [
         "TDA-17"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO23": {
       "description": "Enforce SigV4 on all requests",
       "scf": [
         "TDA-17"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO24": {
-      "description": "Block all requests not using an HTTP authorization header, if not explicitly authorized",
+      "description": "Block all requests not using an HTTP authorization header, unless explicitly authorized",
       "scf": [
         "CFG-03"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO25": {
       "description": "Restrict bucket replication",
       "scf": [
         "AST-02"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO26": {
       "description": "Verify the safety of objects ingested and produced by workflows",
       "scf": [
         "END-04"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO27": {
       "description": "Control event receivers",
@@ -1946,7 +1982,7 @@
         "CHG-02",
         "CHG-04"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO28": {
       "description": "Control the data collected and the storage location of the inventory",
@@ -1954,7 +1990,7 @@
         "CFG-08",
         "DCH-24"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO29": {
       "description": "Limit access from only authorized VPCs",
@@ -1964,7 +2000,7 @@
         "NET-09",
         "NET-10"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO30": {
       "description": "Control CloudFront access",
@@ -1974,14 +2010,14 @@
         "NET-02",
         "WEB-02"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO31": {
       "description": "Protect and/or claim your domains and trademarks/copyrights",
       "scf": [
         "END-08"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO32": {
       "description": "Restrict access point access to VPCs when in use",
@@ -1991,7 +2027,7 @@
         "NET-09",
         "NET-10"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO33": {
       "description": "Restrict Batch access using dedicated IAM roles",
@@ -2001,7 +2037,7 @@
         "IAC-20",
         "IAC-21"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO34": {
       "description": "Enforce only authorized Object Lambda Access Point and associated access",
@@ -2011,28 +2047,28 @@
         "IAC-20",
         "IAC-21"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO35": {
       "description": "Deploy only authorized S3 websites and place them behind a CDN",
       "scf": [
         "CLD-12"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO36": {
       "description": "Use an unguessable naming convention",
       "scf": [
         "DCH-05"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO37": {
       "description": "Disabling ACLs for all buckets",
       "scf": [
         "IAC-02"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO38": {
       "description": "Ensure all requests are blocked from unauthorized service roles",
@@ -2042,7 +2078,7 @@
         "IAC-20",
         "IAC-21"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO39": {
       "description": "Enforce S3 server access logging on buckets",
@@ -2051,7 +2087,7 @@
         "MON-04",
         "MON-08"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO40": {
       "description": "Restrict access points to authorized AWS accounts",
@@ -2059,7 +2095,7 @@
         "IAC-02",
         "IAC-03"
       ],
-      "retired": "false"
+      "retired": false
     },
     "S3.CO41": {
       "description": "Restrict general purpose bucket creation to the account regional namespace",
@@ -2067,7 +2103,7 @@
         "AST-02",
         "DCH-15"
       ],
-      "retired": "false"
+      "retired": false
     }
   },
   "controls": {
@@ -2075,7 +2111,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO1",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C2",
       "depends_on": "S3.C119",
       "description": "Block all unencrypted requests and unauthorized TLS version(s) from IAM entities you control (e.g., by denying all unencrypted requests with the condition \"aws:SecureTransport\" = False, or by using \"s3:TlsVersion\" != <i>authorized TLS version(s)</i>, using an SCP on your AWS Organization root node).",
@@ -2112,7 +2148,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO1",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify the control blocking unencrypted requests and unauthorized TLS versions from IAM entities you control (e.g., an SCP on your AWS Organization's root node) is properly implemented.",
@@ -2132,7 +2168,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO1",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C5",
       "depends_on": "S3.C119",
       "description": "Block all unencrypted requests and unauthorized TLS version(s) from VPC endpoints you control (e.g., by denying all requests with the condition \"aws:SecureTransport\" = False, or by using \"s3:TlsVersion\" != <i>authorized TLS version(s)</i>, on the VPC endpoint policy).",
@@ -2169,7 +2205,7 @@
       "coso": "Detective",
       "nist_csf": "Detect",
       "objective": "S3.CO1",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Monitor and investigate all requests made with HTTP (e.g., via CloudTrail S3 data events with the lack of additionalEventData.CipherSuite).",
@@ -2206,7 +2242,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO1",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify a statement exists on all your VPC endpoint policies denying all requests with the condition \"aws:SecureTransport\" = False or using \"s3:TlsVersion\" != <i>authorized TLS version(s)</i>.",
@@ -2226,7 +2262,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO1",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C7",
       "depends_on": "S3.C119",
       "description": "Block all unencrypted requests to the buckets you control (e.g., by denying all requests with the condition \"aws:SecureTransport\" = False, or by using \"s3:TlsVersion\" != <i>authorized TLS version(s)</i>, on their bucket policy or centrally in an RCP applied to the OU or AWS account).",
@@ -2254,7 +2290,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO1",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify all S3 bucket policies block unencrypted traffic (e.g., using the AWS Config rule: <a href=\"https://docs.aws.amazon.com/config/latest/developerguide/s3-bucket-ssl-requests-only.html\">S3_BUCKET_SSL_REQUESTS_ONLY</a>) and unauthorized versions of TLS.",
@@ -2273,7 +2309,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO2",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Block S3 endpoints (<a href=\"https://docs.aws.amazon.com/general/latest/gr/s3.html\">DNS</a> and <a href=\"https://repost.aws/knowledge-center/s3-find-ip-address-ranges\">IP ranges</a>) in your corporate perimeter security to the Internet (e.g., firewalls or a cloud interception proxy), including via Internet Gateway, to force the use of VPC endpoints. It will block data-plane transfer. Note: AWS Management Console stays functional as it proxies non-data-plane requests (via \"console.aws.amazon.com\").",
@@ -2335,7 +2371,7 @@
       "coso": "Directive",
       "nist_csf": "Detect",
       "objective": "S3.CO3",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C58",
       "description": "Enable <a href=\"https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-data-events-with-cloudtrail.html#logging-data-events\">CloudTrail S3 data events</a> in relevant AWS accounts, Regions, and buckets (e.g., production, with sensitive data). Make it available for security analysis, and protect it using CloudTrail ThreatModel.",
@@ -2485,7 +2521,7 @@
       "coso": "Directive",
       "nist_csf": "Detect",
       "objective": "S3.CO4",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Enable and monitor <a href=\"https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_finding-types-s3.html\">S3 protection in Amazon GuardDuty</a> in all AWS accounts in all Regions, and protect it using the GuardDuty ThreatModel. Ensure findings are investigated (e.g., using Amazon Detective).",
@@ -2549,7 +2585,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO5",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Track all buckets you don't control that host your objects, define their data classification, identify their respective owners (and AWS account ID), require the use of <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/gpbucketnamespaces.html#account-regional-gp-buckets\">account regional namespaces</a>, determine their ObjectACL requirements (including S3 Object Ownership), and get assurance of their protection (e.g., through contractual agreement, verified by assurance programs, or using this ThreatModel).",
@@ -2675,7 +2711,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO5",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C11",
       "description": "Allow only authorized ACLs on objects for buckets you don't control (e.g., using IAM and VPC endpoint policy with the <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#acl-specific-condition-keys\">ACL conditions</a>).",
@@ -2711,7 +2747,7 @@
       "coso": "Detective",
       "nist_csf": "Detect",
       "objective": "S3.CO5",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C11",
       "description": "Monitor that only authorized external buckets are used (e.g., via CloudTrail S3 data events in resources[].accountId and resources[].ARN). Both account ID and bucket name must be verified.",
@@ -2772,7 +2808,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO5",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C11",
       "description": "Scan all data before uploading to an external bucket to ensure the classification of the data is aligned with the bucket classification (e.g., using Macie).",
@@ -2818,7 +2854,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO5",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Request access via an S3 access point on a bucket you don't own, if compatible with your interaction with the bucket (e.g., not through an unsupported AWS service).",
@@ -2862,7 +2898,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO6",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Analyze and protect all AWS services accessing S3 (e.g., via ThreatModel). Enforce use in VPC only, whenever possible.",
@@ -2899,7 +2935,7 @@
       "coso": "Directive",
       "nist_csf": "Identify",
       "objective": "S3.CO7",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "For each VPC, maintain a list of AWS Organizations, OUs, and/or AWS accounts where IAM entities are authorized to access S3.",
@@ -2944,7 +2980,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO7",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C17",
       "description": "For each VPC with an IAM entity allowed to use S3, secure them with the VPC ThreatModel (e.g., <a href=\"https://docs.aws.amazon.com/vpc/latest/privatelink/gateway-endpoints.html\">modification of VPC endpoints, VPC endpoint policy, routing table, Security Groups</a>).",
@@ -2989,7 +3025,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO7",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C20",
       "depends_on": "S3.C17",
       "description": "Block any IAM entity not belonging to an authorized AWS Organization, OU, and/or AWS account from calling S3 from your VPCs by adding a deny statement in the S3 VPC endpoint policy for each VPC, with the condition using \"aws:PrincipalOrgPaths\" (<a href=\"https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-principalorgpaths\">ref</a>) including the full Org IDs, as those are globally unique.",
@@ -3034,7 +3070,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO7",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify all S3 VPC endpoints are blocking any IAM entity not belonging to authorized AWS Organizations, OUs, and/or AWS accounts.",
@@ -3054,7 +3090,7 @@
       "coso": "Directive",
       "nist_csf": "Detect",
       "objective": "S3.CO7",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Enable <a href=\"https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resolver-query-logs.html\">VPC DNS query logging</a> in all VPCs.",
@@ -3099,7 +3135,7 @@
       "coso": "Directive",
       "nist_csf": "Identify",
       "objective": "S3.CO7",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Maintain a list of authorized S3 and S3 access points (and their respective AWS accounts) to be accessed for each VPC.",
@@ -3144,10 +3180,10 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO7",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C24",
       "depends_on": "S3.C22",
-      "description": "Limit the access to only authorized S3 bucket(s) or their AWS account(s) from each VPC (e.g., using the condition key \"s3:ResourceAccount\" on the VPC endpoint policy, alternatively use a specific resource-level statement for each bucket, or if the VPC endpoint policy size is beyond the limit and more granular control on VPC is required, use access points).",
+      "description": "Limit access to only authorized S3 bucket(s) or their AWS account(s) from each VPC (e.g., using the condition key \"s3:ResourceAccount\" on the VPC endpoint policy, alternatively use a specific resource-level statement for each bucket, or if the VPC endpoint policy size is beyond the limit and more granular control on the VPC is required, use access points).",
       "testing": "Make a request to an unauthorized bucket from one of your VPCs; it should be denied.",
       "effort": "Medium",
       "mitigate": [
@@ -3189,7 +3225,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO7",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify all VPCs are limited to accessing only authorized S3 bucket(s).",
@@ -3209,7 +3245,7 @@
       "coso": "Detective",
       "nist_csf": "Detect",
       "objective": "S3.CO7",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C21,S3.C22",
       "description": "Monitor VPC DNS query logs to ensure only authorized S3 buckets and S3 access points are being queried in each VPC (e.g., using VPC DNS query logging) and protect them using Route 53 ThreatModel.",
@@ -3254,7 +3290,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO8",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Limit the access to the IAM actions required to execute the threats using AWS IAM and/or SCP, following the IAM Operating Model and using the IAM ThreatModel. Use the <a href=\"https://aws.amazon.com/blogs/security/tighten-s3-permissions-iam-users-and-roles-using-access-history-s3-actions/\">IAM Access Advisor</a> to review the use of non-object-related S3 actions.",
@@ -3645,7 +3681,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO8",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C28",
       "depends_on": "",
       "description": "In the S3 bucket/access point/Object Lambda Access Point policy, do not allow IAM principals of the same AWS account. Only AWS IAM policies, and not resource policies such as S3 bucket/access point/Object Lambda Access Point policies, should be used to provide permissions to a principal of the same AWS account.",
@@ -3910,7 +3946,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO8",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify all S3 bucket/access point/Object Lambda Access Point policies do not allow an IAM principal of the same AWS account (e.g., using the Config rule S3_BUCKET_POLICY_GRANTEE_CHECK for bucket policy).",
@@ -3942,7 +3978,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO36",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Use an unguessable naming convention for the email addresses of your AWS accounts (e.g., add a + sign and a random string to redirect the email to the same mailbox).",
@@ -3970,7 +4006,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO36",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Use an unguessable naming convention for your IAM users and IAM roles (e.g., add a random string).",
@@ -3998,7 +4034,7 @@
       "coso": "Directive",
       "nist_csf": "Identify",
       "objective": "S3.CO9",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Maintain a list of AWS accounts authorized to provide KMS keys for S3 for each AWS account.",
@@ -4142,7 +4178,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO9",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C31",
       "description": "Block requests with a KMS key from an unauthorized AWS account (e.g., using an SCP, bucket policies, centrally in an RCP applied to the OU or AWS account, or VPC endpoints with a deny statement on PutObject if the condition \"s3:x-amz-server-side-encryption-aws-kms-key-id\" is not a KMS key from an authorized AWS account).",
@@ -4286,7 +4322,7 @@
       "coso": "Detective",
       "nist_csf": "Detect",
       "objective": "S3.CO9",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C31",
       "description": "Monitor that only authorized AWS accounts provide KMS keys for each AWS account (using CloudTrail S3 data events in \"response.x-amz-server-side-encryption-aws-kms-key-id\").",
@@ -4422,7 +4458,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO10",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C36",
       "depends_on": "",
       "description": "Deny requests to change object ACL to public (e.g., using an SCP, bucket policies, centrally in an RCP applied to the OU or AWS account, or VPC endpoint policy with a deny statement on PutObjectAcl for \"s3:x-amz-grant-read\", \"s3:x-amz-grant-read-acp\", \"s3:x-amz-grant-write-acp\", \"s3:x-amz-grant-full-control\" on the following predefined groups \"http://acs.amazonaws.com/groups/global/AllUsers\" and \"http://acs.amazonaws.com/groups/global/AuthenticatedUsers\").",
@@ -4459,7 +4495,7 @@
       "coso": "Detective",
       "nist_csf": "Detect",
       "objective": "S3.CO10",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Monitor ObjectACL changes (or tentative changes) to public using CloudTrail S3 data events.",
@@ -4496,7 +4532,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO10",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify the control blocking change ObjectACL to public (e.g., an SCP and VPC endpoint policy) is properly implemented.",
@@ -4516,7 +4552,7 @@
       "coso": "Detective",
       "nist_csf": "Detect",
       "objective": "S3.CO10",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Monitor and investigate anonymous requests to objects (e.g., using CloudTrail S3 data events with userIdentity.accountId=ANONYMOUS_PRINCIPAL).",
@@ -4544,7 +4580,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO11",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C39",
       "depends_on": "",
       "description": "Block the action \"s3:DeleteBucket\" (e.g., via SCP or in an RCP applied to the OU or AWS account; exemption can be managed by authorizing a SuperAdmin to delete buckets with a certain tag, and with bucket owners able to tag buckets).",
@@ -4572,7 +4608,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO11",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify the control blocking the action \"s3:DeleteBucket\" is properly implemented.",
@@ -4591,7 +4627,7 @@
       "coso": "Detective",
       "nist_csf": "Detect",
       "objective": "S3.CO11",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Scan your CNAME records (e.g., in Amazon Route 53) and CloudFront origin for deleted buckets.",
@@ -4619,7 +4655,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO12",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Parameterize the S3 bucket name or S3 access point in your code (no hardcoding).",
@@ -4647,7 +4683,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO12",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "When connecting to S3 endpoints, use the virtual-hosted model (\"my-bucket-name.s3.amazonaws.com\" or \"my-bucket-name.my-s3-regional-endpoint.amazonaws.com\") instead of the path-style model (\"s3.amazonaws.com/my-bucket-name\" or \"my-s3-regional-endpoint.amazonaws.com/my-bucket-name\") (see <a href=\"https://aws.amazon.com/blogs/aws/amazon-s3-path-deprecation-plan-the-rest-of-the-story/\">ref</a>). All the latest SDKs make use of domain style by default.",
@@ -4675,7 +4711,7 @@
       "coso": "Detective",
       "nist_csf": "Detect",
       "objective": "S3.CO12",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Monitor that all S3 connections are made with the virtual-hosted model (e.g., via CloudTrail S3 requestParameters.Host).",
@@ -4703,7 +4739,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO12",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Ensure the integrity of stored objects (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html\">ref</a>), using \"x-amz-checksum\" from the <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingMetadata.html#SysMetadata\">object metadata</a> instead of ETag (e.g., using the compute checksum functionality in S3 Batch Operations). If ETag is used, make sure to properly account for its different definitions (<a href=\"https://teppen.io/2018/06/23/aws_s3_etags/\">ref</a>).",
@@ -4740,7 +4776,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO12",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Do not include sensitive data in bucket names, access point names, object names, object metadata, and tags.",
@@ -4777,7 +4813,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO12",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Ensure all S3 buckets interacted with are in the correct AWS account (e.g., using the condition in all compatible S3 requests: x-amz-expected-bucket-owner and x-amz-source-expected-bucket-owner).",
@@ -4814,7 +4850,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO13",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C48",
       "depends_on": "",
       "description": "Front buckets that are required to be public, using authenticated CDN (e.g., CloudFront) or API Gateway, protected with WAF (e.g., for <a href=\"https://aws.amazon.com/blogs/security/how-to-prevent-hotlinking-by-using-aws-waf-amazon-cloudfront-and-referer-checking/\">hotlinking</a>).",
@@ -4859,7 +4895,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO13",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify no bucket is available publicly for write or read (e.g., using the AWS Config rules: <a href=\"https://docs.aws.amazon.com/config/latest/developerguide/s3-bucket-public-read-prohibited.html\">S3_BUCKET_PUBLIC_READ_PROHIBITED</a> and <a href=\"https://docs.aws.amazon.com/config/latest/developerguide/s3-bucket-public-write-prohibited.html\">S3_BUCKET_PUBLIC_WRITE_PROHIBITED</a>).",
@@ -4879,7 +4915,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO13",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C50",
       "depends_on": "",
       "description": "Enable account-level S3 Block Public Access on all AWS accounts, with BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, and RestrictPublicBuckets set to true.",
@@ -4941,7 +4977,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO13",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify account-level S3 Block Public Access is enabled on all AWS accounts, with BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, and RestrictPublicBuckets set to true (e.g., using the AWS Config rule: <a href=\"https://docs.aws.amazon.com/config/latest/developerguide/s3-account-level-public-access-blocks.html\">S3_ACCOUNT_LEVEL_PUBLIC_ACCESS_BLOCKS</a>).",
@@ -4962,7 +4998,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO13",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C52",
       "depends_on": "",
       "description": "Enable S3 Block Public Access on all S3 buckets, with BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, and RestrictPublicBuckets set to true (enabled by default for all new buckets after April 2023).",
@@ -5024,7 +5060,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO13",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify S3 Block Public Access is enabled on all S3 buckets, with BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, and RestrictPublicBuckets set to true (e.g., using the AWS Config rule: <a href=\"https://docs.aws.amazon.com/config/latest/developerguide/s3-bucket-level-public-access-prohibited.html\">S3_BUCKET_LEVEL_PUBLIC_ACCESS_PROHIBITED</a>).",
@@ -5045,7 +5081,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO13",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C54",
       "depends_on": "",
       "description": "Enable S3 Block Public Access on all S3 access points (including multi-region), with BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, and RestrictPublicBuckets set to true.",
@@ -5116,7 +5152,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO13",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify S3 Block Public Access is enabled on all S3 access points (including multi-region), with BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, and RestrictPublicBuckets set to true.",
@@ -5138,7 +5174,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO14",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C57",
       "depends_on": "",
       "description": "Deny requests to add an ACL on a bucket (e.g., using an SCP, bucket policies, centrally in an RCP applied to the OU or AWS account, or VPC endpoint policy, with a deny statement on \"s3:PutBucketAcl\").",
@@ -5175,7 +5211,7 @@
       "coso": "Detective",
       "nist_csf": "Detect",
       "objective": "S3.CO14",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Monitor changes to bucket ACLs to ensure they stay private (e.g., using the CloudTrail event PutBucketAcl and its field requestParameters.x-amz-acl, which should either be \"private\" or not exist).",
@@ -5212,7 +5248,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO14",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify the control blocking bucket ACL changes is properly implemented.",
@@ -5232,10 +5268,10 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO15",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
-      "description": "Track all buckets you control, define their data classification and their access control (e.g., ABAC or not), identify whether the hosted data is primary (i.e., the source of truth, for example, logs, backups, forensic data, raw data, etc.) or an input/output of a process (e.g., file-processing, software package), their WORM requirements (e.g., SEC 17a-4, CTCC), whether they are production or non-production (preferably done at account-level), their storage class, their logging requirements (e.g., server access log, CloudTrail S3 data events), and their dual-layer server-side encryption requirement (e.g., for NSA CNSSP 15, or DAR CP). You may use tags, Infra-as-code, AWS Glue Data Catalog, or external management tools like <a href=\"https://finraos.github.io/herd/\">FINRA herd</a>.",
+      "description": "Track all buckets you control, define their data classification and access control (e.g., ABAC or not), identify whether the hosted data is primary (i.e., the source of truth, for example, logs, backups, forensic data, raw data, etc.) or an input/output of a process (e.g., file-processing, software package), their WORM requirements (e.g., SEC 17a-4, CTCC), whether they are production or non-production (preferably done at account-level), their storage class, their logging requirements (e.g., server access log, CloudTrail S3 data events), and their dual-layer server-side encryption requirement (e.g., for NSA CNSSP 15, or DAR CP). You may use tags, Infra-as-code, AWS Glue Data Catalog, or external management.",
       "testing": "Request the list of all buckets you control and their related requirements, and the mechanism and records to ensure the accuracy of that metadata.",
       "effort": "High",
       "mitigate": [
@@ -5502,7 +5538,7 @@
       "coso": "Detective",
       "nist_csf": "Detect",
       "objective": "S3.CO15",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C58",
       "description": "Use a data discovery tool (e.g., Amazon Macie) to ensure no sensitive data is stored in an unauthorized bucket.",
@@ -5530,7 +5566,7 @@
       "coso": "Detective",
       "nist_csf": "Detect",
       "objective": "S3.CO15",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Use a data discovery tool (e.g., Amazon Macie) to ensure the bucket names, object names, tags, and metadata do not contain sensitive data.",
@@ -5558,7 +5594,7 @@
       "coso": "Directive",
       "nist_csf": "Identify",
       "objective": "S3.CO16",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C58",
       "description": "Maintain a list of authorized KMS keys for each bucket and its default encryption key. You might simplify by using only one key per bucket, ideally dedicated. Note that an S3 server access log bucket does not support KMS encryption (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/enable-server-access-logging.html\">ref</a>).",
@@ -5645,7 +5681,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO16",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify all objects in S3 buckets are encrypted with an authorized KMS key (e.g., using S3 Inventory or S3 Batch Operations, see <a href=\"https://aws.amazon.com/blogs/storage/encrypting-objects-with-amazon-s3-batch-operations/\">blog</a>, or <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage_lens_basics_metrics_recommendations.html#storage_lens_basics_metrics_types\">S3 Storage Lens</a>, UnencryptedObjectCount and SSEKMSEnabledBucketCount).",
@@ -5667,7 +5703,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO16",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C61",
       "description": "Use KMS ThreatModel to protect the KMS keys used for S3 (e.g., using encryptionContext on the policy of each KMS key).",
@@ -5722,7 +5758,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO16",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C65",
       "depends_on": "S3.C61",
       "description": "Implement an authorized default encryption key on each bucket; enable S3 Bucket Key if not using DSSE-KMS and if CloudTrail events are not required for KMS encrypt/decrypt (note: Amazon S3 evaluates and applies bucket policies before applying bucket default encryption settings).",
@@ -5776,7 +5812,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO16",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify each bucket has an authorized default encryption key and has S3 Bucket Key enabled.",
@@ -5797,10 +5833,10 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO16",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C67",
       "depends_on": "S3.C61",
-      "description": "Block PutObject requests with unauthorized KMS key on each bucket (e.g., using their bucket policy, or centrally in an RCP applied to the OU or AWS account, with a deny statement on PutObject if the condition \"s3:x-amz-server-side-encryption-aws-kms-key-id\" exists and is not an authorized KMS key).",
+      "description": "Block PutObject requests with unauthorized KMS keys on each bucket (e.g., using their bucket policy, or centrally in an RCP applied to the OU or AWS account, with a deny statement on PutObject if the condition \"s3:x-amz-server-side-encryption-aws-kms-key-id\" exists and is not an authorized KMS key).",
       "testing": "Make a request encrypted with an unauthorized KMS key; it should be denied.",
       "effort": "Low",
       "mitigate": [
@@ -5875,7 +5911,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO16",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify all buckets block PutObject requests with an unauthorized KMS key (e.g., using the Config rule: <a href=\"https://docs.aws.amazon.com/config/latest/developerguide/s3-bucket-policy-not-more-permissive.html\">S3_BUCKET_POLICY_NOT_MORE_PERMISSIVE</a>, note that a new rule needs to be deployed for each configuration, then the resource tracked by name or tag; alternatively, you might use <a href=\"https://docs.aws.amazon.com/config/latest/developerguide/s3-bucket-server-side-encryption-enabled.html\">S3_BUCKET_SERVER_SIDE_ENCRYPTION_ENABLED</a> to ensure limited coverage).",
@@ -5896,7 +5932,7 @@
       "coso": "Detective",
       "nist_csf": "Detect",
       "objective": "S3.CO16",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C61",
       "description": "Monitor that only authorized KMS keys are used for each bucket (using CloudTrail S3 data events in \"requestParameters.bucketName\" and \"response.x-amz-server-side-encryption-aws-kms-key-id\").",
@@ -5948,7 +5984,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO17",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C70",
       "depends_on": "S3.C58",
       "description": "Enable versioning on buckets holding primary data.",
@@ -5985,7 +6021,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO17",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify buckets holding primary data are versioned (e.g., using <a href=\"https://docs.aws.amazon.com/config/latest/developerguide/s3-bucket-versioning-enabled.html\">S3_BUCKET_VERSIONING_ENABLED</a>).",
@@ -6005,7 +6041,7 @@
       "coso": "Directive",
       "nist_csf": "Recover",
       "objective": "S3.CO17",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C58",
       "description": "Back up primary data in a secure location under a different security authority (e.g., in an <a href=\"https://catalog.workshops.aws/well-architected-security/en-US/1-security-foundations/create-a-data-bunker\">AWS data bunker account</a> via replication, or using AWS Backup for Amazon S3).",
@@ -6051,7 +6087,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO18",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Aligned with your data governance, encrypt on the client side - or tokenize - the appropriate data.",
@@ -6162,7 +6198,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO19",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Create a process to apply a legal hold to any S3 bucket whenever required. The condition \"s3:object-lock-legal-hold\" can be used to restrict who can remove such a lock.",
@@ -6199,7 +6235,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO20",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C75",
       "depends_on": "S3.C58",
       "description": "Implement the authorized default S3 Object Lock on buckets requiring WORM (note: Amazon S3 evaluates and applies bucket policies before applying the bucket default S3 Object Lock settings).",
@@ -6254,7 +6290,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO20",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify all buckets requiring WORM have the correct default S3 Object Lock configuration.",
@@ -6276,7 +6312,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO20",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C77",
       "depends_on": "S3.C58",
       "description": "Block PutObject and PutObjectRetention requests with unauthorized S3 Object Lock on buckets requiring WORM (e.g., using their bucket policy and centrally in an RCP applied to the OU or the AWS account with a deny statement on PutObject and PutObjectRetention if the condition \"s3:object-lock-mode\" exists and \"s3:object-lock-remaining-retention-days\" is not the defined S3 Object Lock configuration).",
@@ -6322,7 +6358,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO20",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify all buckets requiring WORM block PutObject and PutObjectRetention requests with unauthorized S3 Object Lock (e.g., using the Config rule: <a href=\"https://docs.aws.amazon.com/config/latest/developerguide/s3-bucket-policy-not-more-permissive.html\">S3_BUCKET_POLICY_NOT_MORE_PERMISSIVE</a>, note that a new rule needs to be deployed for each configuration, then the resource tracked by name or tag).",
@@ -6343,7 +6379,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO21",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C79",
       "depends_on": "",
       "description": "Reduce costs related to incomplete multipart uploads by creating a lifecycle policy to remove them after an agreed length of time (e.g., 7 days) (<a href=\"https://aws.amazon.com/blogs/aws/s3-lifecycle-management-update-support-for-multipart-uploads-and-delete-markers/\">blog</a>).",
@@ -6371,7 +6407,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO21",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify a lifecycle policy on incomplete multipart uploads is implemented on all buckets (e.g., using AWS Config rule: <a href=\"https://docs.aws.amazon.com/config/latest/developerguide/s3-lifecycle-policy-check.html\">S3_LIFECYCLE_POLICY_CHECK</a>).",
@@ -6390,7 +6426,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO22",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Block deprecated S3 actions using IAM ThreatModel and the S3 actions list.",
@@ -6418,7 +6454,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO23",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Block all requests not using SigV4 (e.g., using an SCP, bucket policies, or centrally in an RCP applied to the OU or AWS account on all buckets with deny on \"StringNotEquals\":{\"s3:signatureversion\": \"AWS4-HMAC-SHA256\"}).",
@@ -6446,7 +6482,7 @@
       "coso": "Detective",
       "nist_csf": "Detect",
       "objective": "S3.CO23",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Monitor and investigate any requests not using SigV4 (e.g., via CloudTrail S3 when the additionalEventData.SignatureVersion is different from \"SigV4\").",
@@ -6474,11 +6510,11 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO23",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Use the SDK with SigV4 enabled (<a href=\"https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_sigv.html\">ref</a>).",
-      "testing": "Request the mechanism ensuring the use of SDK with SigV4 enabled.",
+      "testing": "Request the mechanism ensuring the use of the SDK with SigV4 enabled.",
       "effort": "Low",
       "mitigate": [
         {
@@ -6502,7 +6538,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO24",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Block all requests not using the HTTP authorization header, i.e., presigned via query strings or POST (<a href=\"https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_sigv.html\">ref</a>) (e.g., using an SCP, bucket policies, or centrally in an RCP applied to the OU or AWS account on all buckets with deny on \"StringNotEquals\":{\"s3:authType\": \"REST-HEADER\"}). Note that this blocks uploads via the console as well.",
@@ -6530,7 +6566,7 @@
       "coso": "Detective",
       "nist_csf": "Detect",
       "objective": "S3.CO24",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Monitor and investigate all requests that do not use the HTTP authorization header (e.g., via CloudTrail S3 events where the additionalEventData.AuthenticationMethod is different from \"AuthHeader\").",
@@ -6558,7 +6594,7 @@
       "coso": "Directive",
       "nist_csf": "Identify",
       "objective": "S3.CO25",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Maintain a list of authorized buckets to have replication enabled, their target bucket, and replication type (i.e., encryption type, ownership, RTC, etc.) (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication-add-config.html\">ref</a>).",
@@ -6586,11 +6622,11 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO25",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify only authorized buckets have replication enabled with their correct configuration (e.g., using <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage_lens_metrics_glossary.html\">S3 Storage Lens</a> CrossAccountReplicationRuleCount).",
-      "testing": "Configure replication on a non-authorized bucket; it should be detected.",
+      "testing": "Configure replication on an unauthorized bucket; it should be detected.",
       "effort": "Medium",
       "mitigate": [],
       "feature_class": [
@@ -6605,7 +6641,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO25",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify authorized buckets have the correct replication configuration.",
@@ -6624,7 +6660,7 @@
       "coso": "Directive",
       "nist_csf": "Identify",
       "objective": "S3.CO25",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Maintain a list of IAM roles used for replication, ideally dedicated (e.g., using change management process on infrastructure-as-code).",
@@ -6652,7 +6688,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO25",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C89",
       "description": "Limit S3 access to the source and destination buckets and the replication rights of each authorized IAM role configured for replication.",
@@ -6680,7 +6716,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO25",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C89",
       "description": "Limit access to authorized IAM roles used for replication, using the IAM ThreatModel (e.g., trust policy, and \"iam:PassRole\").",
@@ -6708,7 +6744,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO25",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify only the authorized IAM role is configured for each replication.",
@@ -6727,7 +6763,7 @@
       "coso": "Detective",
       "nist_csf": "Detect",
       "objective": "S3.CO26",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C58",
       "description": "If the bucket is used as an input or the output of a process, scan the objects for malware (e.g., using <a href=\"https://docs.aws.amazon.com/guardduty/latest/ug/gdu-malware-protection-s3.html\">GuardDuty Malware Protection for S3</a>, <a href=\"https://bucketav.com/\">BucketAV</a>, <a href=\"https://cloudstoragesecurity.com/antivirus\">Cloud Storage Security</a>, <a href=\"https://aws.amazon.com/blogs/apn/amazon-s3-malware-scanning-using-trend-micro-cloud-one-and-aws-security-hub/\">Trend Micro Cloud One</a>, or <a href=\"https://aws.amazon.com/blogs/architecture/how-usaa-built-an-amazon-s3-malware-scanning-solution/\">your own scanning solution</a>).",
@@ -6764,7 +6800,7 @@
       "coso": "Directive",
       "nist_csf": "Identify",
       "objective": "S3.CO27",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Maintain a list of authorized notification receivers (e.g., SNS topic, Lambda) for each bucket. You might use a simpler approach by using authorized account IDs to ensure all your receivers are in authorized AWS accounts.",
@@ -6792,7 +6828,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO27",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify only authorized notification receiver(s) are configured for buckets.",
@@ -6811,7 +6847,7 @@
       "coso": "Directive",
       "nist_csf": "Identify",
       "objective": "S3.CO28",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Maintain a list of authorized S3 buckets to receive the S3 Inventory of each bucket.",
@@ -6839,7 +6875,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO28",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify only authorized buckets are configured to receive inventory.",
@@ -6858,7 +6894,7 @@
       "coso": "Directive",
       "nist_csf": "Identify",
       "objective": "S3.CO29",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "For each S3 bucket, maintain a list of VPCs authorized to access it.",
@@ -6945,7 +6981,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO29",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C100",
       "depends_on": "S3.C98",
       "description": "Limit access to only authorized VPCs (e.g., using their bucket policy, or centrally in an RCP applied to the OU or AWS account, with a deny statement if the condition \"aws:SourceVpce\" is met, or if the bucket policy size is beyond the limit, use this condition on the access point).",
@@ -7032,7 +7068,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO29",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify all buckets include a control to limit access to only authorized VPCs (e.g., using the AWS Config rule <a href=\"https://docs.aws.amazon.com/config/latest/developerguide/s3-bucket-policy-grantee-check.html\">S3_BUCKET_POLICY_GRANTEE_CHECK</a>).",
@@ -7054,7 +7090,7 @@
       "coso": "Directive",
       "nist_csf": "Identify",
       "objective": "S3.CO30",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Maintain a list of authorized CloudFront distributions (via Origin Access Control) and associated bucket, access point, and/or Object Lambda Access Point.",
@@ -7082,7 +7118,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO30",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify all associations of CloudFront distributions with buckets, access points, and/or Object Lambda Access Points are authorized (e.g., using the Macie finding: \"Policy:IAMUser/S3BucketSharedWithCloudFront\").",
@@ -7101,7 +7137,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO31",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Protect and/or claim your domains and trademarks/copyrights (by creating your trademark buckets and using the <a href=\"https://aws.amazon.com/terms/\">copyright infringement process</a> from AWS).",
@@ -7129,7 +7165,7 @@
       "coso": "Directive",
       "nist_csf": "Identify",
       "objective": "S3.CO32",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Maintain a list of authorized access between VPCs, S3 access points, and S3.",
@@ -7234,7 +7270,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO32",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C109",
       "depends_on": "S3.C104",
       "description": "Limit access via the S3 access point by using a VPC endpoint, bucket policy, or centrally in an RCP applied to the OU or AWS account, with the condition \"s3:DataAccessPointAccount\" or preferably \"s3:DataAccessPointArn\" in an allow statement to reduce the length of the allowlist bucket name in the VPC endpoint/bucket policy.",
@@ -7306,7 +7342,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO32",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C110",
       "depends_on": "S3.C104",
       "description": "In bucket policies, or centrally in an RCP applied to the OU or AWS account, deny all IAM principals not using an authorized S3 access point(s) using the condition \"s3:DataAccessPointAccount\" or preferably \"s3:DataAccessPointArn\".",
@@ -7377,7 +7413,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO32",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Block the creation of non-VPC S3 access point \"s3:CreateAccessPoint\" (e.g., using IAM policies and SCPs with the condition \"StringNotEquals\": {\"s3:AccessPointNetworkOrigin\": \"VPC\"}).",
@@ -7422,7 +7458,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO32",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C111",
       "depends_on": "",
       "description": "Block all traffic from Internet-configured S3 access points (e.g., in their bucket policy, or centrally in an RCP applied to the OU or AWS account, using a deny statement with the condition \"StringNotEquals\": {\"s3:AccessPointNetworkOrigin\": \"VPC\"}).",
@@ -7468,7 +7504,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO32",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify only access points are used in the resource-level statements in VPC endpoints.",
@@ -7491,7 +7527,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO32",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify S3 bucket policies deny unauthorized S3 access points.",
@@ -7513,7 +7549,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO32",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify all S3 access points are VPC-attached.",
@@ -7534,7 +7570,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO32",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C104",
       "description": "Block any <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-points-service-api-support.html\">object-related operations</a> access to S3 buckets not through an access point (i.e., IAM policy, SCP, their bucket policy, or centrally in an RCP applied to the OU or AWS account, with a deny statement on the condition \"ArnNotLike\": {\"s3:DataAccessPointArn\": \"arn:aws:s3:<i>Region</i>:<i>AccountId</i>:accesspoint/*\"}).",
@@ -7571,7 +7607,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO12",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C11",
       "description": "When transmitting an object to an external bucket with bucket-owner-full-control ACL requirements but without S3 Object Ownership handover, use 2 separate APIs (PutObject and PutObjectAcl) instead of the built-in object ACL operation in PutObject.",
@@ -7599,7 +7635,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO5",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C11",
       "description": "For all external buckets with bucket-owner-full-control ACL requirement but without S3 Object Ownership handover, block the PutObject with any ACL (e.g., using IAM or SCP and a deny on the condition \"StringLike\": {\"s3:x-amz-acl\": \"*\"}). It should be called via PutObjectAcl.",
@@ -7627,7 +7663,7 @@
       "coso": "Detective",
       "nist_csf": "Detect",
       "objective": "S3.CO5",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C11",
       "description": "For all external buckets with bucket-owner-full-control ACL requirements but without S3 Object Ownership handover, monitor that the PutObject operation does not include the ACL header.",
@@ -7655,7 +7691,7 @@
       "coso": "Detective",
       "nist_csf": "Detect",
       "objective": "S3.CO25",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Monitor abnormal behavior on replication CloudWatch metrics (i.e., \"BytesPendingReplication\", \"OperationsPendingReplication\", and \"OperationsFailedReplication\").",
@@ -7691,7 +7727,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO25",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify all replicated buckets have metrics enabled on each replication rule (included by default in S3 RTC).",
@@ -7710,7 +7746,7 @@
       "coso": "Directive",
       "nist_csf": "Detect",
       "objective": "S3.CO4",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Enable <a href=\"https://docs.aws.amazon.com/macie/latest/user/findings-types.html#findings-policy-types\">S3 policy findings in Amazon Macie</a> in all AWS accounts in all Regions, and protect them using the Macie ThreatModel.",
@@ -7781,7 +7817,7 @@
       "coso": "Directive",
       "nist_csf": "Identify",
       "objective": "S3.CO1",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Maintain a list of authorized version(s) of TLS/SSL per bucket (or per account/OU/Org) (e.g., considering <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingEncryptionInTransit.PQ-TLS.html\">quantum-resistant encryption</a>).",
@@ -7818,7 +7854,7 @@
       "coso": "Directive",
       "nist_csf": "Identify",
       "objective": "S3.CO33",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Maintain a list of IAM roles used for Batch jobs, ideally dedicated (e.g., using change management process on infrastructure-as-code).",
@@ -7846,7 +7882,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO33",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C120",
       "description": "Limit access to only the required resources/permissions (e.g., source/destination buckets, Lambda functions) for each authorized IAM role configured for Batch jobs.",
@@ -7874,7 +7910,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO33",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C120",
       "description": "Limit access to authorized IAM roles used for Batch jobs, using the IAM ThreatModel (e.g., trust policy, and \"iam:PassRole\").",
@@ -7902,7 +7938,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO33",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify only the authorized IAM role is configured for each Batch job.",
@@ -7921,7 +7957,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO7",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Ensure all S3 VPC endpoints (Interface and Gateway) are covered by the VPC endpoint controls.",
@@ -7957,7 +7993,7 @@
       "coso": "Directive",
       "nist_csf": "Identify",
       "objective": "S3.CO34",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Maintain a list of authorized Lambda functions for each Object Lambda Access Point, its associated access point, its associated HEAD/LIST/GET request(s), and payload.",
@@ -7985,7 +8021,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO34",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C127",
       "depends_on": "S3.C125",
       "description": "Ensure only authorized Lambda functions for each Object Lambda Access Point, its associated access point, its associated HEAD/LIST/GET request(s), and payload are created.",
@@ -8013,7 +8049,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO34",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify only the authorized Lambda functions are configured on each Object Lambda Access Point, its associated access point, its associated HEAD/LIST/GET request(s), and payload.",
@@ -8032,7 +8068,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO34",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Ensure Lambda functions configured on Object Lambda Access Point are secured using Lambda ThreatModel.",
@@ -8060,7 +8096,7 @@
       "coso": "Directive",
       "nist_csf": "Identify",
       "objective": "S3.CO34",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Maintain a list of cross-account access on each Object Lambda Access Point.",
@@ -8088,7 +8124,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO34",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C131",
       "depends_on": "S3.C129",
       "description": "Ensure only authorized cross-account IAM entities are allowed in the Object Lambda Access Point policy.",
@@ -8116,7 +8152,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO34",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify only the authorized cross-account IAM entities are allowed in the Object Lambda Access Point policy.",
@@ -8135,7 +8171,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO34",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C133",
       "depends_on": "",
       "description": "Ensure CloudWatch is enabled for all Object Lambda Access Points.",
@@ -8163,7 +8199,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO34",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify CloudWatch is enabled for all Object Lambda Access Points.",
@@ -8182,7 +8218,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO25",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C87,S3.C88,S3.C117",
       "depends_on": "S3.C86",
       "description": "Ensure only authorized buckets have replication enabled and are configured correctly.",
@@ -8210,7 +8246,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO27",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C95",
       "depends_on": "S3.C94",
       "description": "Ensure only authorized notification receivers for each bucket are configured.",
@@ -8238,7 +8274,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO28",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C97",
       "depends_on": "S3.C96",
       "description": "Ensure only authorized S3 buckets are configured to receive S3 Inventory for each bucket.",
@@ -8266,10 +8302,10 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO30",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C102",
       "depends_on": "S3.C101",
-      "description": "Ensure only authorized CloudFront distributions are associated with their authorized bucket, access point, and/or Object Lambda Access Point; and vice versa (e.g., using their bucket policy, centrally in an RCP applied to the OU or AWS account, with a deny statement, access point policy, resource policy for an Object Lambda Access Point, limiting the access to only the authorized distribution(s) in the SourceArn).",
+      "description": "Ensure only authorized CloudFront distributions are associated with their authorized bucket, access point, and/or Object Lambda Access Point; and vice versa (e.g., using their bucket policy, centrally in an RCP applied to the OU or AWS account, with a deny statement, access point policy, resource policy for an Object Lambda Access Point, limiting access to only the authorized distribution(s) in the SourceArn).",
       "testing": "Request 1) the mechanism ensuring only authorized CloudFront distributions are associated with their authorized bucket, access point, and/or Object Lambda Access Point; and vice versa, 2) its records of execution for all new CloudFront distributions, and 3) the plan to move any older CloudFront distributions.",
       "effort": "Medium",
       "mitigate": [
@@ -8294,7 +8330,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO25",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C92",
       "depends_on": "S3.C89",
       "description": "Ensure only authorized IAM roles are attached for each replication, ideally dedicated.",
@@ -8322,11 +8358,11 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO33",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C123",
       "depends_on": "S3.C120",
       "description": "Ensure only an authorized IAM role is attached to each Batch job.",
-      "testing": "Request the mechanism ensuring only an authorized IAM role is attached to each Batch job, and the evidence of its execution for all new {resource}.",
+      "testing": "Request the mechanism ensuring only an authorized IAM role is attached to each Batch job, and the evidence of its execution for all new Batch jobs.",
       "effort": "Medium",
       "mitigate": [
         {
@@ -8350,7 +8386,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO16",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C62",
       "depends_on": "S3.C61",
       "description": "Ensure all objects in S3 buckets are encrypted with an authorized KMS key.",
@@ -8437,7 +8473,7 @@
       "coso": "Directive",
       "nist_csf": "Identify",
       "objective": "S3.CO35",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Maintain a list of authorized buckets to be configured as an S3 website endpoint.",
@@ -8473,7 +8509,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO35",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C143",
       "depends_on": "S3.C141",
       "description": "Ensure only authorized buckets are configured as an S3 website endpoint.",
@@ -8509,7 +8545,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO35",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify only authorized buckets are configured as S3 website endpoints.",
@@ -8528,7 +8564,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO35",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C141",
       "description": "Ensure S3 website endpoints are protected with HTTP headers (<a href=\"https://aws.amazon.com/blogs/networking-and-content-delivery/adding-http-security-headers-using-lambdaedge-and-amazon-cloudfront/\">ref</a>) using a CDN (e.g., CloudFront).",
@@ -8564,7 +8600,7 @@
       "coso": "Directive",
       "nist_csf": "Identify",
       "objective": "S3.CO16",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Maintain a list of buckets (or paths) required to be encrypted using server-side encryption with customer-provided keys (SSE-C).",
@@ -8642,7 +8678,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO16",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C147",
       "depends_on": "S3.C145",
       "description": "For buckets (or paths) requiring SSE-C, block PutObject requests with unauthorized encryption (e.g., using bucket policies, or centrally in an RCP applied to the OU or AWS account, with a deny statement on PutObject if the condition \"s3:x-amz-server-side-encryption-customer-algorithm\"=\"AES256\" is not present).",
@@ -8711,7 +8747,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO16",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "For buckets (or paths) requiring SSE-C, verify all buckets block PutObject requests with unauthorized encryption.",
@@ -8731,7 +8767,7 @@
       "coso": "Detective",
       "nist_csf": "Detect",
       "objective": "S3.CO16",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C145",
       "description": "For buckets (or paths) requiring SSE-C, monitor that only authorized encryption is used on each bucket or path (using CloudTrail S3 data events in requestParameters.bucketName and response.x-amz-server-side-encryption-customer-algorithm).",
@@ -8783,10 +8819,10 @@
       "coso": "Directive",
       "nist_csf": "Identify",
       "objective": "S3.CO8",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
-      "description": "For each bucket, maintain a list of authorized IAM principals allowed to access via the bucket policy.",
+      "description": "For each bucket, maintain a list of authorized IAM principals allowed to access by the bucket policy.",
       "testing": "Request the list of authorized IAM principals allowed to access via bucket policy, its review process, and its review records.",
       "effort": "Medium",
       "mitigate": [
@@ -8811,7 +8847,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO8",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C151",
       "depends_on": "S3.C149",
       "description": "Ensure only authorized IAM principals allowed to access via bucket policy are configured (e.g., using IAM Access Analyzer for reconciliation).",
@@ -8839,7 +8875,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO8",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify only authorized IAM principals allowed to access via bucket policy are used (e.g., using the AWS Config rule <a href=\"https://docs.aws.amazon.com/config/latest/developerguide/s3-bucket-policy-grantee-check.html\">S3_BUCKET_POLICY_GRANTEE_CHECK</a>).",
@@ -8858,7 +8894,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO37",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C154",
       "depends_on": "",
       "description": "Ensure bucket ACLs and object ACLs are disabled on each bucket (enabled by default for all new buckets after April 2023).",
@@ -8930,7 +8966,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO37",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Prevent the creation of buckets with ACL enabled (e.g., by using an SCP and/or an IAM policy on \"s3:CreateBucket\" with a deny statement on StringNotEquals \"s3:x-amz-object-ownership\":\"BucketOwnerEnforced\"). Note that it does not block someone from enabling an ACL afterward via PutBucketOwnershipControls.",
@@ -9002,7 +9038,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO37",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify bucket ACL and object ACL are disabled on each bucket (e.g., using the AWS Config rule <a href=\"https://docs.aws.amazon.com/config/latest/developerguide/s3-bucket-acl-prohibited.html\">S3_BUCKET_ACL_PROHIBITED</a> for bucket ACL, <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage_lens_metrics_glossary.html\">S3 Storage Lens</a> ObjectOwnershipBucketOwnerEnforcedBucketCount, or S3 Inventory, which includes object ACL metadata).",
@@ -9025,7 +9061,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO38",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C156",
       "depends_on": "",
       "description": "Ensure all requests are blocked from AWS service roles that do not require access (e.g., by denying all requests with the principal \"arn:aws:iam::*:*/AWSServiceRoleFor*\" on S3 bucket policies).",
@@ -9053,7 +9089,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO38",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify all requests from unauthorized service roles are blocked.",
@@ -9072,7 +9108,7 @@
       "coso": "Detective",
       "nist_csf": "Detect",
       "objective": "S3.CO39",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C58",
       "description": "Monitor PutBucketLogging to detect bucket server access logging changes, including deactivation and bucket changes (i.e., using the CloudTrail event \"PutBucketLogging\" and the \"requestParameters.BucketLoggingStatus\" field to examine the lack of the \"LoggingEnabled\" key or an unauthorized bucket in \"requestParameters.BucketLoggingStatus.LoggingEnabled.TargetBucket\").",
@@ -9100,11 +9136,11 @@
       "coso": "Directive",
       "nist_csf": "Identify",
       "objective": "S3.CO40",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Maintain a list of authorized S3 buckets and their AWS accounts for cross-account access points.",
-      "testing": "Request the list of authorized S3 buckets and their AWS account for cross-account access points, its review process, and its review records.",
+      "testing": "Request the list of authorized S3 buckets and their AWS accounts for cross-account access points, its review process, and its review records.",
       "effort": "Low",
       "mitigate": [
         {
@@ -9128,7 +9164,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO40",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C161",
       "depends_on": "S3.C158",
       "description": "Ensure only authorized S3 buckets and their AWS accounts for cross-account access points are configured.",
@@ -9156,7 +9192,7 @@
       "coso": "Detective",
       "nist_csf": "Detect",
       "objective": "S3.CO40",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C158",
       "description": "Monitor CreateAccessPoint to detect unauthorized buckets or AWS accounts (i.e., using CloudTrail event CreateAccessPoint and its fields \"requestParameters.CreateAccessPointRequest.Bucket\" and \"requestParameters.CreateAccessPointRequest.BucketAccountId\").",
@@ -9184,7 +9220,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO40",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify only authorized S3 buckets and their AWS accounts for cross-account access points are used.",
@@ -9203,7 +9239,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO16",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C58",
       "description": "Block requests not using DSSE-KMS when required (e.g., by using an SCP, IAM policies, their bucket policy, or centrally in an RCP applied to the OU or AWS account, with a deny statement on required bucket names and \"s3:x-amz-server-side-encryption\" = \"aws:kms:dsse\").",
@@ -9264,7 +9300,7 @@
       "coso": "Detective",
       "nist_csf": "Detect",
       "objective": "S3.CO16",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C58",
       "description": "Monitor requests not using DSSE-KMS when required (e.g., using CloudTrail log event name(s), CloudTrail S3 data events with field(s) requestParameter.bucketName, and \"response.x-amz-server-side-encryption-aws\").",
@@ -9325,7 +9361,7 @@
       "coso": "Directive",
       "nist_csf": "Identify",
       "objective": "S3.CO28",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C26",
       "description": "Maintain the list of authorized optional fields allowed to be accessed by each authorized IAM principal.",
@@ -9353,7 +9389,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO28",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C164",
       "description": "Prevent the creation of inventories without authorized optional fields (e.g., by using an SCP and/or an IAM policy on \"s3:PutInventoryConfiguration\" with an allow statement on \"s3:InventoryAccessibleOptionalFields\" = authorized optional fields only).",
@@ -9381,7 +9417,7 @@
       "coso": "Directive",
       "nist_csf": "Detect",
       "objective": "S3.CO39",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C58",
       "description": "Enable <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/ServerLogs.html\">server access logging</a> in relevant buckets (e.g., production, with sensitive data). Make it available for security analysis.",
@@ -9531,10 +9567,10 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO16",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C168",
       "depends_on": "S3.C145",
-      "description": "Ensure SSE-C is blocked when not required for each bucket [default from April 2026].",
+      "description": "Ensure SSE-C is blocked when not required for each bucket. Note: S3 disables SSE-C by default for new general purpose buckets, and disables SSE-C on new write requests for existing buckets in AWS accounts that have no SSE-C encrypted objects.",
       "testing": "Request 1) the mechanism ensuring SSE-C is blocked when not required for each bucket, 2) its records of execution for all new buckets, and 3) the plan to move any older buckets.",
       "effort": "Low",
       "mitigate": [
@@ -9568,7 +9604,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO16",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify SS3-C is blocked only when not required for each bucket.",
@@ -9588,7 +9624,7 @@
       "coso": "Detective",
       "nist_csf": "Detect",
       "objective": "S3.CO16",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Monitor abnormal increases in the CloudWatch metric for HTTP 4xx client error status code requests (i.e., \"4xxErrors\").",
@@ -9616,7 +9652,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO8",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "S3.C58",
       "description": "Integrate and limit the access to general purpose buckets via tags in the IAM Operating Model (including enforcing tagging of buckets and objects at creation using AWS:ResourceTag and s3:BucketTag).",
@@ -9644,7 +9680,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO15",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C172",
       "depends_on": "S3.C58",
       "description": "Ensure only the authorized ABAC configuration for each general purpose bucket is configured.",
@@ -9672,7 +9708,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO15",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify all general purpose buckets use their authorized ABAC configuration.",
@@ -9691,7 +9727,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO13",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Block public access to each S3 bucket at the organization root, OU, or account-level by enforcing S3 policies in AWS Organizations.",
@@ -9753,7 +9789,7 @@
       "coso": "Directive",
       "nist_csf": "Protect",
       "objective": "S3.CO41",
-      "retired": "false",
+      "retired": false,
       "assured_by": "S3.C177",
       "depends_on": "",
       "description": "Ensure general purpose buckets are created with account regional namespaces (<a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/gpbucketnamespaces.html#account-regional-gp-buckets\">ref</a>).",
@@ -9781,7 +9817,7 @@
       "coso": "Preventative",
       "nist_csf": "Protect",
       "objective": "S3.CO41",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Prevent the creation of general purpose buckets without account regional namespace (e.g., by using an SCP, RCP, and/or an IAM policy on s3:CreateBucket with a deny statement when the condition \"s3:x-amz-bucket-namespace\" is not \"account-regional\").",
@@ -9809,7 +9845,7 @@
       "coso": "Detective",
       "nist_csf": "Detect",
       "objective": "S3.CO41",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Monitor for general purpose buckets with global namespaces (e.g., using CloudTrail log event CreateBucket with field requestParameters.bucketName not ending with \"-{accountId}-{regionId}-an\").",
@@ -9837,7 +9873,7 @@
       "coso": "Assurance",
       "nist_csf": "Detect",
       "objective": "S3.CO41",
-      "retired": "false",
+      "retired": false,
       "assured_by": "",
       "depends_on": "",
       "description": "Verify all general purpose buckets use account regional namespace.",
@@ -9863,6 +9899,7 @@
       "iam_permission": "s3:AbortMultipartUpload",
       "event_name": "Data-AWS::S3::Object-AbortMultipartUpload",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 1
     },
     "S3.A2": {
@@ -9874,6 +9911,7 @@
       "iam_permission": "s3:BypassGovernanceRetention",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 2
     },
     "S3.A3": {
@@ -9885,6 +9923,7 @@
       "iam_permission": "s3:PutObject",
       "event_name": "Data-AWS::S3::Object-CompleteMultipartUpload",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 3
     },
     "S3.A4": {
@@ -9896,6 +9935,7 @@
       "iam_permission": "s3:GetObject,s3:PutObject",
       "event_name": "Data-AWS::S3::Object-CopyObject",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 4
     },
     "S3.A5": {
@@ -9907,6 +9947,7 @@
       "iam_permission": "s3:CreateBucket",
       "event_name": "CreateBucket",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 5
     },
     "S3.A6": {
@@ -9918,6 +9959,7 @@
       "iam_permission": "s3:GetObject,s3:PutObject",
       "event_name": "Data-AWS::S3::Object-CreateMultipartUpload",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 6
     },
     "S3.A7": {
@@ -9929,6 +9971,7 @@
       "iam_permission": "s3:DeleteBucket",
       "event_name": "DeleteBucket",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 7
     },
     "S3.A8": {
@@ -9940,6 +9983,7 @@
       "iam_permission": "s3:PutAnalyticsConfiguration",
       "event_name": "DeleteBucketAnalyticsConfiguration",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 8
     },
     "S3.A9": {
@@ -9951,6 +9995,7 @@
       "iam_permission": "s3:PutBucketCors",
       "event_name": "DeleteBucketCors",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 9
     },
     "S3.A10": {
@@ -9962,6 +10007,7 @@
       "iam_permission": "s3:PutEncryptionConfiguration",
       "event_name": "DeleteBucketEncryption",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 10
     },
     "S3.A11": {
@@ -9973,6 +10019,7 @@
       "iam_permission": "s3:PutInventoryConfiguration",
       "event_name": "DeleteBucketInventoryConfiguration",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 11
     },
     "S3.A12": {
@@ -9984,6 +10031,7 @@
       "iam_permission": "s3:PutLifecycleConfiguration",
       "event_name": "DeleteBucketLifecycle",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 12
     },
     "S3.A13": {
@@ -9995,6 +10043,7 @@
       "iam_permission": "s3:PutMetricsConfiguration",
       "event_name": "DeleteBucketMetricsConfiguration",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 13
     },
     "S3.A14": {
@@ -10006,6 +10055,7 @@
       "iam_permission": "s3:DeleteBucketPolicy",
       "event_name": "DeleteBucketPolicy",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 14
     },
     "S3.A15": {
@@ -10017,6 +10067,7 @@
       "iam_permission": "s3:PutReplicationConfiguration",
       "event_name": "DeleteBucketReplication",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 15
     },
     "S3.A16": {
@@ -10028,6 +10079,7 @@
       "iam_permission": "s3:PutBucketTagging",
       "event_name": "DeleteBucketTagging",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 16
     },
     "S3.A17": {
@@ -10039,6 +10091,7 @@
       "iam_permission": "s3:DeleteBucketWebsite",
       "event_name": "DeleteBucketWebsite",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 17
     },
     "S3.A18": {
@@ -10050,6 +10103,7 @@
       "iam_permission": "s3:DeleteObject",
       "event_name": "Data-AWS::S3::Object-DeleteObject",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 18
     },
     "S3.A19": {
@@ -10061,6 +10115,7 @@
       "iam_permission": "s3:DeleteObjectVersion",
       "event_name": "Data-AWS::S3::Object-DeleteObject",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 19
     },
     "S3.A20": {
@@ -10072,6 +10127,7 @@
       "iam_permission": "s3:DeleteObject",
       "event_name": "Data-AWS::S3::Object-DeleteObjects",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 20
     },
     "S3.A21": {
@@ -10083,6 +10139,7 @@
       "iam_permission": "s3:DeleteObjectVersion",
       "event_name": "Data-AWS::S3::Object-DeleteObjects",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 21
     },
     "S3.A22": {
@@ -10094,6 +10151,7 @@
       "iam_permission": "s3:DeleteObjectTagging",
       "event_name": "Data-AWS::S3::Object-DeleteObjectTagging",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 22
     },
     "S3.A23": {
@@ -10105,6 +10163,7 @@
       "iam_permission": "s3:DeleteObjectVersionTagging",
       "event_name": "Data-AWS::S3::Object-DeleteObjectTagging",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 23
     },
     "S3.A24": {
@@ -10116,6 +10175,7 @@
       "iam_permission": "s3:PutBucketPublicAccessBlock",
       "event_name": "DeletePublicAccessBlock",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 24
     },
     "S3.A25": {
@@ -10127,6 +10187,7 @@
       "iam_permission": "s3:GetAccelerateConfiguration",
       "event_name": "GetBucketAccelerateConfiguration",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 25
     },
     "S3.A26": {
@@ -10138,6 +10199,7 @@
       "iam_permission": "s3:GetBucketAcl",
       "event_name": "GetBucketAcl",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 26
     },
     "S3.A27": {
@@ -10149,6 +10211,7 @@
       "iam_permission": "s3:GetAnalyticsConfiguration",
       "event_name": "GetBucketAnalyticsConfiguration",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 27
     },
     "S3.A28": {
@@ -10160,6 +10223,7 @@
       "iam_permission": "s3:GetBucketCors",
       "event_name": "GetBucketCors",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 28
     },
     "S3.A29": {
@@ -10171,6 +10235,7 @@
       "iam_permission": "s3:GetEncryptionConfiguration",
       "event_name": "GetBucketEncryption",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 29
     },
     "S3.A30": {
@@ -10182,6 +10247,7 @@
       "iam_permission": "s3:GetInventoryConfiguration",
       "event_name": "GetBucketInventoryConfiguration",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 30
     },
     "S3.A31": {
@@ -10193,6 +10259,7 @@
       "iam_permission": "s3:GetLifecycleConfiguration",
       "event_name": "GetBucketLifecycle",
       "stage": "deprecated",
+      "retired": false,
       "action_id_int": 31
     },
     "S3.A32": {
@@ -10204,6 +10271,7 @@
       "iam_permission": "s3:GetLifecycleConfiguration",
       "event_name": "GetBucketLifecycleConfiguration",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 32
     },
     "S3.A33": {
@@ -10215,6 +10283,7 @@
       "iam_permission": "s3:GetBucketLocation",
       "event_name": "GetBucketLocation",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 33
     },
     "S3.A34": {
@@ -10226,6 +10295,7 @@
       "iam_permission": "s3:GetBucketLogging",
       "event_name": "GetBucketLogging",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 34
     },
     "S3.A35": {
@@ -10237,6 +10307,7 @@
       "iam_permission": "s3:GetMetricsConfiguration",
       "event_name": "GetBucketMetricsConfiguration",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 35
     },
     "S3.A36": {
@@ -10248,6 +10319,7 @@
       "iam_permission": "s3:GetBucketNotification",
       "event_name": "GetBucketNotification",
       "stage": "deprecated",
+      "retired": false,
       "action_id_int": 36
     },
     "S3.A37": {
@@ -10259,6 +10331,7 @@
       "iam_permission": "s3:GetBucketNotification",
       "event_name": "GetBucketNotificationConfiguration",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 37
     },
     "S3.A38": {
@@ -10270,6 +10343,7 @@
       "iam_permission": "s3:GetBucketPolicy",
       "event_name": "GetBucketPolicy",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 38
     },
     "S3.A39": {
@@ -10281,6 +10355,7 @@
       "iam_permission": "s3:GetBucketPolicyStatus",
       "event_name": "GetBucketPolicyStatus",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 39
     },
     "S3.A40": {
@@ -10292,6 +10367,7 @@
       "iam_permission": "s3:GetReplicationConfiguration",
       "event_name": "GetBucketReplication",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 40
     },
     "S3.A41": {
@@ -10303,6 +10379,7 @@
       "iam_permission": "s3:GetBucketRequestPayment",
       "event_name": "GetBucketRequestPayment",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 41
     },
     "S3.A42": {
@@ -10314,6 +10391,7 @@
       "iam_permission": "s3:GetBucketTagging",
       "event_name": "GetBucketTagging",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 42
     },
     "S3.A43": {
@@ -10325,6 +10403,7 @@
       "iam_permission": "s3:GetBucketVersioning",
       "event_name": "GetBucketVersioning",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 43
     },
     "S3.A44": {
@@ -10336,6 +10415,7 @@
       "iam_permission": "s3:GetBucketWebsite",
       "event_name": "GetBucketWebsite",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 44
     },
     "S3.A45": {
@@ -10347,6 +10427,7 @@
       "iam_permission": "s3:GetObject",
       "event_name": "Data-AWS::S3::Object-GetObject",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 45
     },
     "S3.A46": {
@@ -10358,6 +10439,7 @@
       "iam_permission": "s3:GetObjectVersion",
       "event_name": "Data-AWS::S3::Object-GetObject",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 46
     },
     "S3.A47": {
@@ -10369,6 +10451,7 @@
       "iam_permission": "s3:GetObjectAcl",
       "event_name": "Data-AWS::S3::Object-GetObjectAcl",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 47
     },
     "S3.A48": {
@@ -10380,6 +10463,7 @@
       "iam_permission": "s3:GetObjectVersionAcl",
       "event_name": "Data-AWS::S3::Object-GetObjectAcl",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 48
     },
     "S3.A49": {
@@ -10391,6 +10475,7 @@
       "iam_permission": "s3:GetObjectLegalHold",
       "event_name": "Data-AWS::S3::Object-GetObjectLockLegalHold",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 49
     },
     "S3.A50": {
@@ -10402,6 +10487,7 @@
       "iam_permission": "s3:GetBucketObjectLockConfiguration",
       "event_name": "GetObjectLockConfiguration",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 50
     },
     "S3.A51": {
@@ -10413,6 +10499,7 @@
       "iam_permission": "s3:GetObjectRetention",
       "event_name": "Data-AWS::S3::Object-GetObjectLockRetention",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 51
     },
     "S3.A52": {
@@ -10424,6 +10511,7 @@
       "iam_permission": "s3:GetObjectTagging",
       "event_name": "Data-AWS::S3::Object-GetObjectTagging",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 52
     },
     "S3.A53": {
@@ -10435,6 +10523,7 @@
       "iam_permission": "s3:GetObjectVersionTagging",
       "event_name": "Data-AWS::S3::Object-GetObjectTagging",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 53
     },
     "S3.A54": {
@@ -10446,6 +10535,7 @@
       "iam_permission": "s3:GetObjectTorrent",
       "event_name": "Data-AWS::S3::Object-GetObjectTorrent",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 54
     },
     "S3.A55": {
@@ -10457,6 +10547,7 @@
       "iam_permission": "s3:GetObjectVersionTorrent",
       "event_name": "-",
       "stage": "deprecated",
+      "retired": false,
       "action_id_int": 55
     },
     "S3.A56": {
@@ -10468,6 +10559,7 @@
       "iam_permission": "s3:GetObjectVersionForReplication",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 56
     },
     "S3.A57": {
@@ -10479,6 +10571,7 @@
       "iam_permission": "s3:GetBucketPublicAccessBlock",
       "event_name": "GetPublicAccessBlock",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 57
     },
     "S3.A58": {
@@ -10490,6 +10583,7 @@
       "iam_permission": "s3:HeadBucket",
       "event_name": "Data-AWS::S3::Object-HeadBucket",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 58
     },
     "S3.A59": {
@@ -10501,6 +10595,7 @@
       "iam_permission": "s3:GetObject",
       "event_name": "Data-AWS::S3::Object-HeadObject",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 59
     },
     "S3.A60": {
@@ -10512,6 +10607,7 @@
       "iam_permission": "s3:GetObjectVersion",
       "event_name": "Data-AWS::S3::Object-HeadObject",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 60
     },
     "S3.A61": {
@@ -10523,6 +10619,7 @@
       "iam_permission": "s3:GetAnalyticsConfiguration",
       "event_name": "ListBucketAnalyticsConfigurations",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 61
     },
     "S3.A62": {
@@ -10534,6 +10631,7 @@
       "iam_permission": "s3:GetInventoryConfiguration",
       "event_name": "ListBucketInventoryConfigurations",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 62
     },
     "S3.A63": {
@@ -10545,6 +10643,7 @@
       "iam_permission": "s3:GetMetricsConfiguration",
       "event_name": "ListBucketMetricsConfigurations",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 63
     },
     "S3.A64": {
@@ -10556,6 +10655,7 @@
       "iam_permission": "s3:ListAllMyBuckets",
       "event_name": "ListBuckets",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 64
     },
     "S3.A65": {
@@ -10567,6 +10667,7 @@
       "iam_permission": "s3:ListBucketMultipartUploads",
       "event_name": "ListMultipartUploads",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 65
     },
     "S3.A66": {
@@ -10578,6 +10679,7 @@
       "iam_permission": "s3:ListBucket",
       "event_name": "Data-AWS::S3::Object-ListObjects",
       "stage": "deprecated",
+      "retired": false,
       "action_id_int": 66
     },
     "S3.A67": {
@@ -10589,6 +10691,7 @@
       "iam_permission": "s3:ListBucket",
       "event_name": "Data-AWS::S3::Object-ListObjects",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 67
     },
     "S3.A68": {
@@ -10600,6 +10703,7 @@
       "iam_permission": "s3:ListBucketVersions",
       "event_name": "Data-AWS::S3::Object-ListObjectVersions",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 68
     },
     "S3.A69": {
@@ -10611,6 +10715,7 @@
       "iam_permission": "s3:ListMultipartUploadParts",
       "event_name": "Data-AWS::S3::Object-ListParts",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 69
     },
     "S3.A70": {
@@ -10622,6 +10727,7 @@
       "iam_permission": "s3:ObjectOwnerOverrideToBucketOwner",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 70
     },
     "S3.A71": {
@@ -10633,6 +10739,7 @@
       "iam_permission": "s3:PutAccelerateConfiguration",
       "event_name": "PutBucketAccelerateConfiguration",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 71
     },
     "S3.A72": {
@@ -10644,6 +10751,7 @@
       "iam_permission": "s3:PutBucketAcl",
       "event_name": "PutBucketAcl",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 72
     },
     "S3.A73": {
@@ -10655,6 +10763,7 @@
       "iam_permission": "s3:PutAnalyticsConfiguration",
       "event_name": "PutBucketAnalyticsConfiguration",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 73
     },
     "S3.A74": {
@@ -10666,6 +10775,7 @@
       "iam_permission": "s3:PutBucketCors",
       "event_name": "PutBucketCors",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 74
     },
     "S3.A75": {
@@ -10677,6 +10787,7 @@
       "iam_permission": "s3:PutEncryptionConfiguration",
       "event_name": "PutBucketEncryption",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 75
     },
     "S3.A76": {
@@ -10688,6 +10799,7 @@
       "iam_permission": "s3:PutInventoryConfiguration",
       "event_name": "PutBucketInventoryConfiguration",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 76
     },
     "S3.A77": {
@@ -10699,6 +10811,7 @@
       "iam_permission": "s3:PutLifecycleConfiguration",
       "event_name": "PutBucketLifecycle",
       "stage": "deprecated",
+      "retired": false,
       "action_id_int": 77
     },
     "S3.A78": {
@@ -10710,6 +10823,7 @@
       "iam_permission": "s3:PutLifecycleConfiguration",
       "event_name": "PutBucketLifecycleConfiguration",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 78
     },
     "S3.A79": {
@@ -10721,6 +10835,7 @@
       "iam_permission": "s3:PutBucketLogging",
       "event_name": "PutBucketLogging",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 79
     },
     "S3.A80": {
@@ -10732,6 +10847,7 @@
       "iam_permission": "s3:PutMetricsConfiguration",
       "event_name": "PutBucketMetricsConfiguration",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 80
     },
     "S3.A81": {
@@ -10743,6 +10859,7 @@
       "iam_permission": "s3:PutBucketNotification",
       "event_name": "PutBucketNotification",
       "stage": "deprecated",
+      "retired": false,
       "action_id_int": 81
     },
     "S3.A82": {
@@ -10754,6 +10871,7 @@
       "iam_permission": "s3:PutBucketNotification",
       "event_name": "PutBucketNotificationConfiguration",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 82
     },
     "S3.A83": {
@@ -10765,6 +10883,7 @@
       "iam_permission": "s3:PutBucketPolicy",
       "event_name": "PutBucketPolicy",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 83
     },
     "S3.A84": {
@@ -10776,6 +10895,7 @@
       "iam_permission": "s3:PutReplicationConfiguration",
       "event_name": "PutBucketReplication",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 84
     },
     "S3.A85": {
@@ -10787,6 +10907,7 @@
       "iam_permission": "s3:PutBucketRequestPayment",
       "event_name": "PutBucketRequestPayment",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 85
     },
     "S3.A86": {
@@ -10798,6 +10919,7 @@
       "iam_permission": "s3:PutBucketTagging",
       "event_name": "PutBucketTagging",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 86
     },
     "S3.A87": {
@@ -10809,6 +10931,7 @@
       "iam_permission": "s3:PutBucketVersioning",
       "event_name": "PutBucketVersioning",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 87
     },
     "S3.A88": {
@@ -10820,6 +10943,7 @@
       "iam_permission": "s3:PutBucketWebsite",
       "event_name": "PutBucketWebsite",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 88
     },
     "S3.A89": {
@@ -10831,6 +10955,7 @@
       "iam_permission": "s3:PutObject",
       "event_name": "Data-AWS::S3::Object-PutObject",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 89
     },
     "S3.A90": {
@@ -10842,6 +10967,7 @@
       "iam_permission": "s3:PutObjectAcl",
       "event_name": "Data-AWS::S3::Object-PutObjectAcl",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 90
     },
     "S3.A91": {
@@ -10853,6 +10979,7 @@
       "iam_permission": "s3:PutObjectVersionAcl",
       "event_name": "Data-AWS::S3::Object-PutObjectAcl",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 91
     },
     "S3.A92": {
@@ -10864,6 +10991,7 @@
       "iam_permission": "s3:PutObjectLegalHold",
       "event_name": "Data-AWS::S3::Object-PutObjectLockLegalHold",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 92
     },
     "S3.A93": {
@@ -10875,6 +11003,7 @@
       "iam_permission": "s3:PutBucketObjectLockConfiguration",
       "event_name": "PutObjectLockConfiguration",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 93
     },
     "S3.A94": {
@@ -10886,6 +11015,7 @@
       "iam_permission": "s3:PutObjectRetention",
       "event_name": "PutObjectRetention",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 94
     },
     "S3.A95": {
@@ -10897,6 +11027,7 @@
       "iam_permission": "s3:PutObjectTagging",
       "event_name": "Data-AWS::S3::Object-PutObjectTagging",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 95
     },
     "S3.A96": {
@@ -10908,6 +11039,7 @@
       "iam_permission": "s3:PutObjectVersionTagging",
       "event_name": "Data-AWS::S3::Object-PutObjectTagging",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 96
     },
     "S3.A97": {
@@ -10919,6 +11051,7 @@
       "iam_permission": "s3:PutBucketPublicAccessBlock",
       "event_name": "PutPublicAccessBlock",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 97
     },
     "S3.A98": {
@@ -10930,6 +11063,7 @@
       "iam_permission": "s3:ReplicateDelete",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 98
     },
     "S3.A99": {
@@ -10941,6 +11075,7 @@
       "iam_permission": "s3:ReplicateObject",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 99
     },
     "S3.A100": {
@@ -10952,6 +11087,7 @@
       "iam_permission": "s3:ReplicateTags",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 100
     },
     "S3.A101": {
@@ -10963,6 +11099,7 @@
       "iam_permission": "s3:RestoreObject",
       "event_name": "Data-AWS::S3::Object-RestoreObject",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 101
     },
     "S3.A102": {
@@ -10974,10 +11111,11 @@
       "iam_permission": "s3:GetObject",
       "event_name": "Data-AWS::S3::Object-SelectObjectContent",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 102
     },
     "S3.A103": {
-      "action_description": "Uploads a part in a multipart upload.",
+      "action_description": "Uploads part in a multipart upload.",
       "api": "UploadPart",
       "endpoint": "s3",
       "feature_class": "S3.FC1",
@@ -10985,6 +11123,7 @@
       "iam_permission": "s3:PutObject",
       "event_name": "Data-AWS::S3::Object-UploadPart",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 103
     },
     "S3.A104": {
@@ -10996,6 +11135,7 @@
       "iam_permission": "s3:PutObject,s3:GetObject",
       "event_name": "Data-AWS::S3::Object-UploadPartCopy",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 104
     },
     "S3.A105": {
@@ -11007,6 +11147,7 @@
       "iam_permission": "s3:CreateAccessPoint",
       "event_name": "CreateAccessPoint",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 105
     },
     "S3.A106": {
@@ -11018,6 +11159,7 @@
       "iam_permission": "s3:CreateJob",
       "event_name": "JobCreated",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 106
     },
     "S3.A107": {
@@ -11029,6 +11171,7 @@
       "iam_permission": "s3:DeleteAccessPoint",
       "event_name": "DeleteAccessPoint",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 107
     },
     "S3.A108": {
@@ -11040,6 +11183,7 @@
       "iam_permission": "s3:DeleteAccessPointPolicy",
       "event_name": "DeleteAccessPointPolicy",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 108
     },
     "S3.A109": {
@@ -11051,6 +11195,7 @@
       "iam_permission": "s3:PutAccountPublicAccessBlock",
       "event_name": "DeletePublicAccessBlock",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 109
     },
     "S3.A110": {
@@ -11062,6 +11207,7 @@
       "iam_permission": "s3:DescribeJob",
       "event_name": "DescribeJob",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 110
     },
     "S3.A111": {
@@ -11073,6 +11219,7 @@
       "iam_permission": "s3:GetAccessPoint",
       "event_name": "GetAccessPoint",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 111
     },
     "S3.A112": {
@@ -11084,6 +11231,7 @@
       "iam_permission": "s3:GetAccessPointPolicy",
       "event_name": "GetAccessPointPolicy",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 112
     },
     "S3.A113": {
@@ -11095,6 +11243,7 @@
       "iam_permission": "s3:GetAccessPointPolicyStatus",
       "event_name": "GetAccessPointPolicyStatus",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 113
     },
     "S3.A114": {
@@ -11106,6 +11255,7 @@
       "iam_permission": "s3:GetAccountPublicAccessBlock",
       "event_name": "GetPublicAccessBlock",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 114
     },
     "S3.A115": {
@@ -11117,6 +11267,7 @@
       "iam_permission": "s3:ListAccessPoints",
       "event_name": "ListAccessPoints",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 115
     },
     "S3.A116": {
@@ -11128,6 +11279,7 @@
       "iam_permission": "s3:ListJobs",
       "event_name": "ListJobs",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 116
     },
     "S3.A117": {
@@ -11139,6 +11291,7 @@
       "iam_permission": "s3:PutAccessPointPolicy",
       "event_name": "PutAccessPointPolicy",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 117
     },
     "S3.A118": {
@@ -11150,6 +11303,7 @@
       "iam_permission": "s3:PutAccountPublicAccessBlock",
       "event_name": "PutPublicAccessBlock",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 118
     },
     "S3.A119": {
@@ -11161,6 +11315,7 @@
       "iam_permission": "s3:UpdateJobPriority",
       "event_name": "UpdateJobPriority",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 119
     },
     "S3.A120": {
@@ -11172,6 +11327,7 @@
       "iam_permission": "s3:UpdateJobStatus",
       "event_name": "JobStatusChanged",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 120
     },
     "S3.A121": {
@@ -11183,6 +11339,7 @@
       "iam_permission": "s3:PutBucketOwnershipControls",
       "event_name": "DeleteBucketOwnershipControls",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 121
     },
     "S3.A122": {
@@ -11194,6 +11351,7 @@
       "iam_permission": "s3:GetBucketOwnershipControls",
       "event_name": "GetBucketOwnershipControls",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 122
     },
     "S3.A123": {
@@ -11205,6 +11363,7 @@
       "iam_permission": "s3:PutBucketOwnershipControls",
       "event_name": "PutBucketOwnershipControls",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 123
     },
     "S3.A124": {
@@ -11216,6 +11375,7 @@
       "iam_permission": "s3:DeleteIntelligentTieringConfiguration",
       "event_name": "DeleteBucketIntelligentTieringConfiguration",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 124
     },
     "S3.A125": {
@@ -11227,6 +11387,7 @@
       "iam_permission": "s3:GetIntelligentTieringConfiguration",
       "event_name": "GetBucketIntelligentTieringConfiguration",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 125
     },
     "S3.A126": {
@@ -11238,10 +11399,11 @@
       "iam_permission": "s3:ListIntelligentTieringConfigurations",
       "event_name": "ListBucketIntelligentTieringConfigurations",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 126
     },
     "S3.A127": {
-      "action_description": "Puts a S3 Intelligent-Tiering configuration to the specified bucket.",
+      "action_description": "Puts an S3 Intelligent-Tiering configuration to the specified bucket.",
       "api": "PutBucketIntelligentTieringConfiguration",
       "endpoint": "s3",
       "feature_class": "S3.FC13",
@@ -11249,6 +11411,7 @@
       "iam_permission": "s3:PutIntelligentTieringConfiguration",
       "event_name": "PutBucketIntelligentTieringConfiguration",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 127
     },
     "S3.A128": {
@@ -11260,6 +11423,7 @@
       "iam_permission": "s3:DeleteStorageLensConfiguration",
       "event_name": "DeleteStorageLensConfiguration",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 128
     },
     "S3.A129": {
@@ -11271,6 +11435,7 @@
       "iam_permission": "s3:DeleteStorageLensConfigurationTagging",
       "event_name": "DeleteStorageLensConfigurationTagging",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 129
     },
     "S3.A130": {
@@ -11282,6 +11447,7 @@
       "iam_permission": "s3:GetStorageLensConfiguration",
       "event_name": "GetStorageLensConfiguration",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 130
     },
     "S3.A131": {
@@ -11293,6 +11459,7 @@
       "iam_permission": "s3:GetStorageLensConfigurationTagging",
       "event_name": "GetStorageLensConfiguratioTagging",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 131
     },
     "S3.A132": {
@@ -11304,6 +11471,7 @@
       "iam_permission": "s3:ListStorageLensConfigurations",
       "event_name": "ListStorageLensConfigurations",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 132
     },
     "S3.A133": {
@@ -11315,6 +11483,7 @@
       "iam_permission": "s3:PutStorageLensConfiguration",
       "event_name": "PutStorageLensConfiguration",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 133
     },
     "S3.A134": {
@@ -11326,6 +11495,7 @@
       "iam_permission": "s3:PutStorageLensConfigurationTagging",
       "event_name": "PutStorageLensConfigurationTagging",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 134
     },
     "S3.A135": {
@@ -11337,6 +11507,7 @@
       "iam_permission": "s3:CreateAccessPointForObjectLambda",
       "event_name": "CreateAccessPointForObjectLambda",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 135
     },
     "S3.A136": {
@@ -11348,6 +11519,7 @@
       "iam_permission": "s3:DeleteAccessPointForObjectLambda",
       "event_name": "DeleteAccessPointForObjectLambda",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 136
     },
     "S3.A137": {
@@ -11359,6 +11531,7 @@
       "iam_permission": "s3:DeleteAccessPointPolicyForObjectLambda",
       "event_name": "DeleteAccessPointPolicyForObjectLambda",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 137
     },
     "S3.A138": {
@@ -11370,6 +11543,7 @@
       "iam_permission": "s3:GetAccessPointConfigurationForObjectLambda",
       "event_name": "GetAccessPointConfigurationForObjectLambda",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 138
     },
     "S3.A139": {
@@ -11381,6 +11555,7 @@
       "iam_permission": "s3:GetAccessPointForObjectLambda",
       "event_name": "GetAccessPointForObjectLambda",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 139
     },
     "S3.A140": {
@@ -11392,6 +11567,7 @@
       "iam_permission": "s3:GetAccessPointPolicyForObjectLambda",
       "event_name": "GetAccessPointPolicyForObjectLambda",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 140
     },
     "S3.A141": {
@@ -11403,6 +11579,7 @@
       "iam_permission": "s3:GetAccessPointPolicyStatusForObjectLambda",
       "event_name": "GetAccessPointPolicyStatusForObjectLambda",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 141
     },
     "S3.A142": {
@@ -11414,10 +11591,11 @@
       "iam_permission": "s3:ListAccessPointsForObjectLambda",
       "event_name": "ListAccessPointsForObjectLambda",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 142
     },
     "S3.A143": {
-      "action_description": "Replaces configuration for an Object Lambda Access Point.",
+      "action_description": "Replaces the configuration for an Object Lambda Access Point.",
       "api": "PutAccessPointConfigurationForObjectLambda",
       "endpoint": "s3-control",
       "feature_class": "S3.FC32",
@@ -11425,6 +11603,7 @@
       "iam_permission": "s3:PutAccessPointConfigurationForObjectLambda",
       "event_name": "PutAccessPointConfigurationForObjectLambda",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 143
     },
     "S3.A144": {
@@ -11436,6 +11615,7 @@
       "iam_permission": "s3:PutAccessPointPolicyForObjectLambda",
       "event_name": "PutAccessPointPolicyForObjectLambda",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 144
     },
     "S3.A145": {
@@ -11447,6 +11627,7 @@
       "iam_permission": "s3-object-lambda:AbortMultipartUpload",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 145
     },
     "S3.A146": {
@@ -11458,6 +11639,7 @@
       "iam_permission": "s3-object-lambda:DeleteObject",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 146
     },
     "S3.A147": {
@@ -11469,6 +11651,7 @@
       "iam_permission": "s3-object-lambda:DeleteObjectTagging",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 147
     },
     "S3.A148": {
@@ -11480,6 +11663,7 @@
       "iam_permission": "s3-object-lambda:GetObject",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 148
     },
     "S3.A149": {
@@ -11491,6 +11675,7 @@
       "iam_permission": "s3-object-lambda:GetObjectAcl",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 149
     },
     "S3.A150": {
@@ -11502,6 +11687,7 @@
       "iam_permission": "s3-object-lambda:GetObjectLegalHold",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 150
     },
     "S3.A151": {
@@ -11513,6 +11699,7 @@
       "iam_permission": "s3-object-lambda:GetObjectRetention",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 151
     },
     "S3.A152": {
@@ -11524,6 +11711,7 @@
       "iam_permission": "s3-object-lambda:GetObjectTagging",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 152
     },
     "S3.A153": {
@@ -11535,6 +11723,7 @@
       "iam_permission": "s3-object-lambda:GetObjectVersion",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 153
     },
     "S3.A154": {
@@ -11546,6 +11735,7 @@
       "iam_permission": "s3-object-lambda:ListBucket",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 154
     },
     "S3.A155": {
@@ -11557,6 +11747,7 @@
       "iam_permission": "s3-object-lambda:ListMultipartUploadParts",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 155
     },
     "S3.A156": {
@@ -11568,6 +11759,7 @@
       "iam_permission": "s3-object-lambda:PutObject",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 156
     },
     "S3.A157": {
@@ -11579,6 +11771,7 @@
       "iam_permission": "s3-object-lambda:PutObjectAcl",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 157
     },
     "S3.A158": {
@@ -11590,6 +11783,7 @@
       "iam_permission": "s3-object-lambda:PutObjectLegalHold",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 158
     },
     "S3.A159": {
@@ -11601,6 +11795,7 @@
       "iam_permission": "s3-object-lambda:PutObjectRetention",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 159
     },
     "S3.A160": {
@@ -11612,6 +11807,7 @@
       "iam_permission": "s3-object-lambda:PutObjectTagging",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 160
     },
     "S3.A161": {
@@ -11623,6 +11819,7 @@
       "iam_permission": "s3-object-lambda:RestoreObject",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 161
     },
     "S3.A162": {
@@ -11634,6 +11831,7 @@
       "iam_permission": "s3-object-lambda:WriteGetObjectResponse",
       "event_name": "WriteGetObjectResponse",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 162
     },
     "S3.A163": {
@@ -11645,6 +11843,7 @@
       "iam_permission": "s3-object-lambda:DeleteObjectVersion",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 163
     },
     "S3.A164": {
@@ -11656,6 +11855,7 @@
       "iam_permission": "s3-object-lambda:DeleteObjectVersionTagging",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 164
     },
     "S3.A165": {
@@ -11667,6 +11867,7 @@
       "iam_permission": "s3-object-lambda:GetObjectVersionAcl",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 165
     },
     "S3.A166": {
@@ -11678,6 +11879,7 @@
       "iam_permission": "s3-object-lambda:GetObjectVersionTagging",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 166
     },
     "S3.A167": {
@@ -11689,6 +11891,7 @@
       "iam_permission": "s3-object-lambda:ListBucketMultipartUploads",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 167
     },
     "S3.A168": {
@@ -11700,6 +11903,7 @@
       "iam_permission": "s3-object-lambda:ListBucketVersions",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 168
     },
     "S3.A169": {
@@ -11711,6 +11915,7 @@
       "iam_permission": "s3-object-lambda:PutObjectVersionAcl",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 169
     },
     "S3.A170": {
@@ -11722,6 +11927,7 @@
       "iam_permission": "s3-object-lambda:PutObjectVersionTagging",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 170
     },
     "S3.A171": {
@@ -11733,6 +11939,7 @@
       "iam_permission": "s3:GetMultiRegionAccessPoint",
       "event_name": "GetMultiRegionAccessPoint",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 171
     },
     "S3.A172": {
@@ -11744,6 +11951,7 @@
       "iam_permission": "s3:GetMultiRegionAccessPointPolicyStatus",
       "event_name": "GetMultiRegionAccessPointPolicyStatus",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 172
     },
     "S3.A173": {
@@ -11755,6 +11963,7 @@
       "iam_permission": "s3:CreateMultiRegionAccessPoint",
       "event_name": "CreateMultiRegionAccessPoint",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 173
     },
     "S3.A174": {
@@ -11766,6 +11975,7 @@
       "iam_permission": "s3:DescribeMultiRegionAccessPointOperation",
       "event_name": "DescribeMultiRegionAccessPointOperation",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 174
     },
     "S3.A175": {
@@ -11777,6 +11987,7 @@
       "iam_permission": "s3:DeleteMultiRegionAccessPoint",
       "event_name": "DeleteMultiRegionAccessPoint",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 175
     },
     "S3.A176": {
@@ -11788,6 +11999,7 @@
       "iam_permission": "s3:ListMultiRegionAccessPoints",
       "event_name": "ListMultiRegionAccessPoints",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 176
     },
     "S3.A177": {
@@ -11799,6 +12011,7 @@
       "iam_permission": "s3:GetMultiRegionAccessPointPolicy",
       "event_name": "GetMultiRegionAccessPointPolicy",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 177
     },
     "S3.A178": {
@@ -11810,6 +12023,7 @@
       "iam_permission": "s3:PutMultiRegionAccessPointPolicy",
       "event_name": "PutMultiRegionAccessPointPolicy",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 178
     },
     "S3.A179": {
@@ -11821,6 +12035,7 @@
       "iam_permission": "s3:DeleteJobTagging",
       "event_name": "DeleteJobTagging",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 179
     },
     "S3.A180": {
@@ -11832,6 +12047,7 @@
       "iam_permission": "s3:GetJobTagging",
       "event_name": "GetJobTagging",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 180
     },
     "S3.A181": {
@@ -11843,6 +12059,7 @@
       "iam_permission": "s3:GetStorageLensDashboard",
       "event_name": "GetStorageLensDashboardDataInternal",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 181
     },
     "S3.A182": {
@@ -11854,10 +12071,11 @@
       "iam_permission": "s3:PutJobTagging",
       "event_name": "PutJobTagging",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 182
     },
     "S3.A183": {
-      "action_description": "Associate Public Access Block configurations with a specified access point, while creating a access point.",
+      "action_description": "Associate Public Access Block configurations with a specified access point, while creating an access point.",
       "api": "PutAccessPointPublicAccessBlock",
       "endpoint": "s3",
       "feature_class": "S3.FC26",
@@ -11865,10 +12083,11 @@
       "iam_permission": "s3:PutAccessPointPublicAccessBlock",
       "event_name": "PutAccessPointPublicAccessBlock",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 183
     },
     "S3.A184": {
-      "action_description": "Initiate the replication process by setting replication status of an object to pending.",
+      "action_description": "Initiate the replication process by setting the replication status of an object to pending.",
       "api": "-",
       "endpoint": "s3",
       "feature_class": "S3.FC27",
@@ -11876,6 +12095,7 @@
       "iam_permission": "s3:InitiateReplication",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 184
     },
     "S3.A185": {
@@ -11887,6 +12107,7 @@
       "iam_permission": "s3:GetObjectAttributes,s3:GetObject",
       "event_name": "Data-AWS::S3::Object-GetObjectAttributes",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 185
     },
     "S3.A186": {
@@ -11898,6 +12119,7 @@
       "iam_permission": "s3:GetObjectVersionAttributes,s3:GetObjectVersion",
       "event_name": "Data-AWS::S3::Object-GetObjectAttributes",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 186
     },
     "S3.A187": {
@@ -11909,6 +12131,7 @@
       "iam_permission": "s3:GetMultiRegionAccessPointRoutes",
       "event_name": "GetMultiRegionAccessPointRoutes",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 187
     },
     "S3.A188": {
@@ -11920,6 +12143,7 @@
       "iam_permission": "s3:SubmitMultiRegionAccessPointRoutes",
       "event_name": "SubmitMultiRegionAccessPointRoutes",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 188
     },
     "S3.A189": {
@@ -11931,6 +12155,7 @@
       "iam_permission": "s3:CreateStorageLensGroup",
       "event_name": "CreateStorageLensGroup",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 189
     },
     "S3.A190": {
@@ -11942,6 +12167,7 @@
       "iam_permission": "s3:DeleteStorageLensGroup",
       "event_name": "DeleteStorageLensGroup",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 190
     },
     "S3.A191": {
@@ -11953,6 +12179,7 @@
       "iam_permission": "s3:GetStorageLensGroup",
       "event_name": "GetStorageLensGroup",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 191
     },
     "S3.A192": {
@@ -11964,6 +12191,7 @@
       "iam_permission": "s3:ListStorageLensGroups",
       "event_name": "ListStorageLensGroups",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 192
     },
     "S3.A193": {
@@ -11975,6 +12203,7 @@
       "iam_permission": "s3:ListTagsForResource",
       "event_name": "ListTagsForResource",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 193
     },
     "S3.A194": {
@@ -11986,6 +12215,7 @@
       "iam_permission": "s3:TagResource",
       "event_name": "TagResource",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 194
     },
     "S3.A195": {
@@ -11997,6 +12227,7 @@
       "iam_permission": "s3:UntagResource",
       "event_name": "UntagResource",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 195
     },
     "S3.A196": {
@@ -12008,6 +12239,7 @@
       "iam_permission": "s3:UpdateStorageLensGroup",
       "event_name": "UpdateStorageLensGroup",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 196
     },
     "S3.A197": {
@@ -12019,6 +12251,7 @@
       "iam_permission": "s3:PauseReplication",
       "event_name": "-",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 197
     },
     "S3.A198": {
@@ -12030,6 +12263,7 @@
       "iam_permission": "s3:GetBucketAbac",
       "event_name": "GetBucketAbac",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 198
     },
     "S3.A199": {
@@ -12041,10 +12275,11 @@
       "iam_permission": "s3:PutBucketAbac",
       "event_name": "PutBucketAbac",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 199
     },
     "S3.A200": {
-      "action_description": "Update the server-side encryption type of an existing object in a general purpose bucket (within same AWS Organizations).",
+      "action_description": "Update the server-side encryption type of an existing object in a general purpose bucket (within the same AWS Organizations).",
       "api": "UpdateObjectEncryption",
       "endpoint": "s3",
       "feature_class": "S3.FC23",
@@ -12052,6 +12287,7 @@
       "iam_permission": "s3:UpdateObjectEncryption",
       "event_name": "Data-AWS::S3::Object-UpdateObjectEncryption",
       "stage": "ga",
+      "retired": false,
       "action_id_int": 200
     }
   },
