@@ -1,0 +1,31 @@
+{
+  "name": "S3.C106_C110 - access_point_restriction (allowlist)",
+  "enabled": false,
+  "function_as_control": true,
+  "severity": "HIGH",
+  "target_native_types": [
+    "bucket"
+  ],
+  "tags": [
+    {
+      "key": "controlId",
+      "value": "S3C110"
+    },
+    {
+      "key": "mode",
+      "value": "allowlist"
+    },
+    {
+      "key": "matcher",
+      "value": "both"
+    },
+    {
+      "key": "pairedControlId",
+      "value": "S3C106"
+    },
+    {
+      "key": "objective",
+      "value": "S3CO32"
+    }
+  ]
+}

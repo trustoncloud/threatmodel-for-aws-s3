@@ -1,0 +1,31 @@
+{
+  "name": "S3.C135_C95 - notification_receiver_check (allowlist)",
+  "enabled": false,
+  "function_as_control": true,
+  "severity": "LOW",
+  "target_native_types": [
+    "bucket"
+  ],
+  "tags": [
+    {
+      "key": "controlId",
+      "value": "S3C95"
+    },
+    {
+      "key": "mode",
+      "value": "allowlist"
+    },
+    {
+      "key": "matcher",
+      "value": "both"
+    },
+    {
+      "key": "pairedControlId",
+      "value": "S3C135"
+    },
+    {
+      "key": "objective",
+      "value": "S3CO27"
+    }
+  ]
+}

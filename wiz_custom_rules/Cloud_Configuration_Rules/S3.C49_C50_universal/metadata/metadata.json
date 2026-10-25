@@ -1,0 +1,31 @@
+{
+  "name": "S3.C49_C50 - account_public_access_block (universal)",
+  "enabled": true,
+  "function_as_control": true,
+  "severity": "CRITICAL",
+  "target_native_types": [
+    "bucket"
+  ],
+  "tags": [
+    {
+      "key": "controlId",
+      "value": "S3C50"
+    },
+    {
+      "key": "mode",
+      "value": "universal"
+    },
+    {
+      "key": "matcher",
+      "value": "both"
+    },
+    {
+      "key": "pairedControlId",
+      "value": "S3C49"
+    },
+    {
+      "key": "objective",
+      "value": "S3CO13"
+    }
+  ]
+}

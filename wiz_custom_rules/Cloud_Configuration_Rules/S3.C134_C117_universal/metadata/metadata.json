@@ -1,0 +1,31 @@
+{
+  "name": "S3.C134_C117 - replication_metrics_enabled (universal)",
+  "enabled": true,
+  "function_as_control": true,
+  "severity": "MEDIUM",
+  "target_native_types": [
+    "bucket"
+  ],
+  "tags": [
+    {
+      "key": "controlId",
+      "value": "S3C117"
+    },
+    {
+      "key": "mode",
+      "value": "universal"
+    },
+    {
+      "key": "matcher",
+      "value": "both"
+    },
+    {
+      "key": "pairedControlId",
+      "value": "S3C134"
+    },
+    {
+      "key": "objective",
+      "value": "S3CO25"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "name": "S3.C19_C20 - vpc_endpoint_org_restriction (universal)",
+  "enabled": true,
+  "function_as_control": true,
+  "severity": "HIGH",
+  "target_native_types": [
+    "vpcEndpoint"
+  ],
+  "tags": [
+    {
+      "key": "controlId",
+      "value": "S3C20"
+    },
+    {
+      "key": "mode",
+      "value": "universal"
+    },
+    {
+      "key": "matcher",
+      "value": "both"
+    },
+    {
+      "key": "pairedControlId",
+      "value": "S3C19"
+    },
+    {
+      "key": "objective",
+      "value": "S3CO7"
+    }
+  ]
+}

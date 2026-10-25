@@ -1,0 +1,31 @@
+{
+  "name": "S3.C136_C97 - inventory_destination_check (allowlist)",
+  "enabled": false,
+  "function_as_control": true,
+  "severity": "INFORMATIONAL",
+  "target_native_types": [
+    "bucket"
+  ],
+  "tags": [
+    {
+      "key": "controlId",
+      "value": "S3C97"
+    },
+    {
+      "key": "mode",
+      "value": "allowlist"
+    },
+    {
+      "key": "matcher",
+      "value": "both"
+    },
+    {
+      "key": "pairedControlId",
+      "value": "S3C136"
+    },
+    {
+      "key": "objective",
+      "value": "S3CO28"
+    }
+  ]
+}
