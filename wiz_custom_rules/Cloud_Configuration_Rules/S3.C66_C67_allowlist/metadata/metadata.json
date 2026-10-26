@@ -1,0 +1,31 @@
+{
+  "name": "S3.C66_C67 - bucket_enforce_kms_key (allowlist)",
+  "enabled": false,
+  "function_as_control": true,
+  "severity": "HIGH",
+  "target_native_types": [
+    "bucket"
+  ],
+  "tags": [
+    {
+      "key": "controlId",
+      "value": "S3C67"
+    },
+    {
+      "key": "mode",
+      "value": "allowlist"
+    },
+    {
+      "key": "matcher",
+      "value": "both"
+    },
+    {
+      "key": "pairedControlId",
+      "value": "S3C66"
+    },
+    {
+      "key": "objective",
+      "value": "S3CO16"
+    }
+  ]
+}

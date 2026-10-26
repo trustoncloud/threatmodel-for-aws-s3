@@ -1,0 +1,31 @@
+{
+  "name": "S3.C155_C156 - bucket_block_unauthorized_service_roles (allowlist)",
+  "enabled": false,
+  "function_as_control": true,
+  "severity": "LOW",
+  "target_native_types": [
+    "bucket"
+  ],
+  "tags": [
+    {
+      "key": "controlId",
+      "value": "S3C156"
+    },
+    {
+      "key": "mode",
+      "value": "allowlist"
+    },
+    {
+      "key": "matcher",
+      "value": "both"
+    },
+    {
+      "key": "pairedControlId",
+      "value": "S3C155"
+    },
+    {
+      "key": "objective",
+      "value": "S3CO38"
+    }
+  ]
+}

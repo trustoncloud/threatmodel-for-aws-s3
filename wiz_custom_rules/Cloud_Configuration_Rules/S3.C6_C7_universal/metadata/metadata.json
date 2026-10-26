@@ -1,0 +1,31 @@
+{
+  "name": "S3.C6_C7 - bucket_secure_transport (universal)",
+  "enabled": true,
+  "function_as_control": true,
+  "severity": "HIGH",
+  "target_native_types": [
+    "bucket"
+  ],
+  "tags": [
+    {
+      "key": "controlId",
+      "value": "S3C7"
+    },
+    {
+      "key": "mode",
+      "value": "universal"
+    },
+    {
+      "key": "matcher",
+      "value": "both"
+    },
+    {
+      "key": "pairedControlId",
+      "value": "S3C6"
+    },
+    {
+      "key": "objective",
+      "value": "S3CO1"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "name": "S3.C1_C2 - scp_secure_transport (universal)",
+  "enabled": true,
+  "function_as_control": true,
+  "severity": "HIGH",
+  "target_native_types": [],
+  "tags": [
+    {
+      "key": "controlId",
+      "value": "S3C2"
+    },
+    {
+      "key": "mode",
+      "value": "universal"
+    },
+    {
+      "key": "matcher",
+      "value": "terraform"
+    },
+    {
+      "key": "pairedControlId",
+      "value": "S3C1"
+    },
+    {
+      "key": "objective",
+      "value": "S3CO1"
+    }
+  ]
+}

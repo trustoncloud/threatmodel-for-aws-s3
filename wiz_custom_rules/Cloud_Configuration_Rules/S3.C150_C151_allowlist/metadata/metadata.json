@@ -1,0 +1,31 @@
+{
+  "name": "S3.C150_C151 - bucket_policy_principal_check (allowlist)",
+  "enabled": false,
+  "function_as_control": true,
+  "severity": "HIGH",
+  "target_native_types": [
+    "bucket"
+  ],
+  "tags": [
+    {
+      "key": "controlId",
+      "value": "S3C151"
+    },
+    {
+      "key": "mode",
+      "value": "allowlist"
+    },
+    {
+      "key": "matcher",
+      "value": "both"
+    },
+    {
+      "key": "pairedControlId",
+      "value": "S3C150"
+    },
+    {
+      "key": "objective",
+      "value": "S3CO8"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "name": "S3.C159_C161 - cross_account_ap_check (allowlist)",
+  "enabled": false,
+  "function_as_control": true,
+  "severity": "MEDIUM",
+  "target_native_types": [
+    "s3AccessPoint"
+  ],
+  "tags": [
+    {
+      "key": "controlId",
+      "value": "S3C161"
+    },
+    {
+      "key": "mode",
+      "value": "allowlist"
+    },
+    {
+      "key": "matcher",
+      "value": "both"
+    },
+    {
+      "key": "pairedControlId",
+      "value": "S3C159"
+    },
+    {
+      "key": "objective",
+      "value": "S3CO40"
+    }
+  ]
+}
