@@ -137,3 +137,121 @@ resource "aws_s3_bucket_policy" "ap_extracond" {
 }
 POLICY
 }
+
+# Restriction reaches only keys that start with "s", other objects stay open: 1 finding
+resource "aws_s3_bucket" "ap_somekeys" {
+  bucket = "ap-somekeys-bucket"
+}
+
+resource "aws_s3_bucket_policy" "ap_somekeys" {
+  bucket = aws_s3_bucket.ap_somekeys.id
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": "arn:aws:s3:::ap-somekeys-bucket/s*",
+      "Condition": {
+        "StringNotEquals": { "s3:DataAccessPointArn": "arn:aws:s3:us-east-1:123456789012:accesspoint/authorized-ap" }
+      }
+    }
+  ]
+}
+POLICY
+}
+
+# The same narrow pattern after a reference to the bucket: 1 finding
+resource "aws_s3_bucket" "ap_refkeys" {
+  bucket = "ap-refkeys-bucket"
+}
+
+resource "aws_s3_bucket_policy" "ap_refkeys" {
+  bucket = aws_s3_bucket.ap_refkeys.id
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": "${aws_s3_bucket.ap_refkeys.arn}/sample-*",
+      "Condition": {
+        "StringNotEquals": { "s3:DataAccessPointArn": "arn:aws:s3:us-east-1:123456789012:accesspoint/authorized-ap" }
+      }
+    }
+  ]
+}
+POLICY
+}
+
+# Restriction that exempts objects through NotResource: 1 finding
+resource "aws_s3_bucket" "ap_notres" {
+  bucket = "ap-notres-bucket"
+}
+
+resource "aws_s3_bucket_policy" "ap_notres" {
+  bucket = aws_s3_bucket.ap_notres.id
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "NotResource": "arn:aws:s3:::ap-notres-bucket/public/*",
+      "Condition": {
+        "StringNotEquals": { "s3:DataAccessPointArn": "arn:aws:s3:us-east-1:123456789012:accesspoint/authorized-ap" }
+      }
+    }
+  ]
+}
+POLICY
+}
+
+# Policy from a data source with no restriction, whose name starts with the
+# name of one that holds a restriction (apdoc): 1 finding
+resource "aws_s3_bucket" "ap_dsname" {
+  bucket = "ap-dsname-bucket"
+}
+
+data "aws_iam_policy_document" "apdoc" {
+  statement {
+    effect    = "Deny"
+    actions   = ["s3:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "StringNotEquals"
+      variable = "s3:DataAccessPointArn"
+      values   = ["arn:aws:s3:us-east-1:123456789012:accesspoint/authorized-ap"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "apdoc_open" {
+  statement {
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["arn:aws:s3:::ap-dsname-bucket/*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::123456789012:role/app"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "ap_dsname" {
+  bucket = aws_s3_bucket.ap_dsname.id
+  policy = data.aws_iam_policy_document.apdoc_open.json
+}

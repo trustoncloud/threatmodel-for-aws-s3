@@ -45,3 +45,25 @@ resource "aws_s3_bucket_policy" "rogue_ds" {
   bucket = aws_s3_bucket.rogue_ds.id
   policy = data.aws_iam_policy_document.rogue_ds.json
 }
+
+# Data-source Allow to every principal (type "*"), effect left out: 1 finding
+resource "aws_s3_bucket" "public_ds" {
+  bucket = "public-ds-bucket"
+}
+
+data "aws_iam_policy_document" "public_ds" {
+  statement {
+    actions   = ["s3:GetObject"]
+    resources = ["arn:aws:s3:::public-ds-bucket/*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "public_ds" {
+  bucket = aws_s3_bucket.public_ds.id
+  policy = data.aws_iam_policy_document.public_ds.json
+}

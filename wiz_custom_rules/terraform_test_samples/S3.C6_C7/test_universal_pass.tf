@@ -168,3 +168,35 @@ resource "aws_s3_bucket_policy" "arnref_ds" {
   bucket = aws_s3_bucket.arnref_ds.id
   policy = data.aws_iam_policy_document.ds_arnref.json
 }
+
+# A wildcard reaches a bucket whose name holds dots
+resource "aws_s3_bucket" "dotted" {
+  bucket = "logs.example.com"
+}
+
+resource "aws_s3_bucket_policy" "dotted" {
+  bucket = aws_s3_bucket.dotted.id
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyInsecureTransport",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": "arn:aws:s3:::*",
+      "Condition": { "Bool": { "aws:SecureTransport": "false" } }
+    },
+    {
+      "Sid": "DenyOldTls",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["arn:aws:s3:::logs.example.com", "arn:aws:s3:::logs.example.com/*"],
+      "Condition": { "NumericLessThan": { "s3:TlsVersion": "1.2" } }
+    }
+  ]
+}
+POLICY
+}

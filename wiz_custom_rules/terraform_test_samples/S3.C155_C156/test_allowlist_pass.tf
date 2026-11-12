@@ -88,3 +88,26 @@ resource "aws_s3_bucket_policy" "rolesplit" {
 }
 POLICY
 }
+
+# A wildcard reaches a bucket whose name holds dots
+resource "aws_s3_bucket" "role_dotted" {
+  bucket = "logs.example.com"
+}
+
+resource "aws_s3_bucket_policy" "role_dotted" {
+  bucket = aws_s3_bucket.role_dotted.id
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": "arn:aws:s3:::*",
+      "Condition": { "ArnNotEquals": { "aws:PrincipalArn": "arn:aws:iam::123456789012:role/service-role/authorized-service-role" } }
+    }
+  ]
+}
+POLICY
+}

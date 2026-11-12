@@ -1,6 +1,6 @@
 # S3.C5 (vpc_endpoint_secure_transport) - universal - COMPLIANT (0 findings)
 
-# Inline policy denying insecure transport
+# Inline policy denying unencrypted requests and old TLS versions
 resource "aws_vpc_endpoint" "s3_secure" {
   vpc_id            = "vpc-0aaa"
   service_name      = "com.amazonaws.us-east-1.s3"
@@ -15,6 +15,13 @@ resource "aws_vpc_endpoint" "s3_secure" {
       "Action": "*",
       "Resource": "*",
       "Condition": { "Bool": { "aws:SecureTransport": "false" } }
+    },
+    {
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "*",
+      "Resource": "*",
+      "Condition": { "NumericLessThan": { "s3:TlsVersion": "1.2" } }
     }
   ]
 }
@@ -37,7 +44,14 @@ resource "aws_vpc_endpoint_policy" "s3_assoc" {
     {
       "Effect": "Deny",
       "Principal": "*",
-      "Action": "*",
+      "Action": "s3:*",
+      "Resource": "*",
+      "Condition": { "Bool": { "aws:SecureTransport": "false" } }
+    },
+    {
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
       "Resource": "*",
       "Condition": { "NumericLessThan": { "s3:TlsVersion": "1.2" } }
     }
@@ -53,7 +67,7 @@ resource "aws_vpc_endpoint" "ssm_ep" {
   vpc_endpoint_type = "Interface"
 }
 
-# Policy from a policy-document data source, denying insecure transport
+# Policy from a policy-document data source with both denies
 resource "aws_vpc_endpoint" "ep_from_doc" {
   vpc_id            = "vpc-0fff"
   service_name      = "com.amazonaws.us-east-1.s3"
@@ -78,9 +92,27 @@ data "aws_iam_policy_document" "pol_transport_doc" {
       values   = ["false"]
     }
   }
+
+  statement {
+    effect    = "Deny"
+    actions   = ["s3:*"]
+    resources = ["arn:aws:s3:::*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values   = ["1.2"]
+    }
+  }
 }
 
-# TLS floor above 1.2, AWS wildcard principal, via a standalone policy
+# TLS floor above 1.2, AWS wildcard principal, all-bucket patterns, via a
+# standalone policy
 resource "aws_vpc_endpoint" "floor13" {
   vpc_id            = "vpc-0abc"
   service_name      = "com.amazonaws.us-east-1.s3"
@@ -99,8 +131,64 @@ resource "aws_vpc_endpoint_policy" "floor13" {
       "Action": "s3:*",
       "Resource": ["arn:aws:s3:::*", "arn:aws:s3:::*/*"],
       "Condition": { "NumericLessThan": { "s3:TlsVersion": "1.3" } }
+    },
+    {
+      "Effect": "Deny",
+      "Principal": { "AWS": "*" },
+      "Action": "s3:*",
+      "Resource": "arn:*:s3:::*",
+      "Condition": { "Bool": { "aws:SecureTransport": "false" } }
     }
   ]
 }
 POLICY
+}
+
+# Resource scope passed in as a variable: not known in the source, so it is
+# not judged
+variable "deny_scope" {
+  type = string
+}
+
+resource "aws_vpc_endpoint" "scopevar" {
+  vpc_id            = "vpc-0abd"
+  service_name      = "com.amazonaws.us-east-1.s3"
+  vpc_endpoint_type = "Gateway"
+  policy            = data.aws_iam_policy_document.pol_scopevar_doc.json
+}
+
+data "aws_iam_policy_document" "pol_scopevar_doc" {
+  statement {
+    effect    = "Deny"
+    actions   = ["*"]
+    resources = [var.deny_scope]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+
+  statement {
+    effect    = "Deny"
+    actions   = ["*"]
+    resources = [var.deny_scope]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values   = ["1.2"]
+    }
+  }
 }

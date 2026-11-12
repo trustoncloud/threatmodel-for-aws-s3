@@ -13,36 +13,48 @@ authorized_principals := {
 principal_values(v) := {v} { is_string(v) }
 principal_values(v) := {x | x := v[_]} { is_array(v) }
 
-# IAM principals granted access by Allow statements in the bucket policy JSON.
-json_granted(pol) := granted {
-    granted := {p |
-        doc := json.unmarshal(pol.policy)
-        stmt := terraLib.getStatement(doc)[_]
-        stmt.Effect == "Allow"
-        p := principal_values(stmt.Principal.AWS)[_]
-    } | {p |
-        doc := json.unmarshal(pol.policy)
-        stmt := terraLib.getStatement(doc)[_]
-        stmt.Effect == "Allow"
-        stmt.Principal == "*"
-        p := "*"
+# Principal types that name IAM principals: "AWS", and "*" for everyone.
+granting_principal_types := {"aws", "*"}
+
+# Statements of the bucket policy JSON. A policy built in a data source can
+# arrive resolved, with Statements and Principals ({"<type>": [identifiers]})
+# and no Effect when effect is left out, which defaults to Allow.
+json_statements(pol) := array.concat(terraLib.getStatement(doc), terraLib.getArray(object.get(doc, "Statements", []))) {
+    doc := json.unmarshal(pol.policy)
+}
+
+json_effect_allow(stmt) { lower(object.get(stmt, "Effect", "Allow")) == "allow" }
+
+json_principals(stmt) := everyone | aws | resolved {
+    everyone := {"*" | stmt.Principal == "*"}
+    aws := {p | p := principal_values(stmt.Principal.AWS)[_]}
+    resolved := {p |
+        v := stmt.Principals[t]
+        granting_principal_types[lower(t)]
+        p := principal_values(v)[_]
     }
 }
 
+# IAM principals granted access by Allow statements in the bucket policy JSON.
+json_granted(pol) := {p |
+    stmt := json_statements(pol)[_]
+    json_effect_allow(stmt)
+    p := json_principals(stmt)[_]
+}
+
 # From a policy-document data source: principals live in an identifiers list
-# under a principals block whose type is "AWS". The statement effect is
+# under a principals block whose type is "AWS" or "*". The statement effect is
 # optional in this data source and defaults to Allow, so a missing effect
 # counts as Allow.
 ds_effect_allow(stmt) { not stmt.effect }
 ds_effect_allow(stmt) { lower(stmt.effect) == "allow" }
 
 ds_granted(document, pol) := {p |
-    ds := document.data.aws_iam_policy_document[dsName]
-    contains(pol.policy, dsName)
+    ds := document.data.aws_iam_policy_document[policy_data_source_name(pol.policy)]
     stmt := terraLib.getArray(ds.statement)[_]
     ds_effect_allow(stmt)
     pr := terraLib.getArray(stmt.principals)[_]
-    lower(pr.type) == "aws"
+    granting_principal_types[lower(pr.type)]
     p := terraLib.getArray(pr.identifiers)[_]
 }
 
@@ -71,4 +83,11 @@ WizPolicy[result] {
         "keyActualValue": sprintf("bucket '%s' policy grants access to unauthorized principal(s): %v", [name, unauth]),
         "resourceTags": terraLib.get_resource_tags(bucket),
     }
+}
+
+# The data block a policy names: data.aws_iam_policy_document.<name>.json,
+# written with or without "${}".
+policy_data_source_name(v) := m[1] {
+    is_string(v)
+    m := regex.find_all_string_submatch_n(`^\s*(?:\$\{)?\s*data\.aws_iam_policy_document\.([A-Za-z0-9_-]+)\.(?:minified_)?json\s*\}?\s*$`, v, 1)[0]
 }

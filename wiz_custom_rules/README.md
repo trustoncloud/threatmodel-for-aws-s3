@@ -1,6 +1,6 @@
 # AWS S3 Customised CCRs for Wiz
 
-23 Wiz custom configuration rules covering AWS S3 assurance controls from
+27 Wiz custom configuration rules covering 25 AWS S3 assurance controls from
 the TrustOnCloud AWS S3 ThreatModel. Each rule checks your live AWS estate
 (Cloud matcher), your Terraform code before deployment (Terraform matcher),
 or both. Every rule is test-validated, with property paths verified against
@@ -41,7 +41,7 @@ two modes).
 |---|---|---|
 | S3.C49_C50 | Critical | Account-level S3 Block Public Access not fully enabled |
 | S3.C99_C100 | Critical | Bucket policies that do not restrict access to authorized VPCs |
-| S3.C1_C2 | High | Organization SCPs missing the Deny on unencrypted or older-TLS S3 traffic (Terraform-only) |
+| S3.C1_C2 | High | Organization SCPs missing the Deny on unencrypted S3 traffic or the Deny on TLS below 1.2 (Terraform-only) |
 | S3.C6_C7 | High | Buckets whose policy does not deny unencrypted traffic and TLS below 1.2 |
 | S3.C19_C20 | High | S3 VPC endpoints not restricted to authorized AWS Organizations or accounts |
 | S3.C34_C36 | High | S3 VPC endpoints that do not block setting object ACLs to public |
@@ -50,7 +50,7 @@ two modes).
 | S3.C146_C147 | High | SSE-C-required buckets not enforcing customer-key encryption on uploads |
 | S3.C150_C151 | High | Bucket policies granting access to unauthorized IAM principals |
 | S3.C167_C168 | High | SSE-C allowed on buckets that must block it, or blocked where required |
-| S3.C3_C5 | Medium | S3 VPC endpoints whose policy does not deny insecure transport |
+| S3.C3_C5 | Medium | S3 VPC endpoints whose policy does not deny both unencrypted requests and TLS below 1.2 |
 | S3.C23_C24 | Medium | S3 VPC endpoints granting access beyond authorized buckets |
 | S3.C134_C87 | Medium | Replication enabled on buckets not authorized to replicate |
 | S3.C134_C88 | Medium | Replication rules that differ from the bucket's authorized routes (target, replica KMS key, ownership, RTC) |
@@ -73,7 +73,7 @@ two modes).
 | Rule folders (control x mode) | 27 |
 | Cloud matchers | 23 (S3.C1_C2 and S3.C171_C172 are Terraform-only) |
 | Terraform matchers | 24 (S3.C123 is cloud-only) |
-| Cloud OPA tests passing | 248 of 248 |
+| Cloud OPA tests passing | 380 of 380 |
 | Terraform fixture checks passing | 52 of 52 |
 
 Modes shipped per control:
@@ -130,6 +130,7 @@ aws-s3/
 ├── main.tf                             Wiz Terraform module (reads Cloud_Configuration_Rules/)
 ├── providers.tf                        Wiz provider + auth instructions
 ├── versions.tf
+├── pack.json                           Manifest for the ThreatModel Assurance module
 ├── AWS S3 Controls and Wiz Mapping.csv Control-to-rule mapping incl. paired controls
 └── README.md                           This document
 ```
@@ -221,17 +222,83 @@ sync.
 
 ### Notes on specific rules
 
-- The bucket and endpoint policy rules count a Deny only when it applies to
-  all principals, covers the actions and resources the control protects, and
-  carries no other condition. A Deny limited to one role, one path or an
-  extra condition leaves the rest open and does not satisfy the control.
+- The bucket, endpoint and organization policy rules count a Deny only when
+  it applies to all principals, covers the actions and resources the control
+  protects, and carries no other condition. A Deny limited to one role, one
+  path or an extra condition leaves the rest open and does not satisfy the
+  control. A Deny written with `NotResource`, `NotAction` or `NotPrincipal`
+  is never counted.
+- A `Resource` pattern is read the way IAM reads it, and it counts only when
+  it leaves nothing out. For one bucket, `arn:aws:s3:::my-bucket/*`,
+  `arn:aws:s3:::my-bucket*` and `arn:aws:s3:::*` cover every object;
+  `arn:aws:s3:::my-bucket/logs/*` and `arn:aws:s3:::my-bucket/a*` do not.
+  For an endpoint, `arn:aws:s3:::*` covers every bucket and object and
+  `arn:aws:s3:::s*` does not. A wildcard also reaches a bucket whose name
+  contains dots. An object key and a bucket name are never empty, so
+  `arn:aws:s3:::my-bucket/?*` covers every object of the bucket and
+  `arn:aws:s3:::?*` every bucket. A key prefix stays strict:
+  `arn:aws:s3:::my-bucket/secure/?*` misses the key `secure/` itself.
+- In Terraform, a policy written as `data.aws_iam_policy_document.<name>.json`
+  is read from the data block with exactly that name.
 - **S3.C6_C7** requires BOTH transport protections on every bucket policy: a
   Deny on `aws:SecureTransport = false` AND a Deny on `s3:TlsVersion < 1.2`,
-  each covering the bucket and its objects. This is stricter than the AWS
-  Config SSL-only rule, by design.
+  each covering the bucket and every object in it. This is stricter than the
+  AWS Config SSL-only rule, by design.
+- **S3.C3_C5** requires BOTH transport protections on every S3 VPC endpoint
+  policy, each for all principals and all S3 actions on every bucket and
+  object. A request over plain HTTP carries no TLS version, so the TLS Deny
+  alone does not stop it, and the transport Deny alone lets TLS below 1.2
+  through. The control text joins the two with "or"; requiring both is a
+  deliberate reading.
+- **S3.C19_C20** counts the organization Deny only when it applies to all
+  principals and all S3 actions on every bucket and object, with one
+  organization test as its only condition. The operator must suit the key:
+  `StringNotEquals` or `StringNotEqualsIfExists` on `aws:PrincipalOrgID` or
+  `aws:PrincipalAccount`, which hold one value, and
+  `ForAllValues:StringNotEquals` or `ForAllValues:StringNotLike` on
+  `aws:PrincipalOrgPaths`, which holds a set. A `ForAnyValue:` test on
+  `aws:PrincipalOrgPaths` is not counted: a principal outside any
+  organization has no paths, so the test is false and the Deny lets it
+  through. The allowlist mode compares each value in the Deny with the
+  configured list as exact text, so list an org path pattern as written; the
+  rule does not judge how broad a pattern is.
+- **S3.C23_C24** accepts an Allow only on an authorized bucket ARN or on
+  objects in that bucket, a key prefix included. A wildcard in the bucket
+  name, and an Allow written with `NotResource`, are findings. In Terraform,
+  a reference to an `aws_s3_bucket` resource or data source in the same file
+  is read as the literal `bucket` name that block states, and an `arn`
+  reference takes the partition of the endpoint's region. A generated name
+  (`bucket_prefix`, or no `bucket`), a name from a variable and a reference
+  to a block not in the file are not resolved by this source scan and are
+  reported, as is an `arn` reference on an endpoint whose region is outside
+  the `aws`, `aws-cn` and `aws-us-gov` partitions.
+- **S3.C34_C36** counts the Deny only when it covers `s3:PutObjectAcl` for
+  all principals on every object, with `StringEquals` (or
+  `StringEqualsIfExists`) on `s3:x-amz-acl` as its only condition, and when
+  `public-read` and `public-read-write` are both denied, in one statement or
+  two. An upload that sets an ACL needs `s3:PutObjectAcl` as well, so the
+  Deny also stops uploads with a public canned ACL. It reads canned ACLs
+  only: grants made through `x-amz-grant` headers or an ACL body are outside
+  this check.
 - **S3.C106_C110** requires the access point Deny on the bucket's objects
   only. Covering the bucket ARN as well is accepted but not required, since
-  bucket settings calls cannot go through an access point.
+  bucket settings calls cannot go through an access point. The `Resource`
+  pattern must leave no object out.
+- **S3.C146_C147** accepts a Deny on the required path, on a wider pattern
+  that contains it, or on the whole bucket. A Deny on part of the path, such
+  as `my-bucket/secure/a*` or `my-bucket/secure/?*`, does not count.
+- **S3.C137_C102** counts a CloudFront grant as approved only when every
+  value is approved: each `aws:SourceArn` value must be the ARN of an
+  authorized distribution, tested with `StringEquals`, `ArnEquals` or
+  `ArnLike` and no wildcard, and each origin access identity principal must
+  carry an authorized ID. A grant to the CloudFront service with no such test
+  is reported. In Terraform, the ID of a distribution or identity created in
+  the same configuration is not resolved by this source scan and is reported;
+  an identity granted by a literal canonical user ID is not read.
+- **S3.C159_C161** in Terraform needs the bucket owner stated as a literal
+  `bucket_account_id` or `account_id`, and a referenced bucket must state a
+  literal `bucket` name. Values not resolved by this source scan, such as
+  `data.aws_caller_identity`, are reported.
 - **S3.C167_C168** checks the bucket's `BlockedEncryptionTypes` default
   encryption setting (SSE-C blocked by default on new buckets since April
   2026). Buckets in the SSE-C-required set, including a bucket with a
@@ -250,7 +317,12 @@ sync.
 - The VPC endpoint rules evaluate every VPC endpoint in the tenant but skip
   endpoints of other services (scoped by service name ending `.s3`).
 - **S3.C1_C2** has no cloud matcher: Wiz does not ingest SCPs as a scannable
-  resource. The Terraform matcher enforces the control at build time.
+  resource. The Terraform matcher enforces the control at build time. It
+  requires BOTH Denies in the same SCP, each on all S3 actions and every S3
+  resource (`*` or `arn:aws:s3:*`), with no other condition. A Deny on
+  `arn:aws:s3:::*` does not count, because a request through an access point
+  names the access point ARN. Content the Terraform source does not show (a
+  variable or a file) is reported.
 - **S3.C123** has no Terraform matcher: Batch Operations jobs are runtime
   executions with no Terraform resource.
 - **S3.C171_C172** has no cloud matcher: Wiz does not collect a bucket's ABAC
