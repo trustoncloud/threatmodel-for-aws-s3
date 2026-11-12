@@ -27,97 +27,185 @@ statements[s] {
     s := policy_doc.Statement
 }
 
-covers_all_actions(action) { action == "*" }
-covers_all_actions(action) { action == "s3:*" }
-covers_all_actions(action) { action[_] == "*" }
-covers_all_actions(action) { action[_] == "s3:*" }
-
-wildcard(v) { v == "*" }
-wildcard(v) { v[_] == "*" }
-
-# The deny must apply to every principal.
-applies_to_everyone(principal) { principal == "*" }
-applies_to_everyone(principal) { wildcard(principal.AWS) }
-
-# The endpoint reaches every bucket, so the deny must cover any bucket and any
-# object; the sample ARNs stand in for them in each partition.
-partitions := {"aws", "aws-cn", "aws-us-gov"}
-
-scope_suffixes := {"sample-bucket", "sample-bucket/sample-object"}
-
 as_array(v) := v { is_array(v) } else := [v]
 
-resource_covers(stmt, suffix) {
-    glob.match(as_array(stmt.Resource)[_], [], sprintf("arn:%s:s3:::%s", [partitions[_], suffix]))
+# The deny must cover all S3 actions.
+all_s3_actions := {"*", "s3:*"}
+
+covers_all_actions(stmt) {
+    all_s3_actions[lower(as_array(stmt.Action)[_])]
 }
 
-value_false(v) { v == "false" }
-value_false(v) { v == false }
-value_false(v) { v[_] == "false" }
+# The deny must apply to every principal.
+applies_to_everyone(stmt) { as_array(stmt.Principal)[_] == "*" }
+applies_to_everyone(stmt) { as_array(stmt.Principal.AWS)[_] == "*" }
 
-tls_floor_ok(v) { to_number(v) >= 1.2 }
-tls_floor_ok(v) { to_number(v[_]) >= 1.2 }
+# The endpoint reaches every bucket, so the deny must cover every bucket and
+# every object. The endpoint payload does not name its partition, so a pattern
+# for any of these partitions counts.
+partitions := {"aws", "aws-cn", "aws-us-gov"}
+
+covers_every_bucket_and_object(stmt) {
+    tocm_s3_pattern_covers_all(as_array(stmt.Resource)[_], partitions[_])
+}
+
+# A statement written with NotPrincipal, NotAction or NotResource leaves
+# something out, so it never counts.
+negated_elements := {"NotPrincipal", "NotAction", "NotResource"}
+
+uses_negation(stmt) {
+    negated_elements[k]
+    object.get(stmt, k, null) != null
+}
+
+full_scope_deny(stmt) {
+    stmt.Effect == "Deny"
+    not uses_negation(stmt)
+    applies_to_everyone(stmt)
+    covers_all_actions(stmt)
+    covers_every_bucket_and_object(stmt)
+}
 
 # The transport test must be the only condition; any extra key narrows the deny.
-sole_condition(stmt, operator) {
-    count(stmt.Condition) == 1
-    count(stmt.Condition[operator]) == 1
+conditions(stmt) := [{"operator": lower(op), "key": lower(key), "values": as_array(v)} | v := stmt.Condition[op][key]]
+
+sole_condition(stmt) := c {
+    cs := conditions(stmt)
+    count(cs) == 1
+    c := cs[0]
 }
 
-scoped_deny(stmt) {
-    stmt.Effect == "Deny"
-    covers_all_actions(stmt.Action)
-    applies_to_everyone(stmt.Principal)
-}
+value_false(values) { values[_] == "false" }
+value_false(values) { values[_] == false }
+
+tls_floor_ok(values) { to_number(values[_]) >= 1.2 }
 
 denies_insecure_transport(stmt) {
-    sole_condition(stmt, "Bool")
-    value_false(stmt.Condition.Bool["aws:SecureTransport"])
+    full_scope_deny(stmt)
+    c := sole_condition(stmt)
+    c.operator == "bool"
+    c.key == "aws:securetransport"
+    value_false(c.values)
 }
 
 denies_old_tls(stmt) {
-    sole_condition(stmt, "NumericLessThan")
-    tls_floor_ok(stmt.Condition.NumericLessThan["s3:TlsVersion"])
-}
-
-# Qualifying denies of one kind may split bucket and object coverage.
-transport_scope[suffix] {
-    stmt := statements[_]
-    scoped_deny(stmt)
-    denies_insecure_transport(stmt)
-    suffix := scope_suffixes[_]
-    resource_covers(stmt, suffix)
-}
-
-tls_scope[suffix] {
-    stmt := statements[_]
-    scoped_deny(stmt)
-    denies_old_tls(stmt)
-    suffix := scope_suffixes[_]
-    resource_covers(stmt, suffix)
-}
-
-# Either protection satisfies the control.
-has_secure_transport_deny {
-    count(transport_scope) == count(scope_suffixes)
+    full_scope_deny(stmt)
+    c := sole_condition(stmt)
+    c.operator == "numericlessthan"
+    c.key == "s3:tlsversion"
+    tls_floor_ok(c.values)
 }
 
 has_secure_transport_deny {
-    count(tls_scope) == count(scope_suffixes)
+    denies_insecure_transport(statements[_])
 }
 
+has_tls_floor_deny {
+    denies_old_tls(statements[_])
+}
+
+# Both protections are required. A request over plain HTTP carries no TLS
+# version, so the TLS deny alone does not stop it.
 result := "skip" {
     not is_s3_endpoint
 } else := "fail" {
     not has_secure_transport_deny
+} else := "fail" {
+    not has_tls_floor_deny
 }
 
 # --- Metadata ---
-currentConfiguration := "VPC endpoint has no policy, so it does not deny insecure transport." {
+missing_protections[p] {
+    not has_secure_transport_deny
+    p := "a Deny of unencrypted requests (aws:SecureTransport false)"
+}
+
+missing_protections[p] {
+    not has_tls_floor_deny
+    p := "a Deny of TLS versions below 1.2 (s3:TlsVersion)"
+}
+
+currentConfiguration := "VPC endpoint has no policy, so it does not deny unencrypted requests or old TLS versions." {
     result == "fail"
     input.PolicyDocument == null
-} else := "VPC endpoint policy has no Deny of insecure transport that applies to all principals, all S3 actions and all buckets and objects, with no other condition." {
+} else := sprintf("VPC endpoint policy lacks %s. Each Deny must apply to all principals and all S3 actions on all buckets and objects, with no other condition.", [concat(" and ", [p | p := missing_protections[_]])]) {
     result == "fail"
-} else := "VPC endpoint policy denies insecure transport for all principals, buckets and objects."
+} else := "VPC endpoint policy denies unencrypted requests and TLS versions below 1.2 for all principals, buckets and objects."
 
-expectedConfiguration := "S3 VPC endpoint policy must contain a Deny for all principals and all S3 actions on all buckets and objects when aws:SecureTransport is false or s3:TlsVersion is below 1.2, with no other condition."
+expectedConfiguration := "S3 VPC endpoint policy must contain a Deny for all principals and all S3 actions on all buckets and objects when aws:SecureTransport is false, and another when s3:TlsVersion is below 1.2. Each must carry no other condition."
+
+# --- Matching helpers ---
+# --- toc-match begin: iampattern v1 ---
+# An IAM policy pattern as a regular expression: "*" is any run of characters
+# ("/", ":" and a line break included), "?" is any one character, and every
+# other character stands for itself.
+tocm_iam_pattern_regex(p) := concat("", ["(?s)^", body, "$"]) {
+    is_string(p)
+    body := strings.replace_n({
+        "\\": "\\\\", ".": "\\.", "+": "\\+", "(": "\\(", ")": "\\)", "|": "\\|",
+        "[": "\\[", "]": "\\]", "{": "\\{", "}": "\\}", "^": "\\^", "$": "\\$",
+        "*": ".*", "?": "."
+    }, p)
+}
+
+# The pattern matches this one value.
+tocm_iam_pattern_matches(p, value) {
+    is_string(value)
+    regex.match(tocm_iam_pattern_regex(p), value)
+}
+
+# The pattern matches every value that starts with base. It must end in "*",
+# and what stands before that "*" must match base or the start of base. So
+# "arn:aws:s3:::logs/*" and "arn:aws:s3:::lo*" cover everything under
+# "arn:aws:s3:::logs/", and "arn:aws:s3:::logs/a*" does not.
+tocm_iam_pattern_covers_prefix(p, base) {
+    is_string(p)
+    is_string(base)
+    endswith(p, "*")
+    head := tocm_iam_pattern_regex(substring(p, 0, count(p) - 1))
+    n := numbers.range(0, count(base))[_]
+    regex.match(head, substring(base, 0, n))
+}
+
+# The pattern matches every value made of base and at least one more
+# character. Use it where that part is never empty, such as an object key
+# after "<bucket ARN>/": "arn:aws:s3:::logs/?*" then covers every object of
+# the bucket. What stands before the final "*" must match base or the start of
+# base, or match base and any one character; a match for two different
+# characters can only come from a wildcard.
+tocm_iam_pattern_covers_nonempty(p, base) {
+    tocm_iam_pattern_covers_prefix(p, base)
+}
+
+tocm_iam_pattern_covers_nonempty(p, base) {
+    is_string(p)
+    is_string(base)
+    endswith(p, "*")
+    head := tocm_iam_pattern_regex(substring(p, 0, count(p) - 1))
+    regex.match(head, concat("", [base, "a"]))
+    regex.match(head, concat("", [base, "b"]))
+}
+
+# Every object of one bucket, given the bucket ARN. An object key is never
+# empty.
+tocm_s3_pattern_covers_objects(p, bucket_arn) {
+    tocm_iam_pattern_covers_nonempty(p, concat("", [bucket_arn, "/"]))
+}
+
+# Every bucket of a partition, and every object in them. A bucket name is
+# never empty.
+tocm_s3_pattern_covers_all(p, partition) {
+    tocm_iam_pattern_covers_nonempty(p, concat("", ["arn:", partition, ":s3:::"]))
+}
+
+# Every object of every bucket of a partition; "arn:<partition>:s3:::*/*" is
+# the usual way to write it, and "?*" may stand for either "*".
+tocm_s3_pattern_covers_all_objects(p, partition) {
+    tocm_s3_pattern_covers_all(p, partition)
+}
+
+tocm_s3_pattern_covers_all_objects(p, partition) {
+    names := {"*", "?*"}
+    p == concat("", ["arn:", partition, ":s3:::", names[_], "/", names[_]])
+}
+# --- toc-match end: iampattern v1 ---

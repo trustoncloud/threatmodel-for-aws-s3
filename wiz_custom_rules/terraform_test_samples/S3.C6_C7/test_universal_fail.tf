@@ -226,3 +226,178 @@ resource "aws_s3_bucket_policy" "foreign_ref" {
 }
 POLICY
 }
+
+# Object pattern leaves keys out (literal ARN): 2 findings
+resource "aws_s3_bucket" "narrow_objects" {
+  bucket = "narrow-objects-bucket"
+}
+
+resource "aws_s3_bucket_policy" "narrow_objects" {
+  bucket = aws_s3_bucket.narrow_objects.id
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyInsecureTransport",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["arn:aws:s3:::narrow-objects-bucket", "arn:aws:s3:::narrow-objects-bucket/s*"],
+      "Condition": { "Bool": { "aws:SecureTransport": "false" } }
+    },
+    {
+      "Sid": "DenyOldTls",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["arn:aws:s3:::narrow-objects-bucket", "arn:aws:s3:::narrow-objects-bucket/sample-object"],
+      "Condition": { "NumericLessThan": { "s3:TlsVersion": "1.2" } }
+    }
+  ]
+}
+POLICY
+}
+
+# Object pattern leaves keys out (reference to the bucket ARN): 2 findings
+resource "aws_s3_bucket" "narrow_ref" {
+  bucket = "narrow-ref-bucket"
+}
+
+resource "aws_s3_bucket_policy" "narrow_ref" {
+  bucket = aws_s3_bucket.narrow_ref.id
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyInsecureTransport",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["${aws_s3_bucket.narrow_ref.arn}", "${aws_s3_bucket.narrow_ref.arn}/s*"],
+      "Condition": { "Bool": { "aws:SecureTransport": "false" } }
+    },
+    {
+      "Sid": "DenyOldTls",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["${aws_s3_bucket.narrow_ref.arn}", "${aws_s3_bucket.narrow_ref.arn}/logs/*"],
+      "Condition": { "NumericLessThan": { "s3:TlsVersion": "1.2" } }
+    }
+  ]
+}
+POLICY
+}
+
+# Transport deny written with NotResource is never counted: 1 finding
+resource "aws_s3_bucket" "not_resource" {
+  bucket = "not-resource-bucket"
+}
+
+data "aws_iam_policy_document" "ds_notresource" {
+  statement {
+    sid     = "DenyInsecureTransport"
+    effect  = "Deny"
+    actions = ["s3:*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    not_resources = ["arn:aws:s3:::not-resource-bucket/public/*"]
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+
+  statement {
+    sid     = "DenyOldTls"
+    effect  = "Deny"
+    actions = ["s3:*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    resources = [aws_s3_bucket.not_resource.arn, "${aws_s3_bucket.not_resource.arn}/*"]
+
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values   = ["1.2"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "not_resource" {
+  bucket = aws_s3_bucket.not_resource.id
+  policy = data.aws_iam_policy_document.ds_notresource.json
+}
+
+# Bucket whose policy names the data source "guard_extra", which allows only.
+# The compliant data source "guard" shares the start of that name and belongs
+# to no policy here: 2 findings
+resource "aws_s3_bucket" "ds_prefix" {
+  bucket = "ds-prefix-bucket"
+}
+
+data "aws_iam_policy_document" "guard_extra" {
+  statement {
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.ds_prefix.arn}/*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::123456789012:role/reader"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "guard" {
+  statement {
+    effect    = "Deny"
+    actions   = ["s3:*"]
+    resources = ["arn:aws:s3:::*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+
+  statement {
+    effect    = "Deny"
+    actions   = ["s3:*"]
+    resources = ["arn:aws:s3:::*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values   = ["1.2"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "ds_prefix" {
+  bucket = aws_s3_bucket.ds_prefix.id
+  policy = data.aws_iam_policy_document.guard_extra.json
+}

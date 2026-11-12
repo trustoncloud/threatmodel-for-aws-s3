@@ -104,3 +104,87 @@ resource "aws_s3_bucket_policy" "key_extracond" {
 }
 POLICY
 }
+
+# Object pattern leaves keys out (literal ARN): 1 finding
+resource "aws_s3_bucket" "key_narrow" {
+  bucket = "key-narrow-bucket"
+}
+
+resource "aws_s3_bucket_policy" "key_narrow" {
+  bucket = aws_s3_bucket.key_narrow.id
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::key-narrow-bucket/s*",
+      "Condition": {
+        "StringNotEquals": {
+          "s3:x-amz-server-side-encryption-aws-kms-key-id": "arn:aws:kms:us-east-1:123456789012:key/authorized-key"
+        }
+      }
+    }
+  ]
+}
+POLICY
+}
+
+# One object named in place of every object (reference to the bucket ARN): 1 finding
+resource "aws_s3_bucket" "key_oneobject" {
+  bucket = "key-oneobject-bucket"
+}
+
+resource "aws_s3_bucket_policy" "key_oneobject" {
+  bucket = aws_s3_bucket.key_oneobject.id
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:PutObject",
+      "Resource": "${aws_s3_bucket.key_oneobject.arn}/sample-object",
+      "Condition": {
+        "StringNotEquals": {
+          "s3:x-amz-server-side-encryption-aws-kms-key-id": "arn:aws:kms:us-east-1:123456789012:key/authorized-key"
+        }
+      }
+    }
+  ]
+}
+POLICY
+}
+
+# Deny written with NotResource is never counted: 1 finding
+resource "aws_s3_bucket" "key_notresource" {
+  bucket = "key-notresource-bucket"
+}
+
+data "aws_iam_policy_document" "key_notresource" {
+  statement {
+    effect  = "Deny"
+    actions = ["s3:PutObject"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    not_resources = ["arn:aws:s3:::key-notresource-bucket/public/*"]
+
+    condition {
+      test     = "StringNotEquals"
+      variable = "s3:x-amz-server-side-encryption-aws-kms-key-id"
+      values   = ["arn:aws:kms:us-east-1:123456789012:key/authorized-key"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "key_notresource" {
+  bucket = aws_s3_bucket.key_notresource.id
+  policy = data.aws_iam_policy_document.key_notresource.json
+}

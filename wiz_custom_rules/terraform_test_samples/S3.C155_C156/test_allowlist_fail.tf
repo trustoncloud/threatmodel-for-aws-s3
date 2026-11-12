@@ -133,3 +133,79 @@ resource "aws_s3_bucket_policy" "role_extracond" {
 }
 POLICY
 }
+
+# Object pattern leaves keys out (literal ARN): 1 finding
+resource "aws_s3_bucket" "role_narrow" {
+  bucket = "role-narrow-bucket"
+}
+
+resource "aws_s3_bucket_policy" "role_narrow" {
+  bucket = aws_s3_bucket.role_narrow.id
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["arn:aws:s3:::role-narrow-bucket", "arn:aws:s3:::role-narrow-bucket/s*"],
+      "Condition": { "ArnNotEquals": { "aws:PrincipalArn": "arn:aws:iam::123456789012:role/service-role/authorized-service-role" } }
+    }
+  ]
+}
+POLICY
+}
+
+# One object named in place of every object (reference to the bucket ARN): 1 finding
+resource "aws_s3_bucket" "role_oneobject" {
+  bucket = "role-oneobject-bucket"
+}
+
+resource "aws_s3_bucket_policy" "role_oneobject" {
+  bucket = aws_s3_bucket.role_oneobject.id
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["${aws_s3_bucket.role_oneobject.arn}", "${aws_s3_bucket.role_oneobject.arn}/sample-object"],
+      "Condition": { "ArnNotEquals": { "aws:PrincipalArn": "arn:aws:iam::123456789012:role/service-role/authorized-service-role" } }
+    }
+  ]
+}
+POLICY
+}
+
+# Deny written with NotResource is never counted: 1 finding
+resource "aws_s3_bucket" "role_notresource" {
+  bucket = "role-notresource-bucket"
+}
+
+data "aws_iam_policy_document" "role_notresource" {
+  statement {
+    effect  = "Deny"
+    actions = ["s3:*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    not_resources = ["arn:aws:s3:::role-notresource-bucket/public/*"]
+
+    condition {
+      test     = "ArnNotEquals"
+      variable = "aws:PrincipalArn"
+      values   = ["arn:aws:iam::123456789012:role/service-role/authorized-service-role"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "role_notresource" {
+  bucket = aws_s3_bucket.role_notresource.id
+  policy = data.aws_iam_policy_document.role_notresource.json
+}

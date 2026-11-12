@@ -82,3 +82,26 @@ resource "aws_s3_bucket_policy" "vpcref" {
 }
 POLICY
 }
+
+# A wildcard reaches a bucket whose name holds dots
+resource "aws_s3_bucket" "vpc_dotted" {
+  bucket = "logs.example.com"
+}
+
+resource "aws_s3_bucket_policy" "vpc_dotted" {
+  bucket = aws_s3_bucket.vpc_dotted.id
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": "arn:aws:s3:::*",
+      "Condition": { "StringNotEquals": { "aws:SourceVpc": "vpc-0123456789abcdef0" } }
+    }
+  ]
+}
+POLICY
+}

@@ -55,3 +55,30 @@ resource "aws_s3_bucket_policy" "keyref" {
   bucket = aws_s3_bucket.keyref.id
   policy = data.aws_iam_policy_document.ds_keyref.json
 }
+
+# A wildcard reaches a bucket whose name holds dots
+resource "aws_s3_bucket" "key_dotted" {
+  bucket = "logs.example.com"
+}
+
+resource "aws_s3_bucket_policy" "key_dotted" {
+  bucket = aws_s3_bucket.key_dotted.id
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::*",
+      "Condition": {
+        "StringNotEquals": {
+          "s3:x-amz-server-side-encryption-aws-kms-key-id": "arn:aws:kms:us-east-1:123456789012:key/authorized-key"
+        }
+      }
+    }
+  ]
+}
+POLICY
+}

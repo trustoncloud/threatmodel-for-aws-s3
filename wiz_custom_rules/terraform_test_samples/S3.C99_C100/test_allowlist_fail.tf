@@ -156,3 +156,79 @@ resource "aws_s3_bucket_policy" "vpc_extrakey" {
 }
 POLICY
 }
+
+# Object pattern leaves keys out (literal ARN): 1 finding
+resource "aws_s3_bucket" "vpc_narrow" {
+  bucket = "vpc-narrow-bucket"
+}
+
+resource "aws_s3_bucket_policy" "vpc_narrow" {
+  bucket = aws_s3_bucket.vpc_narrow.id
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["arn:aws:s3:::vpc-narrow-bucket", "arn:aws:s3:::vpc-narrow-bucket/s*"],
+      "Condition": { "StringNotEquals": { "aws:SourceVpc": "vpc-0123456789abcdef0" } }
+    }
+  ]
+}
+POLICY
+}
+
+# One object named in place of every object (reference to the bucket ARN): 1 finding
+resource "aws_s3_bucket" "vpc_oneobject" {
+  bucket = "vpc-oneobject-bucket"
+}
+
+resource "aws_s3_bucket_policy" "vpc_oneobject" {
+  bucket = aws_s3_bucket.vpc_oneobject.id
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["${aws_s3_bucket.vpc_oneobject.arn}", "${aws_s3_bucket.vpc_oneobject.arn}/sample-object"],
+      "Condition": { "StringNotEquals": { "aws:SourceVpc": "vpc-0123456789abcdef0" } }
+    }
+  ]
+}
+POLICY
+}
+
+# Deny written with NotResource is never counted: 1 finding
+resource "aws_s3_bucket" "vpc_notresource" {
+  bucket = "vpc-notresource-bucket"
+}
+
+data "aws_iam_policy_document" "vpc_notresource" {
+  statement {
+    effect  = "Deny"
+    actions = ["s3:*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    not_resources = ["arn:aws:s3:::vpc-notresource-bucket/public/*"]
+
+    condition {
+      test     = "StringNotEquals"
+      variable = "aws:SourceVpc"
+      values   = ["vpc-0123456789abcdef0"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "vpc_notresource" {
+  bucket = aws_s3_bucket.vpc_notresource.id
+  policy = data.aws_iam_policy_document.vpc_notresource.json
+}

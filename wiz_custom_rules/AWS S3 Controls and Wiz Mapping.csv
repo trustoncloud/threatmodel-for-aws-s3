@@ -22,7 +22,7 @@ S3.C79,a lifecycle policy on incomplete multipart uploads is implemented on all 
 S3.C87,only authorized buckets have replication enabled with their correct configuration.,Allowlist,S3-023 (Partial: checks that a replication rule exists; not which buckets may replicate),S3.C134 (Directive)
 S3.C88,authorized buckets have the correct replication configuration.,Allowlist,N/A,S3.C134 (Directive)
 S3.C92,only the authorized IAM role is configured for each replication.,Allowlist,N/A,S3.C138 (Directive)
-S3.C95,only authorized notification receiver are configured for buckets.,Universal,S3-052 (Partial),S3.C135 (Directive)
+S3.C95,only authorized notification receiver are configured for buckets.,Allowlist,S3-052 (Partial),S3.C135 (Directive)
 S3.C97,only authorized buckets are configured to receive inventory.,Allowlist,N/A,S3.C136 (Directive)
 S3.C100,all buckets include a control to limit access to only authorized VPCs.,Allowlist,N/A,S3.C99 (Preventative)
 S3.C102,"all associations of CloudFront distributions with buckets, access points, and/or Object Lambda Access Points are authorized.",Allowlist,N/A,S3.C137 (Directive)

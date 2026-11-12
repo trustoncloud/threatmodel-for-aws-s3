@@ -41,19 +41,17 @@ wildcard(v) { v[_] == "*" }
 applies_to_everyone(principal) { principal == "*" }
 applies_to_everyone(principal) { wildcard(principal.AWS) }
 
-# The deny must reach every object in the bucket; the sample object ARN stands
-# in for any key. Covering the bucket ARN as well is accepted but not required,
-# since bucket settings calls cannot go through an access point.
+# The deny must reach every object in the bucket: one Resource pattern must
+# leave no key out. Covering the bucket ARN as well is accepted but not
+# required, since bucket settings calls cannot go through an access point.
 bucket_arn := input.BucketArn {
     is_string(input.BucketArn)
 } else := sprintf("arn:aws:s3:::%s", [input.Name])
 
-scope_arns := {sprintf("%s/sample-object", [bucket_arn])}
-
 as_array(v) := v { is_array(v) } else := [v]
 
-resource_covers(stmt, arn) {
-    glob.match(as_array(stmt.Resource)[_], [], arn)
+covers_every_object(stmt) {
+    tocm_s3_pattern_covers_objects(as_array(stmt.Resource)[_], bucket_arn)
 }
 
 restriction_operators := {"stringnotequals", "stringnotequalsifexists"}
@@ -74,19 +72,14 @@ ap_condition_values(stmt) := vals {
     vals := as_array(val)
 }
 
-restricted_scope[arn] {
-    stmt := statements[_]
-    ap_condition_values(stmt)
-    arn := scope_arns[_]
-    resource_covers(stmt, arn)
-}
-
 allowed_by_policy[ap] {
     ap := ap_condition_values(statements[_])[_]
 }
 
 has_ap_restriction {
-    count(restricted_scope) == count(scope_arns)
+    stmt := statements[_]
+    ap_condition_values(stmt)
+    covers_every_object(stmt)
 }
 
 unauthorized_aps := allowed_by_policy - authorized_access_points
@@ -111,3 +104,79 @@ currentConfiguration := "Bucket has no bucket policy, so access points are not r
 } else := "Bucket policy restricts access to authorized access points."
 
 expectedConfiguration := sprintf("Bucket policy must contain a Deny for all principals and all S3 actions on every object in the bucket whose only condition is StringNotEquals on s3:DataAccessPointArn, listing only authorized access points: %v", [authorized_access_points])
+
+# --- Matching helpers ---
+# --- toc-match begin: iampattern v1 ---
+# An IAM policy pattern as a regular expression: "*" is any run of characters
+# ("/", ":" and a line break included), "?" is any one character, and every
+# other character stands for itself.
+tocm_iam_pattern_regex(p) := concat("", ["(?s)^", body, "$"]) {
+    is_string(p)
+    body := strings.replace_n({
+        "\\": "\\\\", ".": "\\.", "+": "\\+", "(": "\\(", ")": "\\)", "|": "\\|",
+        "[": "\\[", "]": "\\]", "{": "\\{", "}": "\\}", "^": "\\^", "$": "\\$",
+        "*": ".*", "?": "."
+    }, p)
+}
+
+# The pattern matches this one value.
+tocm_iam_pattern_matches(p, value) {
+    is_string(value)
+    regex.match(tocm_iam_pattern_regex(p), value)
+}
+
+# The pattern matches every value that starts with base. It must end in "*",
+# and what stands before that "*" must match base or the start of base. So
+# "arn:aws:s3:::logs/*" and "arn:aws:s3:::lo*" cover everything under
+# "arn:aws:s3:::logs/", and "arn:aws:s3:::logs/a*" does not.
+tocm_iam_pattern_covers_prefix(p, base) {
+    is_string(p)
+    is_string(base)
+    endswith(p, "*")
+    head := tocm_iam_pattern_regex(substring(p, 0, count(p) - 1))
+    n := numbers.range(0, count(base))[_]
+    regex.match(head, substring(base, 0, n))
+}
+
+# The pattern matches every value made of base and at least one more
+# character. Use it where that part is never empty, such as an object key
+# after "<bucket ARN>/": "arn:aws:s3:::logs/?*" then covers every object of
+# the bucket. What stands before the final "*" must match base or the start of
+# base, or match base and any one character; a match for two different
+# characters can only come from a wildcard.
+tocm_iam_pattern_covers_nonempty(p, base) {
+    tocm_iam_pattern_covers_prefix(p, base)
+}
+
+tocm_iam_pattern_covers_nonempty(p, base) {
+    is_string(p)
+    is_string(base)
+    endswith(p, "*")
+    head := tocm_iam_pattern_regex(substring(p, 0, count(p) - 1))
+    regex.match(head, concat("", [base, "a"]))
+    regex.match(head, concat("", [base, "b"]))
+}
+
+# Every object of one bucket, given the bucket ARN. An object key is never
+# empty.
+tocm_s3_pattern_covers_objects(p, bucket_arn) {
+    tocm_iam_pattern_covers_nonempty(p, concat("", [bucket_arn, "/"]))
+}
+
+# Every bucket of a partition, and every object in them. A bucket name is
+# never empty.
+tocm_s3_pattern_covers_all(p, partition) {
+    tocm_iam_pattern_covers_nonempty(p, concat("", ["arn:", partition, ":s3:::"]))
+}
+
+# Every object of every bucket of a partition; "arn:<partition>:s3:::*/*" is
+# the usual way to write it, and "?*" may stand for either "*".
+tocm_s3_pattern_covers_all_objects(p, partition) {
+    tocm_s3_pattern_covers_all(p, partition)
+}
+
+tocm_s3_pattern_covers_all_objects(p, partition) {
+    names := {"*", "?*"}
+    p == concat("", ["arn:", partition, ":s3:::", names[_], "/", names[_]])
+}
+# --- toc-match end: iampattern v1 ---
