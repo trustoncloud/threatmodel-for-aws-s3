@@ -17,9 +17,7 @@ has_ap {
 
 target_bucket := input.Bucket
 
-# The bucket's owning account: BucketAccountId when set (cross-account access
-# point), otherwise the access point's own account, parsed from its ARN
-# (arn:aws:s3:<region>:<account>:accesspoint/<name>).
+# The bucket owner: BucketAccountId, else the account in the access point ARN.
 target_account := acct {
     input.BucketAccountId != null
     acct := input.BucketAccountId

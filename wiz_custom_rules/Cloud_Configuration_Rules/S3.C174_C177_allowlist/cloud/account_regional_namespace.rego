@@ -1,10 +1,9 @@
 package wiz
 
 # --- Configuration ---
-# Buckets allowed to stay in the global namespace until they are replaced, since
-# a bucket's namespace is fixed when it is created. List bucket names; every
-# other bucket must be in its account regional namespace. Keep in sync with the
-# Terraform matcher.
+# Bucket names allowed to stay in the global namespace until replaced (it is
+# fixed at creation). Every other bucket must be in its account regional
+# namespace. Keep in sync with the Terraform matcher.
 authorized_global_buckets := {
     "example-legacy-bucket-awaiting-migration",
 }
@@ -22,8 +21,7 @@ account_id := a {
     regex.match(`^[0-9]{12}$`, a)
 }
 
-# BucketRegion comes from ListBuckets; the connector's own region field is the
-# fallback.
+# BucketRegion comes from ListBuckets; the connector region is the fallback.
 region := r {
     r := input.BucketRegion
     is_string(r)

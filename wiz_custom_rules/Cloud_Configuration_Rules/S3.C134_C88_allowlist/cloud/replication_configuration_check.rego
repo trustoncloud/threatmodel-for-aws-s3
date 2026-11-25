@@ -1,13 +1,10 @@
 package wiz
 
 # --- Configuration ---
-# Authorized replication routes: source bucket name, then each destination
-# bucket ARN it may replicate to and that route's expected settings:
-#   replica_kms_key  KMS key ARN for replicas of SSE-KMS objects, or null when
-#                    the route must not name a replica key
-#   owner_override   whether replica ownership passes to the destination account
-#   rtc              whether S3 Replication Time Control must be enabled
-# S3.C87 checks which buckets may replicate. Keep in sync with S3.C87.
+# Authorized routes: source bucket name, then destination bucket ARN. Set
+# replica_kms_key (key ARN, or null for none), owner_override (replicas owned
+# by the destination account) and rtc (Replication Time Control required).
+# Keep in sync with S3.C87.
 authorized_replications := {
     "authorized-source-bucket": {
         "arn:aws:s3:::authorized-replica-bucket": {
@@ -26,8 +23,7 @@ authorized_replications := {
 # --- Logic ---
 default result := "pass"
 
-# Replication arrives at bucketReplication.ReplicationConfiguration; the whole
-# aggregation is null when the bucket has no replication.
+# bucketReplication is null when the bucket has no replication.
 fetch_ok {
     input.WizMetadata.objectFetchStatus.bucketReplication.result == "Success"
 }
@@ -73,16 +69,14 @@ rtc_enabled(rule) {
     rule.Destination.Metrics.Status == "Enabled"
 }
 
-# Target: every enabled rule replicates to a destination authorized for this
-# source bucket.
+# Target: the destination is authorized for this source bucket.
 problems[msg] {
     rule := enabled_rules[_]
     not routes[rule.Destination.Bucket]
     msg := sprintf("%s replicates to unauthorized destination %s", [rule_label(rule), rule.Destination.Bucket])
 }
 
-# Encryption: a route with a replica key replicates SSE-KMS objects with
-# exactly that key; a route without one names no replica key.
+# Encryption: exactly the route's replica key, or no replica key when null.
 problems[msg] {
     rule := enabled_rules[_]
     route := routes[rule.Destination.Bucket]
@@ -134,7 +128,7 @@ problems[msg] {
     msg := sprintf("%s does not enable Replication Time Control with metrics", [rule_label(rule)])
 }
 
-# Buckets not on the list are S3.C87's finding, not this rule's.
+# A bucket not on the list is skipped; S3.C87 reports it.
 result := "skip" {
     not fetch_ok
 } else := "skip" {

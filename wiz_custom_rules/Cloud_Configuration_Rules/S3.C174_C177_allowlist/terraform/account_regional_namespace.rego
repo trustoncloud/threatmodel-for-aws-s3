@@ -30,11 +30,71 @@ literal_namespace(v) {
     not contains(v, "${")
 }
 
+# --- toc-match begin: tf v1 ---
+# A Terraform value that is still an unresolved reference ("${...}"). Treat
+# it as unknown: never compare it with an allowlist as a string.
+tocm_tf_unresolved(v) {
+    is_string(v)
+    contains(v, "${")
+}
+# --- toc-match end: tf v1 ---
+
+# --- tf_never_created: begin ---
+# A resource with a literal count of 0 or an empty for_each is never created
+# and is not judged; any other expression is judged.
+tf_expression(v) := trim_space(trim_suffix(trim_prefix(trim_space(v), "${"), "}")) {
+    is_string(v)
+}
+
+tf_empty_collection := `^(\[\s*\]|\{\s*\}|toset\(\s*(\[\s*\]|\{\s*\})\s*\))$`
+
+tf_zero(v) {
+    v == 0
+}
+
+tf_zero(v) {
+    tf_expression(v) == "0"
+}
+
+tf_empty(v) {
+    is_array(v)
+    count(v) == 0
+}
+
+tf_empty(v) {
+    is_object(v)
+    count(v) == 0
+}
+
+tf_empty(v) {
+    regex.match(tf_empty_collection, tf_expression(v))
+}
+
+tf_not_created(r) {
+    tf_zero(object.get(r, "count", null))
+}
+
+tf_not_created(r) {
+    tf_empty(object.get(r, "for_each", null))
+}
+# --- tf_never_created: end ---
+
+# A region or bucket name given by reference is known only at apply; not judged.
+tf_scope_unresolved(bucket) {
+    tocm_tf_unresolved(bucket.region)
+}
+
+tf_scope_unresolved(bucket) {
+    tocm_tf_unresolved(bucket.bucket)
+}
+
 WizPolicy[result] {
     document := input.document[i]
     bucket := document.resource.aws_s3_bucket[name]
+    not tf_not_created(bucket)
     not unsupported_region(bucket)
     not authorized_global(bucket)
+    not tf_scope_unresolved(bucket)
     not terraLib.validKey(bucket, "bucket_namespace")
 
     result := {
@@ -52,8 +112,10 @@ WizPolicy[result] {
 WizPolicy[result] {
     document := input.document[i]
     bucket := document.resource.aws_s3_bucket[name]
+    not tf_not_created(bucket)
     not unsupported_region(bucket)
     not authorized_global(bucket)
+    not tf_scope_unresolved(bucket)
     ns := bucket.bucket_namespace
     literal_namespace(ns)
     lower(ns) != "account-regional"

@@ -9,13 +9,11 @@ authorized_vpcs := {
 }
 
 # --- Policy helpers ---
-# Policies reach the matcher in three shapes: a JSON string with real IAM keys
-# (jsonencode or heredoc), a JSON string with resolved data-source keys
-# (Actions/Resources/Principals, condition values as arrays), or an unresolved
-# reference to an aws_iam_policy_document data block (walked directly,
-# lowercase names).
+# A policy is a JSON string with IAM keys or resolved data-source keys
+# (Actions, Resources), or a reference to an aws_iam_policy_document block.
 
-restriction_operators := {"stringnotequals", "stringnotequalsifexists"}
+# Condition operator names are case sensitive, so they match by exact name.
+restriction_operators := {"StringNotEquals", "StringNotEqualsIfExists"}
 
 stmt_actions(stmt) := terraLib.getArray(stmt.Action)
 stmt_actions(stmt) := terraLib.getArray(stmt.Actions)
@@ -23,11 +21,12 @@ stmt_actions(stmt) := terraLib.getArray(stmt.Actions)
 stmt_resources(stmt) := terraLib.getArray(stmt.Resource)
 stmt_resources(stmt) := terraLib.getArray(stmt.Resources)
 
-json_covers_all_s3(stmt) { stmt_actions(stmt)[_] == "s3:*" }
-json_covers_all_s3(stmt) { stmt_actions(stmt)[_] == "*" }
+# IAM action names are not case sensitive, so they are compared in lower case.
+all_s3_actions := {"s3:*", "*"}
 
-hcl_covers_all_s3(stmt) { terraLib.getArray(stmt.actions)[_] == "s3:*" }
-hcl_covers_all_s3(stmt) { terraLib.getArray(stmt.actions)[_] == "*" }
+json_covers_all_s3(stmt) { all_s3_actions[lower(stmt_actions(stmt)[_])] }
+
+hcl_covers_all_s3(stmt) { all_s3_actions[lower(terraLib.getArray(stmt.actions)[_])] }
 
 wildcard(v) { v == "*" }
 wildcard(v) { v[_] == "*" }
@@ -48,8 +47,7 @@ json_statements(pol) := array.concat(terraLib.getStatement(doc), terraLib.getArr
     doc := json.unmarshal(pol.policy)
 }
 
-# A statement written with NotResource, NotAction or NotPrincipal is never
-# counted as the covering deny.
+# A statement with NotResource, NotAction or NotPrincipal never counts.
 not_keys := {
     "NotResource", "NotResources", "NotAction", "NotActions", "NotPrincipal", "NotPrincipals",
     "not_resources", "not_actions", "not_principals",
@@ -66,9 +64,9 @@ json_uses_not(stmt) { is_set_value(stmt[not_keys[_]]) }
 
 hcl_uses_not(stmt) { is_set_value(stmt[not_keys[_]]) }
 
-# A Deny for everyone on all S3 actions whose only condition is a
-# StringNotEquals on aws:SourceVpc allows exactly the listed VPCs.
-vpc_restrictions(document, pol) := json_rs | hcl_rs {
+# Denies for everyone on all S3 actions whose only condition is aws:SourceVpc,
+# read from the policy's JSON and from data block ds ({} when it names none).
+vpc_restrictions(ds, pol) := json_rs | hcl_rs {
     json_rs := {{"resources": stmt_resources(stmt), "vpcs": terraLib.getArray(val)} |
         stmt := json_statements(pol)[_]
         stmt.Effect == "Deny"
@@ -77,15 +75,13 @@ vpc_restrictions(document, pol) := json_rs | hcl_rs {
         json_everyone(stmt)
         count(stmt.Condition) == 1
         conditions := stmt.Condition[operator]
-        restriction_operators[lower(operator)]
+        restriction_operators[operator]
         count(conditions) == 1
         val := conditions[key]
         lower(key) == "aws:sourcevpc"
     }
     hcl_rs := {{"resources": terraLib.getArray(stmt.resources), "vpcs": terraLib.getArray(c.values)} |
-        is_string(pol.policy)
-        ds := document.data.aws_iam_policy_document[policy_data_source_name(pol.policy)]
-        stmt := terraLib.getArray(ds.statement)[_]
+        stmt := tf_deny_statements(ds)[_]
         lower(stmt.effect) == "deny"
         not hcl_uses_not(stmt)
         hcl_covers_all_s3(stmt)
@@ -93,15 +89,34 @@ vpc_restrictions(document, pol) := json_rs | hcl_rs {
         conds := terraLib.getArray(stmt.condition)
         count(conds) == 1
         c := conds[0]
-        restriction_operators[lower(c.test)]
+        restriction_operators[c.test]
         lower(c.variable) == "aws:sourcevpc"
     }
 }
 
-bucket_restrictions(document, bucket, name) := {r |
-    pol := document.resource.aws_s3_bucket_policy[pName]
-    terraLib.associatedResources(pol, bucket, pName, name, "bucket", "id")
-    r := vpc_restrictions(document, pol)[_]
+# The policy argument and every linked aws_s3_bucket_policy. Only one applies,
+# so each must hold the restriction alone. Any unauthorized VPC is reported.
+bucket_policies(i, bucket, name) := inline | linked {
+    inline := {src |
+        is_string(object.get(bucket, "policy", null))
+        src := {"id": sprintf("aws_s3_bucket.%s (policy argument)", [name]), "doc": i, "pol": bucket}
+    }
+    linked := {{"id": sprintf("aws_s3_bucket_policy.%s", [pName]), "doc": j, "pol": pol} |
+        pol := input.document[j].resource.aws_s3_bucket_policy[pName]
+        not tf_not_created(pol)
+        terraLib.associatedResources(pol, bucket, pName, name, "bucket", "id")
+        tf_reference_reaches(i, j, pol.bucket, "aws_s3_bucket", name)
+    }
+}
+
+# The data blocks a source names, each read on its own.
+source_documents(src) := tf_documents_or_none(src.doc, object.get(src.pol, "policy", null))
+
+# An unauthorized VPC in any data block a source names is reported.
+bucket_restrictions(i, bucket, name) := {r |
+    src := bucket_policies(i, bucket, name)[_]
+    ds := source_documents(src)[_]
+    r := vpc_restrictions(ds, src.pol)[_]
 }
 
 # --- Resource scope ---
@@ -118,8 +133,7 @@ literal_bucket_name(bucket) := n {
 
 own_arn_pattern(name) := sprintf(`^(\$\{aws_s3_bucket\.%s\.arn\}|aws_s3_bucket\.%s\.arn|arn:[^:]*:s3:::(?:\$\{)?aws_s3_bucket\.%s\.(id|bucket)\}?)(.*)$`, [name, name, name])
 
-# A pattern reaches the bucket when it matches the bucket ARN, and the objects
-# only when it leaves no key out.
+# A pattern covers the objects only when it leaves no key out.
 pattern_reaches(pattern, arn, "bucket") {
     tocm_iam_pattern_matches(pattern, arn)
 }
@@ -132,8 +146,7 @@ resource_reaches(r, bucket, name, target) {
     r == "*"
 }
 
-# A reference to this bucket's ARN or name, interpolated or bare: judge
-# whatever follows it, with "x" standing for the bucket ARN.
+# A reference to this bucket: judge what follows it, with "x" as the ARN.
 resource_reaches(r, bucket, name, target) {
     m := regex.find_all_string_submatch_n(own_arn_pattern(name), r, 1)[0]
     pattern_reaches(concat("", ["x", m[3]]), "x", target)
@@ -145,8 +158,7 @@ resource_reaches(r, bucket, name, target) {
     pattern_reaches(r, sprintf("arn:%s:s3:::%s", [partitions[_], n]), target)
 }
 
-# Values that cannot be resolved statically (a generated bucket name, variables,
-# locals, module outputs) are given the benefit of the doubt.
+# Values that cannot be resolved statically are given the benefit of the doubt.
 resource_reaches(r, bucket, name, target) {
     not contains(r, "${")
     not literal_bucket_name(bucket)
@@ -161,17 +173,36 @@ resource_reaches(r, bucket, name, target) {
     regex.match(`^(var|local|module|data)\.`, r)
 }
 
-has_restriction(document, bucket, name) {
+document_restricted(ds, src, bucket, name) {
     reached := {target |
-        r := bucket_restrictions(document, bucket, name)[_]
+        r := vpc_restrictions(ds, src.pol)[_]
         scope_targets[target]
         resource_reaches(r.resources[_], bucket, name, target)
     }
     count(reached) == count(scope_targets)
 }
 
-allowed_vpcs(document, bucket, name) := {vpc |
-    vpc := bucket_restrictions(document, bucket, name)[_].vpcs[_]
+# A data block defined in several files must hold the restriction in each.
+source_restricted(src, bucket, name) {
+    count([ds | ds := source_documents(src)[_]; not document_restricted(ds, src, bucket, name)]) == 0
+}
+
+unrestricted_sources(i, bucket, name) := {src.id |
+    src := bucket_policies(i, bucket, name)[_]
+    not source_restricted(src, bucket, name)
+}
+
+has_restriction(i, bucket, name) {
+    count(bucket_policies(i, bucket, name)) > 0
+    count(unrestricted_sources(i, bucket, name)) == 0
+}
+
+restriction_actual_value(i, bucket, name) := sprintf("bucket '%s' sets more than one bucket policy and only one applies after apply, so each must hold the full VPC restriction on its own; these do not: %s", [name, concat(", ", sort(unrestricted_sources(i, bucket, name)))]) {
+    count(bucket_policies(i, bucket, name)) > 1
+} else := sprintf("bucket '%s' has no bucket policy (policy argument or aws_s3_bucket_policy) restricting access to authorized VPCs at that scope", [name])
+
+allowed_vpcs(i, bucket, name) := {vpc |
+    vpc := bucket_restrictions(i, bucket, name)[_].vpcs[_]
 }
 
 # --- Logic ---
@@ -179,7 +210,8 @@ allowed_vpcs(document, bucket, name) := {vpc |
 WizPolicy[result] {
     document := input.document[i]
     bucket := document.resource.aws_s3_bucket[name]
-    not has_restriction(document, bucket, name)
+    not tf_not_created(bucket)
+    not has_restriction(i, bucket, name)
 
     result := {
         "documentId": document.id,
@@ -188,7 +220,7 @@ WizPolicy[result] {
         "searchKey": sprintf("aws_s3_bucket[%s]", [name]),
         "issueType": "MissingAttribute",
         "keyExpectedValue": sprintf("bucket '%s' must have a bucket policy Deny for all principals and all S3 actions on the bucket and every object in it whose only condition is StringNotEquals on aws:SourceVpc, listing only authorized VPCs: %v", [name, authorized_vpcs]),
-        "keyActualValue": sprintf("bucket '%s' has no bucket policy restricting access to authorized VPCs at that scope", [name]),
+        "keyActualValue": restriction_actual_value(i, bucket, name),
         "resourceTags": terraLib.get_resource_tags(bucket),
     }
 }
@@ -197,7 +229,8 @@ WizPolicy[result] {
 WizPolicy[result] {
     document := input.document[i]
     bucket := document.resource.aws_s3_bucket[name]
-    unauth := allowed_vpcs(document, bucket, name) - authorized_vpcs
+    not tf_not_created(bucket)
+    unauth := allowed_vpcs(i, bucket, name) - authorized_vpcs
     count(unauth) > 0
 
     result := {
@@ -212,12 +245,159 @@ WizPolicy[result] {
     }
 }
 
-# The data block a policy names: data.aws_iam_policy_document.<name>.json,
-# written with or without "${}".
+# The data block a policy names, as data.aws_iam_policy_document.<name>.json.
 policy_data_source_name(v) := m[1] {
     is_string(v)
     m := regex.find_all_string_submatch_n(`^\s*(?:\$\{)?\s*data\.aws_iam_policy_document\.([A-Za-z0-9_-]+)\.(?:minified_)?json\s*\}?\s*$`, v, 1)[0]
 }
+
+# A policy naming no data block this scan holds is read from its JSON alone.
+tf_documents_or_none(i, v) := docs {
+    docs := [c.block | c := tf_lookup(i, "data", "aws_iam_policy_document", policy_data_source_name(v))[_]]
+    count(docs) > 0
+} else := [{}]
+
+# --- tf_scan_lookup: begin ---
+# A reference reads the definition in its own file, else every definition in
+# the other files of its module: the document id up to its last "/" or "\".
+tf_module(i) := m[1] {
+    m := regex.find_all_string_submatch_n(`^(.*)[/\\][^/\\]*$`, input.document[i].id, 1)[0]
+} else := ""
+
+# Documents whose <kind>.<rtype>.<name> a reference in document i reads.
+tf_lookup_docs(i, kind, rtype, name) := {i} {
+    input.document[i][kind][rtype][name]
+} else := {j |
+    input.document[j][kind][rtype][name]
+    j != i
+    tf_module(j) == tf_module(i)
+}
+
+# Those definitions, as {"doc": index, "block": definition}.
+tf_lookup(i, kind, rtype, name) := {{"doc": j, "block": input.document[j][kind][rtype][name]} |
+    j := tf_lookup_docs(i, kind, rtype, name)[_]
+}
+
+# A value naming <rtype>.<name> by its address, with any instance index.
+tf_names_address(v, rtype, name) {
+    is_string(v)
+    regex.match(sprintf(`(^|[^A-Za-z0-9_.-])%s\.%s(\[[^\]]*\])?\.`, [rtype, name]), v)
+}
+
+# A reference v in document j reaches <rtype>.<name> of document i.
+tf_reference_reaches(i, j, v, rtype, name) {
+    j == i
+}
+
+tf_reference_reaches(i, j, v, rtype, name) {
+    j != i
+    tf_names_address(v, rtype, name)
+    tf_lookup_docs(j, "resource", rtype, name)[i]
+}
+# --- tf_scan_lookup: end ---
+
+# --- tf_never_created: begin ---
+# A resource with a literal count of 0 or an empty for_each is never created
+# and is not judged; any other expression is judged.
+tf_expression(v) := trim_space(trim_suffix(trim_prefix(trim_space(v), "${"), "}")) {
+    is_string(v)
+}
+
+tf_empty_collection := `^(\[\s*\]|\{\s*\}|toset\(\s*(\[\s*\]|\{\s*\})\s*\))$`
+
+tf_zero(v) {
+    v == 0
+}
+
+tf_zero(v) {
+    tf_expression(v) == "0"
+}
+
+tf_empty(v) {
+    is_array(v)
+    count(v) == 0
+}
+
+tf_empty(v) {
+    is_object(v)
+    count(v) == 0
+}
+
+tf_empty(v) {
+    regex.match(tf_empty_collection, tf_expression(v))
+}
+
+tf_not_created(r) {
+    tf_zero(object.get(r, "count", null))
+}
+
+tf_not_created(r) {
+    tf_empty(object.get(r, "for_each", null))
+}
+# --- tf_never_created: end ---
+
+# --- tf_dynamic: begin ---
+# A dynamic block generates blocks the source does not show; one whose
+# for_each is a literal empty collection generates nothing. Needs
+# tf_never_created.
+tf_dynamic_blocks(b, label) := {d |
+    d := terraLib.getArray(b.dynamic[_][label])[_]
+    is_object(d)
+} | {d |
+    d := terraLib.getArray(b.dynamic[label])[_]
+    is_object(d)
+}
+
+tf_dynamic(b, label) {
+    d := tf_dynamic_blocks(b, label)[_]
+    not tf_empty(object.get(d, "for_each", null))
+}
+# --- tf_dynamic: end ---
+
+# --- tf_policy_document: begin ---
+# Statements a policy document does not show: a dynamic statement block, and
+# source or override documents. Needs tf_dynamic.
+tf_document_set(v) {
+    v != null
+    v != []
+    v != {}
+    v != ""
+}
+
+tf_document_overridden(ds) {
+    tf_document_set(object.get(ds, {"override_policy_documents", "override_json"}[_], null))
+}
+
+# The document may hold statements beyond the ones it writes out.
+tf_document_unshown(ds) {
+    tf_dynamic(ds, "statement")
+}
+
+tf_document_unshown(ds) {
+    tf_document_set(object.get(ds, {"source_policy_documents", "source_json"}[_], null))
+}
+
+tf_document_unshown(ds) {
+    tf_document_overridden(ds)
+}
+
+# A written statement whose principals a dynamic block generates.
+tf_statement_dynamic_principals(stmt) {
+    tf_dynamic(stmt, {"principals", "not_principals"}[_])
+}
+
+tf_statement_dynamic(stmt) {
+    tf_dynamic(stmt, {"condition", "principals", "not_principals"}[_])
+}
+
+# Written statements that can prove a Deny: none when an override document
+# may replace them, and none with a dynamic block inside.
+tf_deny_statements(ds) := [stmt |
+    not tf_document_overridden(ds)
+    stmt := terraLib.getArray(object.get(ds, "statement", []))[_]
+    not tf_statement_dynamic(stmt)
+]
+# --- tf_policy_document: end ---
 
 # --- Matching helpers ---
 # --- toc-match begin: iampattern v1 ---

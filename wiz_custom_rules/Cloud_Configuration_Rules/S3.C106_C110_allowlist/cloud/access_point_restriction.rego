@@ -30,10 +30,19 @@ statements[s] {
     s := policy_doc.Statement
 }
 
-covers_all_s3(action) { action == "s3:*" }
-covers_all_s3(action) { action == "*" }
-covers_all_s3(action) { action[_] == "s3:*" }
-covers_all_s3(action) { action[_] == "*" }
+# IAM action names are not case sensitive, so they are compared in lower case.
+all_s3_actions := {"s3:*", "*"}
+
+covers_all_s3(action) {
+    is_string(action)
+    all_s3_actions[lower(action)]
+}
+
+covers_all_s3(action) {
+    a := action[_]
+    is_string(a)
+    all_s3_actions[lower(a)]
+}
 
 wildcard(v) { v == "*" }
 wildcard(v) { v[_] == "*" }
@@ -41,9 +50,8 @@ wildcard(v) { v[_] == "*" }
 applies_to_everyone(principal) { principal == "*" }
 applies_to_everyone(principal) { wildcard(principal.AWS) }
 
-# The deny must reach every object in the bucket: one Resource pattern must
-# leave no key out. Covering the bucket ARN as well is accepted but not
-# required, since bucket settings calls cannot go through an access point.
+# The deny must reach every object; the bucket ARN is optional, since bucket
+# settings calls cannot go through an access point.
 bucket_arn := input.BucketArn {
     is_string(input.BucketArn)
 } else := sprintf("arn:aws:s3:::%s", [input.Name])
@@ -54,18 +62,23 @@ covers_every_object(stmt) {
     tocm_s3_pattern_covers_objects(as_array(stmt.Resource)[_], bucket_arn)
 }
 
-restriction_operators := {"stringnotequals", "stringnotequalsifexists"}
+# A statement with NotResource, NotAction or NotPrincipal never counts.
+uses_not_element(stmt) {
+    _ = stmt[{"NotResource", "NotAction", "NotPrincipal"}[_]]
+}
 
-# A Deny for everyone on all S3 actions whose only condition is a
-# StringNotEquals on s3:DataAccessPointArn allows exactly the listed access
-# points.
+# Condition operator names are case sensitive, so they match by exact name.
+restriction_operators := {"StringNotEquals", "StringNotEqualsIfExists"}
+
+# A Deny for everyone on all S3 actions conditioned only on the access point.
 ap_condition_values(stmt) := vals {
     stmt.Effect == "Deny"
+    not uses_not_element(stmt)
     covers_all_s3(stmt.Action)
     applies_to_everyone(stmt.Principal)
     count(stmt.Condition) == 1
     conditions := stmt.Condition[operator]
-    restriction_operators[lower(operator)]
+    restriction_operators[operator]
     count(conditions) == 1
     val := conditions[key]
     lower(key) == "s3:dataaccesspointarn"
@@ -99,7 +112,7 @@ currentConfiguration := "Bucket has no bucket policy, so access points are not r
 } else := sprintf("Bucket policy allows unauthorized access point(s): %v", [unauthorized_aps]) {
     result == "fail"
     count(unauthorized_aps) > 0
-} else := "Bucket policy has no access point restriction that applies to all principals and all S3 actions on every object, with no other condition." {
+} else := "Bucket policy has no access point restriction that applies to all principals and all S3 actions on every object, with no other condition and no NotPrincipal, NotAction or NotResource." {
     result == "fail"
 } else := "Bucket policy restricts access to authorized access points."
 

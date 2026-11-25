@@ -12,12 +12,12 @@ S3.C50,"account-level S3 Block Public Access is enabled on all AWS accounts, wit
 S3.C52,"S3 Block Public Access is enabled on all S3 buckets, with BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, and RestrictPublicBuckets set to true.",,"S3-039, S3-037, S3-040, S3-038",-
 S3.C54,"S3 Block Public Access is enabled on all S3 access points, with BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, and RestrictPublicBuckets set to true.",,PrivateEndpoint-001,-
 S3.C57,the control blocking bucket ACL changes is properly implemented.,,S3-044,-
-S3.C62,all objects in S3 buckets are encrypted with an authorized KMS key.,,S3-010,-
+S3.C62,all objects in S3 buckets are encrypted with an authorized KMS key.,Allowlist,S3-010 (Partial),S3.C140 (Directive)
 S3.C65,each bucket has an authorized default encryption key and has S3 Bucket Key enabled.,,S3-049,-
 S3.C67,all buckets block PutObject requests with an unauthorized KMS key.,Allowlist,S3-022 (Partial),S3.C66 (Preventative)
 S3.C70,buckets holding primary data are versioned.,,S3-002,-
-S3.C75,all buckets requiring WORM have the correct default S3 Object Lock configuration.,,S3-041,-
-S3.C77,all buckets requiring WORM block PutObject and PutObjectRetention requests with unauthorized S3 Object Lock.,,S3-045,-
+S3.C75,all buckets requiring WORM have the correct default S3 Object Lock configuration.,Allowlist,S3-041 (Partial),S3.C74 (Preventative)
+S3.C77,all buckets requiring WORM block PutObject and PutObjectRetention requests with unauthorized S3 Object Lock.,,None. S3-045 checks cross-account Allow statements; no built-in checks Object Lock conditions on PutObject or PutObjectRetention,-
 S3.C79,a lifecycle policy on incomplete multipart uploads is implemented on all buckets.,,S3-048,-
 S3.C87,only authorized buckets have replication enabled with their correct configuration.,Allowlist,S3-023 (Partial: checks that a replication rule exists; not which buckets may replicate),S3.C134 (Directive)
 S3.C88,authorized buckets have the correct replication configuration.,Allowlist,N/A,S3.C134 (Directive)

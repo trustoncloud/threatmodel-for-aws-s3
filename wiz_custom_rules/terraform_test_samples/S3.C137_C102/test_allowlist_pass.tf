@@ -206,3 +206,123 @@ resource "aws_s3_bucket_policy" "cf_named" {
   bucket = aws_s3_bucket.cf_named.id
   policy = data.aws_iam_policy_document.cfdoc_main.json
 }
+
+# OAC association to an authorized distribution, set in the policy argument of
+# the bucket
+resource "aws_s3_bucket" "inline_cf" {
+  bucket = "inline-cf-bucket"
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": { "Service": "cloudfront.amazonaws.com" },
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::inline-cf-bucket/*",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceArn": "arn:aws:cloudfront::123456789012:distribution/E2AUTHORIZED12345"
+        }
+      }
+    }
+  ]
+}
+POLICY
+}
+
+# Both forms: an authorized identity in the policy argument of the bucket built
+# by a data source, an authorized distribution in the linked aws_s3_bucket_policy
+resource "aws_s3_bucket" "both_cf" {
+  bucket = "both-cf-bucket"
+  policy = data.aws_iam_policy_document.both_cf.json
+}
+
+data "aws_iam_policy_document" "both_cf" {
+  statement {
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["arn:aws:s3:::both-cf-bucket/*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity E2AUTHORIZED12345"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "both_cf" {
+  bucket = aws_s3_bucket.both_cf.id
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": { "Service": "cloudfront.amazonaws.com" },
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::both-cf-bucket/*",
+      "Condition": {
+        "ArnEquals": {
+          "aws:SourceArn": "arn:aws:cloudfront::123456789012:distribution/E2AUTHORIZED12345"
+        }
+      }
+    }
+  ]
+}
+POLICY
+}
+
+# Data-source policy referenced through minified_json, OAC to an authorized
+# distribution: no finding
+resource "aws_s3_bucket" "ds_minified_ok" {
+  bucket = "ds-minified-ok-bucket"
+}
+
+data "aws_iam_policy_document" "ds_minified_ok" {
+  statement {
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["arn:aws:s3:::ds-minified-ok-bucket/*"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+      values   = ["arn:aws:cloudfront::123456789012:distribution/E2AUTHORIZED12345"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "ds_minified_ok" {
+  bucket = aws_s3_bucket.ds_minified_ok.id
+  policy = data.aws_iam_policy_document.ds_minified_ok.minified_json
+}
+
+# --- Never-created resources and statements the source does not show ---
+
+# A bucket that is never created is not judged, whatever its policy grants.
+resource "aws_s3_bucket" "zzncsubj" {
+  count  = 0
+  bucket = "zz-cloudfront-bucket"
+  policy = <<POLICY
+{"Version": "2012-10-17", "Statement": [{"Effect": "Allow", "Principal": {"Service": "cloudfront.amazonaws.com"}, "Action": "s3:GetObject", "Resource": "*"}]}
+POLICY
+}
+
+# A bucket policy that is never created grants nothing.
+resource "aws_s3_bucket" "zzncpol" {
+  bucket = "zz-cloudfront-bucket"
+}
+
+resource "aws_s3_bucket_policy" "zzncpol" {
+  count  = 0
+  bucket = aws_s3_bucket.zzncpol.id
+  policy = <<POLICY
+{"Version": "2012-10-17", "Statement": [{"Effect": "Allow", "Principal": {"Service": "cloudfront.amazonaws.com"}, "Action": "s3:GetObject", "Resource": "*"}]}
+POLICY
+}

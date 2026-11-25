@@ -30,12 +30,8 @@ statements[s] {
     s := policy_doc.Statement
 }
 
-covers_put_object(action) { action == "s3:PutObject" }
-covers_put_object(action) { action == "s3:*" }
-covers_put_object(action) { action == "*" }
-covers_put_object(action) { action[_] == "s3:PutObject" }
-covers_put_object(action) { action[_] == "s3:*" }
-covers_put_object(action) { action[_] == "*" }
+# An action pattern counts when it matches s3:PutObject, in any letter case.
+covers_put_object(action) { tocm_iam_pattern_matches(lower(as_array(action)[_]), "s3:putobject") }
 
 wildcard(v) { v == "*" }
 wildcard(v) { v[_] == "*" }
@@ -50,16 +46,14 @@ bucket_arn := input.BucketArn {
 
 as_array(v) := v { is_array(v) } else := [v]
 
-# A statement written with NotResource, NotAction or NotPrincipal is never
-# counted as the covering deny.
+# A statement with a Not element never counts as the covering deny.
 uses_not_element(stmt) {
     _ = stmt[{"NotResource", "NotAction", "NotPrincipal"}[_]]
 }
 
-restriction_operators := {"stringnotequals", "stringnotequalsifexists"}
+# Condition operator names are case sensitive, so they match by exact name.
+restriction_operators := {"StringNotEquals", "StringNotEqualsIfExists"}
 
-# A Deny on PutObject for everyone on every object whose only condition is a
-# StringNotEquals on the KMS key header, listing only authorized keys.
 enforces_authorized_key {
     statement := statements[_]
     statement.Effect == "Deny"
@@ -69,7 +63,7 @@ enforces_authorized_key {
     tocm_s3_pattern_covers_objects(as_array(statement.Resource)[_], bucket_arn)
     count(statement.Condition) == 1
     conditions := statement.Condition[operator]
-    restriction_operators[lower(operator)]
+    restriction_operators[operator]
     count(conditions) == 1
     val := conditions[key]
     lower(key) == "s3:x-amz-server-side-encryption-aws-kms-key-id"

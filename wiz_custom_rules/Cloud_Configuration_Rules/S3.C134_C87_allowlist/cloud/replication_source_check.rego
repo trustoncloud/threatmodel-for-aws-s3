@@ -2,9 +2,8 @@ package wiz
 
 # --- Configuration ---
 # Authorized replication routes: source bucket name, then each destination
-# bucket ARN it may replicate to and that route's expected settings. This rule
-# reads the source bucket names; S3.C88 checks the routes. Keep in sync with
-# S3.C88.
+# bucket ARN and its expected settings. This rule reads only the source names.
+# Keep in sync with S3.C88.
 authorized_replications := {
     "authorized-source-bucket": {
         "arn:aws:s3:::authorized-replica-bucket": {
@@ -23,8 +22,7 @@ authorized_replications := {
 # --- Logic ---
 default result := "pass"
 
-# Replication arrives at bucketReplication.ReplicationConfiguration; the whole
-# aggregation is null when the bucket has no replication.
+# bucketReplication is null when the bucket has no replication.
 fetch_ok {
     input.WizMetadata.objectFetchStatus.bucketReplication.result == "Success"
 }

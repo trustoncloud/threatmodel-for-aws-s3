@@ -381,3 +381,115 @@ data "aws_iam_policy_document" "pd_ref_iso" {
     }
   }
 }
+
+# --- Never-created resources and statements the source does not show ---
+
+# An endpoint policy that is never created (count = 0) does not limit the
+# endpoint, which keeps its default full-access policy.
+resource "aws_vpc_endpoint" "zzncpol" {
+  vpc_id            = "vpc-0123456789abcdef0"
+  service_name      = "com.amazonaws.us-east-1.s3"
+  vpc_endpoint_type = "Gateway"
+}
+
+data "aws_iam_policy_document" "zz_nc_doc" {
+  statement {
+    sid       = "AuthorizedBucket"
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["arn:aws:s3:::authorized-bucket/*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+  }
+}
+
+resource "aws_vpc_endpoint_policy" "zzncpol" {
+  count           = 0
+  vpc_endpoint_id = aws_vpc_endpoint.zzncpol.id
+  policy          = data.aws_iam_policy_document.zz_nc_doc.json
+}
+
+# A dynamic statement block generates statements the source does not show,
+# which may grant more than the written statements.
+resource "aws_vpc_endpoint" "zzdynadd" {
+  vpc_id            = "vpc-0123456789abcdef0"
+  service_name      = "com.amazonaws.us-east-1.s3"
+  vpc_endpoint_type = "Gateway"
+}
+
+data "aws_iam_policy_document" "zz_dyn_added" {
+  statement {
+    sid       = "AuthorizedBucket"
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["arn:aws:s3:::authorized-bucket/*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+  }
+
+  dynamic "statement" {
+    for_each = ["s3:GetObject"]
+    content {
+      effect    = "Allow"
+      actions   = [statement.value]
+      resources = ["arn:aws:s3:::other-bucket/*"]
+      principals {
+        type        = "*"
+        identifiers = ["*"]
+      }
+    }
+  }
+}
+
+resource "aws_vpc_endpoint_policy" "zzdynadd" {
+  vpc_endpoint_id = aws_vpc_endpoint.zzdynadd.id
+  policy          = data.aws_iam_policy_document.zz_dyn_added.json
+}
+
+# source_policy_documents adds statements the document does not write out.
+resource "aws_vpc_endpoint" "zzsrcadd" {
+  vpc_id            = "vpc-0123456789abcdef0"
+  service_name      = "com.amazonaws.us-east-1.s3"
+  vpc_endpoint_type = "Gateway"
+}
+
+data "aws_iam_policy_document" "zz_src_extra" {
+  statement {
+    sid       = "ReadObjects"
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "zz_src_added" {
+  source_policy_documents = [data.aws_iam_policy_document.zz_src_extra.json]
+
+  statement {
+    sid       = "AuthorizedBucketOwn"
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["arn:aws:s3:::authorized-bucket/*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+  }
+}
+
+resource "aws_vpc_endpoint_policy" "zzsrcadd" {
+  vpc_endpoint_id = aws_vpc_endpoint.zzsrcadd.id
+  policy          = data.aws_iam_policy_document.zz_src_added.json
+}

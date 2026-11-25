@@ -19,9 +19,7 @@ literal(v) {
     not tocm_tf_unresolved(v)
 }
 
-# A reference to a bucket in this file, by its exact address: a managed
-# bucket (aws_s3_bucket.<name>) or a data source (data.aws_s3_bucket.<name>),
-# through its id, bucket or arn.
+# A reference to aws_s3_bucket.<name> or data.aws_s3_bucket.<name> in this file.
 bucket_reference(v) := {"block": m[1], "name": m[2]} {
     is_string(v)
     m := regex.find_all_string_submatch_n(`^\s*(?:\$\{)?\s*(data\.)?aws_s3_bucket\.([A-Za-z0-9_-]+)\.(?:id|bucket|arn)\s*\}?\s*$`, v, 1)[0]
@@ -30,8 +28,7 @@ bucket_reference(v) := {"block": m[1], "name": m[2]} {
 referenced_bucket(document, ref) := document.resource.aws_s3_bucket[ref.name] { ref.block == "" }
 referenced_bucket(document, ref) := document.data.aws_s3_bucket[ref.name] { ref.block == "data." }
 
-# The bucket name an access point targets: the name it states, or the name
-# stated on the bucket it references. A generated name is not in the source.
+# The stated bucket name, or the name stated on the referenced bucket.
 tf_target_bucket(document, ap) := ap.bucket {
     literal(ap.bucket)
     not bucket_reference(ap.bucket)
@@ -42,9 +39,8 @@ tf_target_bucket(document, ap) := n {
     literal(n)
 }
 
-# The account that owns the bucket: bucket_account_id when the access point
-# states it, otherwise account_id, the owner of the access point. An access
-# point that states neither is never approved.
+# The bucket owner: bucket_account_id, else account_id. An access point that
+# states neither is never approved.
 stated(ap, key) { object.get(ap, key, null) != null }
 
 stated_account(ap) := sprintf("%v", [ap.bucket_account_id]) { stated(ap, "bucket_account_id") }
@@ -75,9 +71,50 @@ account_text(ap) := sprintf("account '%v'", [tf_target_account(ap)]) {
     stated_account(ap)
 } else := "an account the access point does not state (set bucket_account_id or account_id)"
 
+# --- tf_never_created: begin ---
+# A resource with a literal count of 0 or an empty for_each is never created
+# and is not judged; any other expression is judged.
+tf_expression(v) := trim_space(trim_suffix(trim_prefix(trim_space(v), "${"), "}")) {
+    is_string(v)
+}
+
+tf_empty_collection := `^(\[\s*\]|\{\s*\}|toset\(\s*(\[\s*\]|\{\s*\})\s*\))$`
+
+tf_zero(v) {
+    v == 0
+}
+
+tf_zero(v) {
+    tf_expression(v) == "0"
+}
+
+tf_empty(v) {
+    is_array(v)
+    count(v) == 0
+}
+
+tf_empty(v) {
+    is_object(v)
+    count(v) == 0
+}
+
+tf_empty(v) {
+    regex.match(tf_empty_collection, tf_expression(v))
+}
+
+tf_not_created(r) {
+    tf_zero(object.get(r, "count", null))
+}
+
+tf_not_created(r) {
+    tf_empty(object.get(r, "for_each", null))
+}
+# --- tf_never_created: end ---
+
 WizPolicy[result] {
     document := input.document[i]
     ap := document.resource.aws_s3_access_point[name]
+    not tf_not_created(ap)
     not ap_authorized(document, ap)
 
     result := {

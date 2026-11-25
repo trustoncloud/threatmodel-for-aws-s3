@@ -27,28 +27,25 @@ statements[s] {
 
 as_array(v) := v { is_array(v) } else := [v]
 
-# The deny must cover s3:PutObjectAcl, by name or by a pattern that matches it.
-# An upload that sets an ACL needs s3:PutObjectAcl as well, so the deny also
-# stops uploads with a public canned ACL.
-covers_put_object_acl(stmt) {
-    tocm_iam_pattern_matches(lower(as_array(stmt.Action)[_]), "s3:putobjectacl")
+# s3:PutObjectVersionAcl applies when a request names a version. An upload
+# with an ACL also needs s3:PutObjectAcl, so this deny covers uploads too.
+acl_actions := {"s3:PutObjectAcl", "s3:PutObjectVersionAcl"}
+
+covers_action(stmt, action) {
+    tocm_iam_pattern_matches(lower(as_array(stmt.Action)[_]), lower(action))
 }
 
-# The deny must apply to every principal.
 applies_to_everyone(stmt) { as_array(stmt.Principal)[_] == "*" }
 applies_to_everyone(stmt) { as_array(stmt.Principal.AWS)[_] == "*" }
 
-# The endpoint reaches every bucket, so the deny must cover every object. The
-# endpoint payload does not name its partition, so a pattern for any of these
-# partitions counts.
+# The payload does not name the endpoint's partition, so any of these counts.
 partitions := {"aws", "aws-cn", "aws-us-gov"}
 
 covers_every_object(stmt) {
     tocm_s3_pattern_covers_all_objects(as_array(stmt.Resource)[_], partitions[_])
 }
 
-# A statement written with NotPrincipal, NotAction or NotResource leaves
-# something out, so it never counts.
+# A statement with a Not element leaves something out and never counts.
 negated_elements := {"NotPrincipal", "NotAction", "NotResource"}
 
 uses_negation(stmt) {
@@ -56,8 +53,16 @@ uses_negation(stmt) {
     object.get(stmt, k, null) != null
 }
 
-# The canned ACL test must be the only condition; any extra key narrows the deny.
-conditions(stmt) := [{"operator": lower(op), "key": lower(key), "values": as_array(v)} | v := stmt.Condition[op][key]]
+full_scope_deny(stmt) {
+    stmt.Effect == "Deny"
+    not uses_negation(stmt)
+    applies_to_everyone(stmt)
+    covers_every_object(stmt)
+}
+
+# Each header test must be the only condition: two keys deny only requests
+# with both. Operator names are case sensitive; key names are not.
+conditions(stmt) := [{"operator": op, "key": lower(key), "values": as_array(v)} | v := stmt.Condition[op][key]]
 
 sole_condition(stmt) := c {
     cs := conditions(stmt)
@@ -65,48 +70,132 @@ sole_condition(stmt) := c {
     c := cs[0]
 }
 
-public_acls := {"public-read", "public-read-write"}
+# Canned ACLs that let anyone, or any AWS account, read the object.
+public_canned_acls := {"public-read", "public-read-write", "authenticated-read"}
 
-acl_operators := {"stringequals", "stringequalsifexists"}
+canned_acl_operators := {"StringEquals", "StringEqualsIfExists"}
 
-# A Deny of s3:PutObjectAcl for all principals on every object, with the
-# canned ACL test as its one condition.
-acl_deny(stmt) := c {
-    stmt.Effect == "Deny"
-    not uses_negation(stmt)
-    applies_to_everyone(stmt)
-    covers_put_object_acl(stmt)
-    covers_every_object(stmt)
-    c := sole_condition(stmt)
-    acl_operators[c.operator]
+# A canned ACL is one token, so a pattern covers each ACL it matches.
+canned_acl_pattern_operators := {"StringLike", "StringLikeIfExists"}
+
+# Grant headers, and the groups whose grant makes an object public.
+grant_headers := {
+    "s3:x-amz-grant-read",
+    "s3:x-amz-grant-read-acp",
+    "s3:x-amz-grant-write-acp",
+    "s3:x-amz-grant-full-control",
+}
+
+public_groups := {
+    "http://acs.amazonaws.com/groups/global/AllUsers": "AllUsers",
+    "http://acs.amazonaws.com/groups/global/AuthenticatedUsers": "AuthenticatedUsers",
+}
+
+grant_operators := {"StringLike", "StringLikeIfExists"}
+
+# A grant header lists comma-separated grantees, so only a pattern with "*" at
+# both ends covers the group URI wherever it sits.
+pattern_covers_group(p, uri) {
+    is_string(p)
+    startswith(p, "*")
+    endswith(p, "*")
+    tocm_iam_pattern_matches(p, uri)
+}
+
+# Every pairing of action and header value the policy must deny.
+required[r] {
+    action := acl_actions[_]
+    acl := public_canned_acls[_]
+    r := {"action": action, "key": "s3:x-amz-acl", "value": acl}
+}
+
+required[r] {
+    action := acl_actions[_]
+    header := grant_headers[_]
+    public_groups[uri]
+    r := {"action": action, "key": header, "value": uri}
+}
+
+condition_covers(c, value) {
     c.key == "s3:x-amz-acl"
+    canned_acl_operators[c.operator]
+    c.values[_] == value
 }
 
-# Qualifying denies may split the two public canned ACLs between them.
-blocked_acls[v] {
-    c := acl_deny(statements[_])
-    v := c.values[_]
+condition_covers(c, value) {
+    c.key == "s3:x-amz-acl"
+    canned_acl_pattern_operators[c.operator]
+    tocm_iam_pattern_matches(c.values[_], value)
 }
 
-missing_acls := public_acls - blocked_acls
+condition_covers(c, uri) {
+    grant_headers[c.key]
+    grant_operators[c.operator]
+    pattern_covers_group(c.values[_], uri)
+}
+
+# Null "false" denies every request that carries the header, whatever it names.
+condition_covers(c, _) {
+    grant_headers[c.key]
+    c.operator == "Null"
+    is_false(c.values[_])
+}
+
+is_false(v) { v == false }
+
+is_false(v) {
+    is_string(v)
+    lower(v) == "false"
+}
+
+# Qualifying denies may split the actions, headers and values between them.
+covered[r] {
+    stmt := statements[_]
+    full_scope_deny(stmt)
+    c := sole_condition(stmt)
+    r := required[_]
+    r.key == c.key
+    covers_action(stmt, r.action)
+    condition_covers(c, r.value)
+}
+
+# A deny with no condition blocks every ACL write of the actions it covers.
+covered[r] {
+    stmt := statements[_]
+    full_scope_deny(stmt)
+    count(conditions(stmt)) == 0
+    r := required[_]
+    covers_action(stmt, r.action)
+}
+
+missing := required - covered
+
+describe(r) := sprintf("%s with %s %s", [r.action, r.key, r.value]) {
+    r.key == "s3:x-amz-acl"
+} else := sprintf("%s with %s naming %s", [r.action, r.key, public_groups[r.value]])
+
+missing_list := concat(", ", sort([describe(r) | r := missing[_]]))
 
 result := "skip" {
     not is_s3_endpoint
 } else := "fail" {
     input.PolicyDocument == null
 } else := "fail" {
-    count(missing_acls) > 0
+    count(missing) > 0
 }
 
 # --- Metadata ---
 currentConfiguration := "VPC endpoint has no policy, so it does not block setting object ACLs to public." {
     result == "fail"
     input.PolicyDocument == null
-} else := sprintf("VPC endpoint policy has no Deny of s3:PutObjectAcl for all principals on all objects, with no other condition, for the canned ACL(s): %v", [missing_acls]) {
+} else := "VPC endpoint policy has no Deny for all principals on every object that blocks a public canned ACL or a public grant header." {
     result == "fail"
-} else := "VPC endpoint policy blocks setting object ACLs to public."
+    count(covered) == 0
+} else := sprintf("VPC endpoint policy does not deny, for all principals on every object with that test as the only condition: %s", [missing_list]) {
+    result == "fail"
+} else := "VPC endpoint policy denies every public canned ACL and public grant header on object ACL writes."
 
-expectedConfiguration := "S3 VPC endpoint policy must Deny s3:PutObjectAcl for all principals on all objects when s3:x-amz-acl is public-read or public-read-write (StringEquals), with no other condition."
+expectedConfiguration := "S3 VPC endpoint policy must Deny s3:PutObjectAcl and s3:PutObjectVersionAcl for all principals on every object when s3:x-amz-acl is public-read, public-read-write or authenticated-read (StringEquals, or a StringLike pattern that matches the value), and when s3:x-amz-grant-read, s3:x-amz-grant-read-acp, s3:x-amz-grant-write-acp or s3:x-amz-grant-full-control names the AllUsers or AuthenticatedUsers group (StringLike, for example \"*http://acs.amazonaws.com/groups/global/AllUsers*\", or Null false), each header in its own statement; a Deny with no condition covers everything. Only request headers are checked: an ACL sent in the request body is not shown to be denied."
 
 # --- Matching helpers ---
 # --- toc-match begin: iampattern v1 ---

@@ -3,8 +3,7 @@ package wiz
 # --- Logic ---
 default result := "pass"
 
-# Only S3 VPC endpoints are in scope; the vpcEndpoint native type covers every
-# service, so filter by service name.
+# The vpcEndpoint native type covers every service; only S3 endpoints count.
 is_s3_endpoint {
     endswith(input.ServiceName, ".s3")
 }
@@ -29,28 +28,24 @@ statements[s] {
 
 as_array(v) := v { is_array(v) } else := [v]
 
-# The deny must cover all S3 actions.
 all_s3_actions := {"*", "s3:*"}
 
 covers_all_actions(stmt) {
     all_s3_actions[lower(as_array(stmt.Action)[_])]
 }
 
-# The deny must apply to every principal.
 applies_to_everyone(stmt) { as_array(stmt.Principal)[_] == "*" }
 applies_to_everyone(stmt) { as_array(stmt.Principal.AWS)[_] == "*" }
 
-# The endpoint reaches every bucket, so the deny must cover every bucket and
-# every object. The endpoint payload does not name its partition, so a pattern
-# for any of these partitions counts.
+# The Deny must cover every bucket and object. The payload does not name its
+# partition, so a pattern for any partition counts.
 partitions := {"aws", "aws-cn", "aws-us-gov"}
 
 covers_every_bucket_and_object(stmt) {
     tocm_s3_pattern_covers_all(as_array(stmt.Resource)[_], partitions[_])
 }
 
-# A statement written with NotPrincipal, NotAction or NotResource leaves
-# something out, so it never counts.
+# A statement with NotPrincipal, NotAction or NotResource never counts.
 negated_elements := {"NotPrincipal", "NotAction", "NotResource"}
 
 uses_negation(stmt) {
@@ -66,34 +61,61 @@ full_scope_deny(stmt) {
     covers_every_bucket_and_object(stmt)
 }
 
-# The transport test must be the only condition; any extra key narrows the deny.
-conditions(stmt) := [{"operator": lower(op), "key": lower(key), "values": as_array(v)} | v := stmt.Condition[op][key]]
+# Every condition test as {operator, key, values}. Operators match by exact
+# name; condition key names are not case sensitive.
+conditions(stmt) := [{"operator": op, "key": lower(key), "values": as_array(v)} | v := stmt.Condition[op][key]]
 
-sole_condition(stmt) := c {
-    cs := conditions(stmt)
-    count(cs) == 1
-    c := cs[0]
+value_false(v) { v == "false" }
+value_false(v) { v == false }
+
+transport_test(c) {
+    {"Bool", "BoolIfExists"}[c.operator]
+    c.key == "aws:securetransport"
+    value_false(c.values[_])
 }
 
-value_false(values) { values[_] == "false" }
-value_false(values) { values[_] == false }
+tls_test(c) {
+    {"NumericLessThan", "NumericLessThanIfExists"}[c.operator]
+    c.key == "s3:tlsversion"
+    to_number(c.values[_]) >= 1.2
+}
 
-tls_floor_ok(values) { to_number(values[_]) >= 1.2 }
+# A Deny may exempt AWS services with aws:PrincipalIsAWSService false. Only
+# BoolIfExists keeps the Deny on anonymous requests, which omit that key.
+service_exemption(c) {
+    c.operator == "BoolIfExists"
+    c.key == "aws:principalisawsservice"
+    count(c.values) > 0
+    count([v | v := c.values[_]; not value_false(v)]) == 0
+}
+
+protection_test(c, "transport") { transport_test(c) }
+protection_test(c, "tls") { tls_test(c) }
+
+# The transport test stands alone or beside the service exemption; any other
+# key narrows the deny.
+qualifying_conditions(stmt, kind) {
+    cs := conditions(stmt)
+    count(cs) == 1
+    protection_test(cs[0], kind)
+}
+
+qualifying_conditions(stmt, kind) {
+    cs := conditions(stmt)
+    count(cs) == 2
+    some i
+    protection_test(cs[i], kind)
+    service_exemption(cs[1 - i])
+}
 
 denies_insecure_transport(stmt) {
     full_scope_deny(stmt)
-    c := sole_condition(stmt)
-    c.operator == "bool"
-    c.key == "aws:securetransport"
-    value_false(c.values)
+    qualifying_conditions(stmt, "transport")
 }
 
 denies_old_tls(stmt) {
     full_scope_deny(stmt)
-    c := sole_condition(stmt)
-    c.operator == "numericlessthan"
-    c.key == "s3:tlsversion"
-    tls_floor_ok(c.values)
+    qualifying_conditions(stmt, "tls")
 }
 
 has_secure_transport_deny {
@@ -104,8 +126,7 @@ has_tls_floor_deny {
     denies_old_tls(statements[_])
 }
 
-# Both protections are required. A request over plain HTTP carries no TLS
-# version, so the TLS deny alone does not stop it.
+# Both Denies are required: a plain HTTP request carries no TLS version.
 result := "skip" {
     not is_s3_endpoint
 } else := "fail" {
@@ -128,11 +149,11 @@ missing_protections[p] {
 currentConfiguration := "VPC endpoint has no policy, so it does not deny unencrypted requests or old TLS versions." {
     result == "fail"
     input.PolicyDocument == null
-} else := sprintf("VPC endpoint policy lacks %s. Each Deny must apply to all principals and all S3 actions on all buckets and objects, with no other condition.", [concat(" and ", [p | p := missing_protections[_]])]) {
+} else := sprintf("VPC endpoint policy lacks %s. Each Deny must apply to all principals and all S3 actions on all buckets and objects, with no other condition than an optional aws:PrincipalIsAWSService false under BoolIfExists.", [concat(" and ", [p | p := missing_protections[_]])]) {
     result == "fail"
-} else := "VPC endpoint policy denies unencrypted requests and TLS versions below 1.2 for all principals, buckets and objects."
+} else := "VPC endpoint policy denies unencrypted requests and TLS versions below 1.2 on all buckets and objects."
 
-expectedConfiguration := "S3 VPC endpoint policy must contain a Deny for all principals and all S3 actions on all buckets and objects when aws:SecureTransport is false, and another when s3:TlsVersion is below 1.2. Each must carry no other condition."
+expectedConfiguration := "S3 VPC endpoint policy must contain a Deny for all principals and all S3 actions on all buckets and objects when aws:SecureTransport is false, and another when s3:TlsVersion is below 1.2. Each may exempt AWS service principals with aws:PrincipalIsAWSService false under BoolIfExists and must carry no other condition."
 
 # --- Matching helpers ---
 # --- toc-match begin: iampattern v1 ---

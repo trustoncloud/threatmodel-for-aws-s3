@@ -329,3 +329,264 @@ resource "aws_s3_bucket_policy" "ds_negated_cf" {
   bucket = aws_s3_bucket.ds_negated_cf.id
   policy = data.aws_iam_policy_document.ds_negated_cf.json
 }
+
+# OAC association to an unauthorized distribution, set in the policy argument
+# of the bucket: 1 finding
+resource "aws_s3_bucket" "inline_rogue_oac" {
+  bucket = "inline-rogue-oac-bucket"
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": { "Service": "cloudfront.amazonaws.com" },
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::inline-rogue-oac-bucket/*",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceArn": "arn:aws:cloudfront::123456789012:distribution/E6ROGUEINLINE666"
+        }
+      }
+    }
+  ]
+}
+POLICY
+}
+
+# Unauthorized identity in the policy argument of the bucket built by a data
+# source: 1 finding
+resource "aws_s3_bucket" "inline_rogue_oai" {
+  bucket = "inline-rogue-oai-bucket"
+  policy = data.aws_iam_policy_document.inline_rogue_oai.json
+}
+
+data "aws_iam_policy_document" "inline_rogue_oai" {
+  statement {
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["arn:aws:s3:::inline-rogue-oai-bucket/*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity E5ROGUEINLINE555"]
+    }
+  }
+}
+
+# Both forms: the linked aws_s3_bucket_policy is approved, the policy argument
+# grants the CloudFront service with no aws:SourceArn test: 1 finding
+resource "aws_s3_bucket" "both_rogue_cf" {
+  bucket = "both-rogue-cf-bucket"
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": { "Service": "cloudfront.amazonaws.com" },
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::both-rogue-cf-bucket/*"
+    }
+  ]
+}
+POLICY
+}
+
+resource "aws_s3_bucket_policy" "both_rogue_cf" {
+  bucket = aws_s3_bucket.both_rogue_cf.id
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": { "Service": "cloudfront.amazonaws.com" },
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::both-rogue-cf-bucket/*",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceArn": "arn:aws:cloudfront::123456789012:distribution/E2AUTHORIZED12345"
+        }
+      }
+    }
+  ]
+}
+POLICY
+}
+
+# Data-source policy referenced through minified_json, OAC to an unauthorized
+# distribution: 1 finding
+resource "aws_s3_bucket" "ds_minified_cf" {
+  bucket = "ds-minified-cf-bucket"
+}
+
+data "aws_iam_policy_document" "ds_minified_cf" {
+  statement {
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["arn:aws:s3:::ds-minified-cf-bucket/*"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+      values   = ["arn:aws:cloudfront::123456789012:distribution/E7ROGUEMIN777777"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "ds_minified_cf" {
+  bucket = aws_s3_bucket.ds_minified_cf.id
+  policy = data.aws_iam_policy_document.ds_minified_cf.minified_json
+}
+
+# --- Never-created resources and statements the source does not show ---
+
+# A count other than 0 creates the bucket, so it is judged.
+resource "aws_s3_bucket" "zzcounted" {
+  count  = 1
+  bucket = "zz-cloudfront-bucket"
+  policy = <<POLICY
+{"Version": "2012-10-17", "Statement": [{"Effect": "Allow", "Principal": {"Service": "cloudfront.amazonaws.com"}, "Action": "s3:GetObject", "Resource": "*"}]}
+POLICY
+}
+
+# A dynamic statement block generates statements the source does not show,
+# which may grant more than the written statements.
+resource "aws_s3_bucket" "zzdynadd" {
+  bucket = "zz-cloudfront-bucket"
+}
+
+data "aws_iam_policy_document" "zz_dyn_added" {
+  statement {
+    sid       = "ApprovedDistribution"
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["*"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+      values   = ["arn:aws:cloudfront::123456789012:distribution/E2AUTHORIZED12345"]
+    }
+  }
+
+  dynamic "statement" {
+    for_each = ["s3:GetObject"]
+    content {
+      effect    = "Allow"
+      actions   = [statement.value]
+      resources = ["*"]
+      principals {
+        type        = "Service"
+        identifiers = ["cloudfront.amazonaws.com"]
+      }
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "zzdynadd" {
+  bucket = aws_s3_bucket.zzdynadd.id
+  policy = data.aws_iam_policy_document.zz_dyn_added.json
+}
+
+# source_policy_documents adds statements the document does not write out.
+resource "aws_s3_bucket" "zzsrcadd" {
+  bucket = "zz-cloudfront-bucket"
+}
+
+data "aws_iam_policy_document" "zz_src_extra" {
+  statement {
+    sid       = "ReadObjects"
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["*"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "zz_src_added" {
+  source_policy_documents = [data.aws_iam_policy_document.zz_src_extra.json]
+
+  statement {
+    sid       = "ApprovedDistribution"
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["*"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+      values   = ["arn:aws:cloudfront::123456789012:distribution/E2AUTHORIZED12345"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "zzsrcadd" {
+  bucket = aws_s3_bucket.zzsrcadd.id
+  policy = data.aws_iam_policy_document.zz_src_added.json
+}
+
+# A dynamic principals block generates principals the source does not show.
+resource "aws_s3_bucket" "zzdynprinc" {
+  bucket = "zz-cloudfront-bucket"
+}
+
+data "aws_iam_policy_document" "zz_dyn_principals" {
+  statement {
+    sid       = "ApprovedDistribution"
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["*"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+      values   = ["arn:aws:cloudfront::123456789012:distribution/E2AUTHORIZED12345"]
+    }
+  }
+
+  statement {
+    sid       = "GeneratedPrincipals"
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["*"]
+
+    dynamic "principals" {
+      for_each = ["Service"]
+      content {
+        type        = principals.value
+        identifiers = ["cloudfront.amazonaws.com"]
+      }
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "zzdynprinc" {
+  bucket = aws_s3_bucket.zzdynprinc.id
+  policy = data.aws_iam_policy_document.zz_dyn_principals.json
+}

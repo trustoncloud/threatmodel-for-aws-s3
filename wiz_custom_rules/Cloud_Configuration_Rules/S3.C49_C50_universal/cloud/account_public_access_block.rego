@@ -3,17 +3,14 @@ package wiz
 # --- Logic ---
 default result := "pass"
 
-# Account-level Block Public Access, read from
-# accountPublicAccessBlockConfiguration. Accept both the wrapped and flat
-# rendering of the configuration object.
+# The payload may wrap the flags in PublicAccessBlockConfiguration.
 pab := cfg {
     cfg := input.accountPublicAccessBlockConfiguration.PublicAccessBlockConfiguration
 } else := cfg {
     cfg := input.accountPublicAccessBlockConfiguration
 }
 
-# Only judge when Wiz successfully fetched the account-level configuration;
-# null with a fetch error means unreadable, not absent.
+# A null configuration after a failed fetch is unreadable, so it is skipped.
 fetch_ok {
     input.WizMetadata.objectFetchStatus.accountPublicAccessBlockConfiguration.result == "Success"
 }

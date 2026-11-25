@@ -1,10 +1,9 @@
 package wiz
 
 # --- Configuration ---
-# Buckets that require SSE-C and therefore must NOT block it: a bucket name for
-# the whole bucket, or "bucket/prefix/" for one path inside it. The block
-# setting covers the whole bucket, so a path entry keeps SSE-C allowed on its
-# bucket. Every other bucket must block SSE-C. Keep in sync with S3.C147.
+# Buckets that require SSE-C and must not block it: "bucket" or "bucket/prefix/"
+# (a path keeps SSE-C allowed bucket-wide). Every other bucket must block SSE-C.
+# Keep in sync with S3.C147.
 buckets_requiring_ssec := {
     "ssec-required-bucket",
     "mixed-bucket/secure/",
@@ -28,8 +27,7 @@ is_ssec_required {
 value_is(v, target) { v == target }
 value_is(v, target) { v[_] == target }
 
-# The bucket's default encryption setting blocks SSE-C uploads for the whole
-# bucket (BlockedEncryptionTypes; the S3 default since April 2026).
+# BlockedEncryptionTypes blocks SSE-C uploads for the whole bucket.
 setting_blocks_ssec {
     rule := input.bucketEncryptionConfiguration.ServerSideEncryptionConfiguration.Rules[_]
     value_is(rule.BlockedEncryptionTypes.EncryptionType, "SSE-C")

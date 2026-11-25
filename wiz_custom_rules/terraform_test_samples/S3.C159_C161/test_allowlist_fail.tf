@@ -73,3 +73,11 @@ resource "aws_s3_access_point" "near_account_ap" {
   name       = "near-account-ap"
   account_id = "123456789013"
 }
+
+# Unauthorized bucket on an access point created through count: 1 finding
+resource "aws_s3_access_point" "count_one_ap" {
+  count             = 1
+  bucket            = "rogue-bucket"
+  name              = "counted-ap"
+  bucket_account_id = "123456789012"
+}
