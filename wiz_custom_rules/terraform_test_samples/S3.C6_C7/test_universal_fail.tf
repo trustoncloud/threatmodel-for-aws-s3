@@ -401,3 +401,390 @@ resource "aws_s3_bucket_policy" "ds_prefix" {
   bucket = aws_s3_bucket.ds_prefix.id
   policy = data.aws_iam_policy_document.guard_extra.json
 }
+
+# The bucket's own policy argument holds the transport Deny but no TLS
+# floor: 1 finding (TLS)
+resource "aws_s3_bucket" "inline_transport_only" {
+  bucket = "inline-transport-only-bucket"
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyInsecureTransport",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["arn:aws:s3:::inline-transport-only-bucket", "arn:aws:s3:::inline-transport-only-bucket/*"],
+      "Condition": { "Bool": { "aws:SecureTransport": "false" } }
+    }
+  ]
+}
+POLICY
+}
+
+# Service exemption set to true, which leaves every other principal out of the
+# transport Deny: 1 finding (transport)
+resource "aws_s3_bucket" "exempt_true" {
+  bucket = "exempt-true-bucket"
+}
+
+resource "aws_s3_bucket_policy" "exempt_true" {
+  bucket = aws_s3_bucket.exempt_true.id
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyInsecureTransport",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["arn:aws:s3:::exempt-true-bucket", "arn:aws:s3:::exempt-true-bucket/*"],
+      "Condition": { "BoolIfExists": { "aws:SecureTransport": "false", "aws:PrincipalIsAWSService": "true" } }
+    },
+    {
+      "Sid": "DenyOldTls",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["arn:aws:s3:::exempt-true-bucket", "arn:aws:s3:::exempt-true-bucket/*"],
+      "Condition": { "NumericLessThan": { "s3:TlsVersion": "1.2" } }
+    }
+  ]
+}
+POLICY
+}
+
+# Service exemption beside a second extra key, which narrows the TLS Deny:
+# 1 finding (TLS)
+resource "aws_s3_bucket" "exempt_extra" {
+  bucket = "exempt-extra-bucket"
+}
+
+resource "aws_s3_bucket_policy" "exempt_extra" {
+  bucket = aws_s3_bucket.exempt_extra.id
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyInsecureTransport",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["arn:aws:s3:::exempt-extra-bucket", "arn:aws:s3:::exempt-extra-bucket/*"],
+      "Condition": { "Bool": { "aws:SecureTransport": "false" } }
+    },
+    {
+      "Sid": "DenyOldTlsOutsideAccount",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["arn:aws:s3:::exempt-extra-bucket", "arn:aws:s3:::exempt-extra-bucket/*"],
+      "Condition": {
+        "NumericLessThan": { "s3:TlsVersion": "1.2" },
+        "BoolIfExists": { "aws:PrincipalIsAWSService": "false" },
+        "StringNotEquals": { "aws:PrincipalAccount": "111122223333" }
+      }
+    }
+  ]
+}
+POLICY
+}
+
+# Unrelated operators: the transport key under StringEquals and the TLS key
+# under a lower-case operator name: 2 findings
+resource "aws_s3_bucket" "wrong_operator" {
+  bucket = "wrong-operator-bucket"
+}
+
+data "aws_iam_policy_document" "ds_wrong_operator" {
+  statement {
+    effect    = "Deny"
+    actions   = ["s3:*"]
+    resources = ["arn:aws:s3:::wrong-operator-bucket", "arn:aws:s3:::wrong-operator-bucket/*"]
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+
+  statement {
+    effect    = "Deny"
+    actions   = ["s3:*"]
+    resources = ["arn:aws:s3:::wrong-operator-bucket", "arn:aws:s3:::wrong-operator-bucket/*"]
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    condition {
+      test     = "numericlessthan"
+      variable = "s3:TlsVersion"
+      values   = ["1.2"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "wrong_operator" {
+  bucket = aws_s3_bucket.wrong_operator.id
+  policy = data.aws_iam_policy_document.ds_wrong_operator.json
+}
+
+# The Denies split across the bucket's own policy argument and an
+# aws_s3_bucket_policy. Each writes the whole bucket policy and only one holds
+# after apply, so each must carry both Denies: 2 findings
+resource "aws_s3_bucket" "split_forms" {
+  bucket = "split-forms-bucket"
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyInsecureTransport",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["arn:aws:s3:::split-forms-bucket", "arn:aws:s3:::split-forms-bucket/*"],
+      "Condition": { "Bool": { "aws:SecureTransport": "false" } }
+    }
+  ]
+}
+POLICY
+}
+
+resource "aws_s3_bucket_policy" "split_forms" {
+  bucket = aws_s3_bucket.split_forms.id
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyOldTls",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["arn:aws:s3:::split-forms-bucket", "arn:aws:s3:::split-forms-bucket/*"],
+      "Condition": { "NumericLessThan": { "s3:TlsVersion": "1.2" } }
+    }
+  ]
+}
+POLICY
+}
+
+# Service exemption under plain Bool: anonymous requests omit
+# aws:PrincipalIsAWSService, so the condition is false for them and an
+# unsigned HTTP request is not denied: 2 findings
+resource "aws_s3_bucket" "exempt_plain_bool" {
+  bucket = "exempt-plain-bool-bucket"
+}
+
+resource "aws_s3_bucket_policy" "exempt_plain_bool" {
+  bucket = aws_s3_bucket.exempt_plain_bool.id
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyInsecureTransport",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["arn:aws:s3:::exempt-plain-bool-bucket", "arn:aws:s3:::exempt-plain-bool-bucket/*"],
+      "Condition": { "Bool": { "aws:SecureTransport": "false", "aws:PrincipalIsAWSService": "false" } }
+    },
+    {
+      "Sid": "DenyOldTls",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["arn:aws:s3:::exempt-plain-bool-bucket", "arn:aws:s3:::exempt-plain-bool-bucket/*"],
+      "Condition": {
+        "NumericLessThan": { "s3:TlsVersion": "1.2" },
+        "Bool": { "aws:PrincipalIsAWSService": "false" }
+      }
+    }
+  ]
+}
+POLICY
+}
+
+# --- Never-created resources and statements the source does not show ---
+
+# A bucket policy that is never created (count = 0) does not protect its bucket,
+# even when it holds the required Deny.
+resource "aws_s3_bucket" "zzncpol" {
+  bucket = "zz-transport-bucket"
+}
+
+data "aws_iam_policy_document" "zz_nc_doc" {
+  statement {
+    sid       = "DenyInsecureTransport"
+    effect    = "Deny"
+    actions   = ["s3:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+
+  statement {
+    sid       = "DenyOldTls"
+    effect    = "Deny"
+    actions   = ["s3:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values   = ["1.2"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "zzncpol" {
+  count  = 0
+  bucket = aws_s3_bucket.zzncpol.id
+  policy = data.aws_iam_policy_document.zz_nc_doc.json
+}
+
+# override_policy_documents replaces any written statement with the same
+# sid, so a document that sets it cannot prove the Deny.
+resource "aws_s3_bucket" "zzoverride" {
+  bucket = "zz-transport-bucket"
+}
+
+data "aws_iam_policy_document" "zz_override_src" {
+  statement {
+    sid       = "DenyOldTls"
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "zz_overridden" {
+  override_policy_documents = [data.aws_iam_policy_document.zz_override_src.json]
+
+  statement {
+    sid       = "DenyInsecureTransport"
+    effect    = "Deny"
+    actions   = ["s3:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+
+  statement {
+    sid       = "DenyOldTls"
+    effect    = "Deny"
+    actions   = ["s3:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values   = ["1.2"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "zzoverride" {
+  bucket = aws_s3_bucket.zzoverride.id
+  policy = data.aws_iam_policy_document.zz_overridden.json
+}
+
+# A dynamic condition block adds conditions the source does not show, which
+# can narrow the Deny, so that statement does not count.
+resource "aws_s3_bucket" "zzdyncond" {
+  bucket = "zz-transport-bucket"
+}
+
+data "aws_iam_policy_document" "zz_dyn_cond" {
+  statement {
+    sid       = "DenyInsecureTransport"
+    effect    = "Deny"
+    actions   = ["s3:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+
+  statement {
+    sid       = "DenyOldTls"
+    effect    = "Deny"
+    actions   = ["s3:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values   = ["1.2"]
+    }
+
+    dynamic "condition" {
+      for_each = ["aws:SourceVpce"]
+      content {
+        test     = "StringEquals"
+        variable = condition.value
+        values   = ["vpce-0123456789abcdef0"]
+      }
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "zzdyncond" {
+  bucket = aws_s3_bucket.zzdyncond.id
+  policy = data.aws_iam_policy_document.zz_dyn_cond.json
+}

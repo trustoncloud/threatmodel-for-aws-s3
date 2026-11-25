@@ -15,3 +15,9 @@ resource "aws_s3_bucket" "global" {
 resource "aws_s3_bucket" "prefixed" {
   bucket_prefix = "example-legacy-"
 }
+
+# Bucket created through count with no bucket_namespace: 1 finding
+resource "aws_s3_bucket" "count_one" {
+  count  = 1
+  bucket = "example-counted-global-bucket"
+}

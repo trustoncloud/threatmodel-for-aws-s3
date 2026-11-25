@@ -51,12 +51,8 @@ statements[s] {
     s := policy_doc.Statement
 }
 
-covers_put_object(action) { action == "s3:PutObject" }
-covers_put_object(action) { action == "s3:*" }
-covers_put_object(action) { action == "*" }
-covers_put_object(action) { action[_] == "s3:PutObject" }
-covers_put_object(action) { action[_] == "s3:*" }
-covers_put_object(action) { action[_] == "*" }
+# Actions compare in lower case. A pattern counts only if it matches s3:PutObject.
+covers_put_object(action) { tocm_iam_pattern_matches(lower(as_array(action)[_]), "s3:putobject") }
 
 wildcard(v) { v == "*" }
 wildcard(v) { v[_] == "*" }
@@ -76,20 +72,18 @@ path_base(prefix) := concat("", [bucket_arn, "/", prefix])
 
 as_array(v) := v { is_array(v) } else := [v]
 
-# A statement written with NotResource, NotAction or NotPrincipal is never
-# counted as the covering deny.
+# A Deny written with NotResource, NotAction or NotPrincipal never counts.
 uses_not_element(stmt) {
     _ = stmt[{"NotResource", "NotAction", "NotPrincipal"}[_]]
 }
 
 ssec_key := "s3:x-amz-server-side-encryption-customer-algorithm"
 
-# The SSE-C test must be the only condition: a StringNotEquals AES256 or a
-# Null true on the customer-algorithm header.
+# The SSE-C test must be the only condition. Operator names match exactly.
 enforcing_condition(stmt) {
     count(stmt.Condition) == 1
     conditions := stmt.Condition[operator]
-    {"stringnotequals", "stringnotequalsifexists"}[lower(operator)]
+    {"StringNotEquals", "StringNotEqualsIfExists"}[operator]
     count(conditions) == 1
     val := conditions[key]
     lower(key) == ssec_key
@@ -99,7 +93,7 @@ enforcing_condition(stmt) {
 enforcing_condition(stmt) {
     count(stmt.Condition) == 1
     conditions := stmt.Condition[operator]
-    lower(operator) == "null"
+    operator == "Null"
     count(conditions) == 1
     val := conditions[key]
     lower(key) == ssec_key
@@ -117,8 +111,8 @@ enforced_prefixes[prefix] {
     covers_path(as_array(stmt.Resource)[_], prefix)
 }
 
-# The whole bucket: an object key is never empty, so "/?*" reaches every
-# object. A path stays strict: the key that names the path is an object too.
+# "/?*" covers a whole bucket, since a key is never empty. A path needs "*":
+# the key that names the path is an object too.
 covers_path(p, prefix) {
     prefix == ""
     tocm_s3_pattern_covers_objects(p, bucket_arn)

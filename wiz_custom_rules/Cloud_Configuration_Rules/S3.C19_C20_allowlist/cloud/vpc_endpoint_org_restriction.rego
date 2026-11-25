@@ -35,28 +35,24 @@ statements[s] {
 
 as_array(v) := v { is_array(v) } else := [v]
 
-# The deny must cover all S3 actions.
 all_s3_actions := {"*", "s3:*"}
 
 covers_all_actions(stmt) {
     all_s3_actions[lower(as_array(stmt.Action)[_])]
 }
 
-# The deny must apply to every principal.
 applies_to_everyone(stmt) { as_array(stmt.Principal)[_] == "*" }
 applies_to_everyone(stmt) { as_array(stmt.Principal.AWS)[_] == "*" }
 
-# The endpoint reaches every bucket, so the deny must cover every bucket and
-# every object. The endpoint payload does not name its partition, so a pattern
-# for any of these partitions counts.
+# The Deny must cover every bucket and object. The payload does not name its
+# partition, so a pattern for any partition counts.
 partitions := {"aws", "aws-cn", "aws-us-gov"}
 
 covers_every_bucket_and_object(stmt) {
     tocm_s3_pattern_covers_all(as_array(stmt.Resource)[_], partitions[_])
 }
 
-# A statement written with NotPrincipal, NotAction or NotResource leaves
-# something out, so it never counts.
+# A statement with NotPrincipal, NotAction or NotResource never counts.
 negated_elements := {"NotPrincipal", "NotAction", "NotResource"}
 
 uses_negation(stmt) {
@@ -72,8 +68,9 @@ full_scope_deny(stmt) {
     covers_every_bucket_and_object(stmt)
 }
 
-# The organization test must be the only condition; any extra key narrows the deny.
-conditions(stmt) := [{"operator": lower(op), "key": lower(key), "values": as_array(v)} | v := stmt.Condition[op][key]]
+# The organization test must be the only condition. Operators match by exact
+# name; condition key names are not case sensitive.
+conditions(stmt) := [{"operator": op, "key": lower(key), "values": as_array(v)} | v := stmt.Condition[op][key]]
 
 sole_condition(stmt) := c {
     cs := conditions(stmt)
@@ -81,20 +78,15 @@ sole_condition(stmt) := c {
     c := cs[0]
 }
 
-# Operators that make the Deny apply to every principal outside the listed
-# values, by condition key. aws:PrincipalOrgID and aws:PrincipalAccount hold
-# one value. aws:PrincipalOrgPaths holds a set, so it needs ForAllValues: a
-# principal outside any organization has no paths, ForAllValues is then true
-# and the Deny applies, while a ForAnyValue condition is then false.
+# Operators that Deny every principal outside the listed values, by key.
+# aws:PrincipalOrgPaths needs ForAllValues, true for a principal with no paths.
 org_key_operators := {
-    "aws:principalorgid": {"stringnotequals", "stringnotequalsifexists"},
-    "aws:principalaccount": {"stringnotequals", "stringnotequalsifexists"},
-    "aws:principalorgpaths": {"forallvalues:stringnotequals", "forallvalues:stringnotlike"},
+    "aws:principalorgid": {"StringNotEquals", "StringNotEqualsIfExists"},
+    "aws:principalaccount": {"StringNotEquals", "StringNotEqualsIfExists"},
+    "aws:principalorgpaths": {"ForAllValues:StringNotEquals", "ForAllValues:StringNotLike"},
 }
 
-# A full-scope Deny with an org condition lets through exactly the listed
-# values. Values are compared with the configured list as exact text, patterns
-# included.
+# A full-scope Deny with an org condition lets through exactly its values.
 org_condition(stmt) := c {
     full_scope_deny(stmt)
     c := sole_condition(stmt)

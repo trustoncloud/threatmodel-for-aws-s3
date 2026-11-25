@@ -37,9 +37,8 @@ principal_values(stmt, kind) := as_array(stmt.Principal[kind]) {
     is_object(stmt.Principal)
 } else := []
 
-# Legacy OAI association: the principal is an identity of the "cloudfront"
-# account, written "arn:aws:iam::cloudfront:user/CloudFront Origin Access
-# Identity <ID>".
+# Legacy OAI: an AWS principal of the "cloudfront" account, written
+# arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity <ID>.
 is_oai_principal(p) {
     parts := tocm_arn_parts(p)
     parts.service == "iam"
@@ -50,8 +49,7 @@ oai_approved(p) {
     tocm_arn_parts(p).resource == sprintf("user/CloudFront Origin Access Identity %s", [authorized_cloudfront_ids[_]])
 }
 
-# Modern OAC association: the cloudfront.amazonaws.com service principal,
-# limited to a distribution by aws:SourceArn.
+# OAC: the cloudfront.amazonaws.com service, limited by aws:SourceArn.
 is_oac_statement(stmt) {
     lower(principal_values(stmt, "Service")[_]) == "cloudfront.amazonaws.com"
 }
@@ -66,8 +64,7 @@ source_arn_tests(stmt) := [values |
     lower(key) == "aws:sourcearn"
 ]
 
-# A value is approved when it is the ARN of an approved distribution, with no
-# wildcard in it.
+# An approved distribution ARN, with no wildcard.
 distribution_approved(v) {
     not regex.match(`[*?]`, v)
     parts := tocm_arn_parts(v)
@@ -78,8 +75,7 @@ distribution_approved(v) {
 
 unapproved_values(values) := [v | v := values[_]; not distribution_approved(v)]
 
-# One test must hold approved distributions only; the values of a test are
-# alternatives, so one that is not approved opens the grant to it.
+# Values in a test are alternatives, so every one must be approved.
 oac_authorized(stmt) {
     values := source_arn_tests(stmt)[_]
     count(values) > 0

@@ -12,8 +12,7 @@ policy_doc := doc {
     doc := input.bucketPolicy
 }
 
-# Only judge when Wiz successfully fetched the bucket policy; null with a
-# fetch error means unreadable, not absent.
+# Judge only a fetched policy: a null policy with a fetch error is unreadable.
 fetch_ok {
     input.WizMetadata.objectFetchStatus.bucketPolicy.result == "Success"
 }
@@ -28,20 +27,26 @@ statements[s] {
     s := policy_doc.Statement
 }
 
-# The deny must cover all S3 actions to block traffic comprehensively.
-covers_all_s3(action) { action == "s3:*" }
-covers_all_s3(action) { action == "*" }
-covers_all_s3(action) { action[_] == "s3:*" }
-covers_all_s3(action) { action[_] == "*" }
+# IAM action names are not case sensitive.
+all_s3_actions := {"s3:*", "*"}
+
+covers_all_s3(action) {
+    is_string(action)
+    all_s3_actions[lower(action)]
+}
+
+covers_all_s3(action) {
+    a := action[_]
+    is_string(a)
+    all_s3_actions[lower(a)]
+}
 
 wildcard(v) { v == "*" }
 wildcard(v) { v[_] == "*" }
 
-# The deny must apply to every principal.
 applies_to_everyone(principal) { principal == "*" }
 applies_to_everyone(principal) { wildcard(principal.AWS) }
 
-# The deny must reach the bucket itself and every object in it.
 bucket_arn := input.BucketArn {
     is_string(input.BucketArn)
 } else := sprintf("arn:aws:s3:::%s", [input.Name])
@@ -60,23 +65,56 @@ resource_covers(stmt, "objects") {
     tocm_s3_pattern_covers_objects(as_array(stmt.Resource)[_], bucket_arn)
 }
 
-# A statement written with NotResource, NotAction or NotPrincipal is never
-# counted as the covering deny.
+# A statement with NotResource, NotAction or NotPrincipal never counts.
 uses_not_element(stmt) {
     _ = stmt[{"NotResource", "NotAction", "NotPrincipal"}[_]]
 }
 
-secure_transport_false(v) { v == "false" }
-secure_transport_false(v) { v == false }
-secure_transport_false(v) { v[_] == "false" }
+# Every condition test as {operator, key, values}. Operators match by exact
+# name; condition key names are not case sensitive.
+conditions(stmt) := [{"operator": op, "key": lower(key), "values": as_array(v)} | v := stmt.Condition[op][key]]
 
-tls_floor_ok(v) { to_number(v) >= 1.2 }
-tls_floor_ok(v) { to_number(v[_]) >= 1.2 }
+value_false(v) { v == "false" }
+value_false(v) { v == false }
 
-# The transport test must be the only condition; any extra key narrows the deny.
-sole_condition(stmt, operator) {
-    count(stmt.Condition) == 1
-    count(stmt.Condition[operator]) == 1
+transport_test(c) {
+    {"Bool", "BoolIfExists"}[c.operator]
+    c.key == "aws:securetransport"
+    value_false(c.values[_])
+}
+
+tls_test(c) {
+    {"NumericLessThan", "NumericLessThanIfExists"}[c.operator]
+    c.key == "s3:tlsversion"
+    to_number(c.values[_]) >= 1.2
+}
+
+# A Deny may exempt AWS services with aws:PrincipalIsAWSService false. Only
+# BoolIfExists keeps the Deny on anonymous requests, which omit that key.
+service_exemption(c) {
+    c.operator == "BoolIfExists"
+    c.key == "aws:principalisawsservice"
+    count(c.values) > 0
+    count([v | v := c.values[_]; not value_false(v)]) == 0
+}
+
+protection_test(c, "transport") { transport_test(c) }
+protection_test(c, "tls") { tls_test(c) }
+
+# The transport test stands alone or beside the service exemption; any other
+# key narrows the deny.
+qualifying_conditions(stmt, kind) {
+    cs := conditions(stmt)
+    count(cs) == 1
+    protection_test(cs[0], kind)
+}
+
+qualifying_conditions(stmt, kind) {
+    cs := conditions(stmt)
+    count(cs) == 2
+    some i
+    protection_test(cs[i], kind)
+    service_exemption(cs[1 - i])
 }
 
 scoped_deny(stmt) {
@@ -88,14 +126,12 @@ scoped_deny(stmt) {
 
 denies_insecure_transport(stmt) {
     scoped_deny(stmt)
-    sole_condition(stmt, "Bool")
-    secure_transport_false(stmt.Condition.Bool["aws:SecureTransport"])
+    qualifying_conditions(stmt, "transport")
 }
 
 denies_unauthorized_tls(stmt) {
     scoped_deny(stmt)
-    sole_condition(stmt, "NumericLessThan")
-    tls_floor_ok(stmt.Condition.NumericLessThan["s3:TlsVersion"])
+    qualifying_conditions(stmt, "tls")
 }
 
 # Qualifying denies may split the bucket and its objects across statements.
@@ -121,7 +157,6 @@ has_tls_floor_deny {
     count(tls_scope) == count(scope_targets)
 }
 
-# Both protections are required; missing either one is non-compliant.
 result := "skip" {
     not fetch_ok
 } else := "fail" {
@@ -141,14 +176,14 @@ missing_protections[p] {
     p := "a Deny of TLS versions below 1.2 (s3:TlsVersion)"
 }
 
-currentConfiguration := "Bucket has no bucket policy, so nothing blocks unencrypted requests or old TLS versions." {
+currentConfiguration := "Bucket has no bucket policy, so no bucket policy Deny covers unencrypted requests or TLS versions below 1.2." {
     result == "fail"
     input.bucketPolicy == null
-} else := sprintf("Bucket policy lacks %s. Each Deny must apply to all principals and all S3 actions on the bucket and every object in it, with no other condition.", [concat(" and ", [p | p := missing_protections[_]])]) {
+} else := sprintf("Bucket policy lacks %s. Each Deny must apply to all principals and all S3 actions on the bucket and every object in it, with no other condition than an optional aws:PrincipalIsAWSService false under BoolIfExists.", [concat(" and ", [p | p := missing_protections[_]])]) {
     result == "fail"
-} else := "Bucket policy denies unencrypted requests and TLS versions below 1.2 for all principals on the bucket and every object in it."
+} else := "Bucket policy denies unencrypted requests and TLS versions below 1.2 on the bucket and every object in it."
 
-expectedConfiguration := "Bucket policy must contain a Deny statement for all principals and all S3 actions on the bucket and every object in it when aws:SecureTransport is false, and another when s3:TlsVersion is below 1.2. Each must carry no other condition."
+expectedConfiguration := "Bucket policy must contain a Deny statement for all principals and all S3 actions on the bucket and every object in it when aws:SecureTransport is false, and another when s3:TlsVersion is below 1.2. Each may exempt AWS service principals with aws:PrincipalIsAWSService false under BoolIfExists and must carry no other condition."
 
 # --- Matching helpers ---
 # --- toc-match begin: iampattern v1 ---

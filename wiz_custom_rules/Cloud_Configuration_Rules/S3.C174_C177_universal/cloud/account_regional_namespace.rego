@@ -14,8 +14,7 @@ account_id := a {
     regex.match(`^[0-9]{12}$`, a)
 }
 
-# BucketRegion comes from ListBuckets; the connector's own region field is the
-# fallback.
+# BucketRegion comes from ListBuckets; the connector region is the fallback.
 region := r {
     r := input.BucketRegion
     is_string(r)

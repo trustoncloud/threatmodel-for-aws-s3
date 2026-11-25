@@ -9,13 +9,11 @@ authorized_access_points := {
 }
 
 # --- Policy helpers ---
-# Policies reach the matcher in three shapes: a JSON string with real IAM keys
-# (jsonencode or heredoc), a JSON string with resolved data-source keys
-# (Actions/Resources/Principals, condition values as arrays), or an unresolved
-# reference to an aws_iam_policy_document data block (walked directly,
-# lowercase names).
+# A policy is a JSON string with IAM keys or resolved data-source keys
+# (Actions, Resources), or a reference to an aws_iam_policy_document block.
 
-restriction_operators := {"stringnotequals", "stringnotequalsifexists"}
+# Condition operator names are case sensitive, so they match by exact name.
+restriction_operators := {"StringNotEquals", "StringNotEqualsIfExists"}
 
 stmt_actions(stmt) := terraLib.getArray(stmt.Action)
 stmt_actions(stmt) := terraLib.getArray(stmt.Actions)
@@ -23,11 +21,12 @@ stmt_actions(stmt) := terraLib.getArray(stmt.Actions)
 stmt_resources(stmt) := terraLib.getArray(stmt.Resource)
 stmt_resources(stmt) := terraLib.getArray(stmt.Resources)
 
-json_covers_all_s3(stmt) { stmt_actions(stmt)[_] == "s3:*" }
-json_covers_all_s3(stmt) { stmt_actions(stmt)[_] == "*" }
+# IAM action names are not case sensitive, so they are compared in lower case.
+tf_all_s3_actions := {"s3:*", "*"}
 
-hcl_covers_all_s3(stmt) { terraLib.getArray(stmt.actions)[_] == "s3:*" }
-hcl_covers_all_s3(stmt) { terraLib.getArray(stmt.actions)[_] == "*" }
+json_covers_all_s3(stmt) { tf_all_s3_actions[lower(stmt_actions(stmt)[_])] }
+
+hcl_covers_all_s3(stmt) { tf_all_s3_actions[lower(terraLib.getArray(stmt.actions)[_])] }
 
 wildcard(v) { v == "*" }
 wildcard(v) { v[_] == "*" }
@@ -48,52 +47,89 @@ json_statements(pol) := array.concat(terraLib.getStatement(doc), terraLib.getArr
     doc := json.unmarshal(pol.policy)
 }
 
-# The data block a policy names: data.aws_iam_policy_document.<name>.json.
-policy_data_source(pol) := m[1] {
-    is_string(pol.policy)
-    m := regex.find_all_string_submatch_n(`^\s*(?:\$\{)?\s*data\.aws_iam_policy_document\.([A-Za-z0-9_-]+)\.json\s*\}?\s*$`, pol.policy, 1)[0]
+# A statement with NotResource, NotAction or NotPrincipal never counts.
+not_keys := {
+    "NotResource", "NotResources", "NotAction", "NotActions", "NotPrincipal", "NotPrincipals",
+    "not_resources", "not_actions", "not_principals",
 }
 
-# A Deny for everyone on all S3 actions whose only condition is a
-# StringNotEquals on s3:DataAccessPointArn allows exactly the listed access
-# points.
-ap_restrictions(document, pol) := json_rs | hcl_rs {
+is_set_value(v) {
+    v != null
+    v != []
+    v != {}
+    v != ""
+}
+
+json_uses_not(stmt) { is_set_value(stmt[not_keys[_]]) }
+
+hcl_uses_not(stmt) { is_set_value(stmt[not_keys[_]]) }
+
+# The data block a policy names, as data.aws_iam_policy_document.<name>.json.
+policy_data_source_name(v) := m[1] {
+    is_string(v)
+    m := regex.find_all_string_submatch_n(`^\s*(?:\$\{)?\s*data\.aws_iam_policy_document\.([A-Za-z0-9_-]+)\.(?:minified_)?json\s*\}?\s*$`, v, 1)[0]
+}
+
+# A policy naming no data block this scan holds is read from its JSON alone.
+tf_documents_or_none(i, v) := docs {
+    docs := [c.block | c := tf_lookup(i, "data", "aws_iam_policy_document", policy_data_source_name(v))[_]]
+    count(docs) > 0
+} else := [{}]
+
+# Denies for everyone on all S3 actions conditioned only on the access point,
+# read from the policy's JSON and from data block ds ({} when it names none).
+ap_restrictions(ds, pol) := json_rs | hcl_rs {
     json_rs := {{"resources": stmt_resources(stmt), "aps": terraLib.getArray(val)} |
         stmt := json_statements(pol)[_]
         stmt.Effect == "Deny"
+        not json_uses_not(stmt)
         json_covers_all_s3(stmt)
         json_everyone(stmt)
         count(stmt.Condition) == 1
         conditions := stmt.Condition[operator]
-        restriction_operators[lower(operator)]
+        restriction_operators[operator]
         count(conditions) == 1
         val := conditions[key]
         lower(key) == "s3:dataaccesspointarn"
     }
     hcl_rs := {{"resources": terraLib.getArray(stmt.resources), "aps": terraLib.getArray(c.values)} |
-        ds := document.data.aws_iam_policy_document[policy_data_source(pol)]
-        stmt := terraLib.getArray(ds.statement)[_]
+        stmt := tf_deny_statements(ds)[_]
         lower(stmt.effect) == "deny"
+        not hcl_uses_not(stmt)
         hcl_covers_all_s3(stmt)
         hcl_everyone(stmt)
         conds := terraLib.getArray(stmt.condition)
         count(conds) == 1
         c := conds[0]
-        restriction_operators[lower(c.test)]
+        restriction_operators[c.test]
         lower(c.variable) == "s3:dataaccesspointarn"
     }
 }
 
-bucket_restrictions(document, bucket, name) := {r |
-    pol := document.resource.aws_s3_bucket_policy[pName]
-    terraLib.associatedResources(pol, bucket, pName, name, "bucket", "id")
-    r := ap_restrictions(document, pol)[_]
+# The bucket's policy argument and every linked aws_s3_bucket_policy.
+bucket_policies(i, bucket, name) := inline | linked {
+    inline := {src | is_string(object.get(bucket, "policy", null)); src := {"doc": i, "pol": bucket}}
+    linked := {{"doc": j, "pol": pol} |
+        pol := input.document[j].resource.aws_s3_bucket_policy[pName]
+        not tf_not_created(pol)
+        terraLib.associatedResources(pol, bucket, pName, name, "bucket", "id")
+        tf_reference_reaches(i, j, pol.bucket, "aws_s3_bucket", name)
+    }
+}
+
+# The data blocks a source names, each read on its own.
+source_documents(src) := tf_documents_or_none(src.doc, object.get(src.pol, "policy", null))
+
+# An unauthorized access point in any data block a source names is reported.
+bucket_restrictions(i, bucket, name) := {r |
+    src := bucket_policies(i, bucket, name)[_]
+    ds := source_documents(src)[_]
+    r := ap_restrictions(ds, src.pol)[_]
 }
 
 # --- Resource scope ---
-# The deny must reach every object in the bucket: one Resource pattern must
-# leave no key out. Covering the bucket ARN as well is accepted but not
-# required, since bucket settings calls cannot go through an access point.
+# The deny must reach every object; the bucket ARN is optional, since bucket
+# settings calls cannot go through an access point.
 
 partitions := {"aws", "aws-cn", "aws-us-gov"}
 
@@ -109,8 +145,7 @@ tf_covers_every_object(r, bucket, name) {
     r == "*"
 }
 
-# A reference to this bucket's ARN or name, interpolated or bare: judge
-# whatever follows it ("/*" and "/?*" reach every object, "/s*" does not).
+# A reference to this bucket: judge what follows it, with "x" as the ARN.
 tf_covers_every_object(r, bucket, name) {
     m := regex.find_all_string_submatch_n(own_arn_pattern(name), r, 1)[0]
     tocm_s3_pattern_covers_objects(concat("", ["x", m[3]]), "x")
@@ -122,8 +157,7 @@ tf_covers_every_object(r, bucket, name) {
     tocm_s3_pattern_covers_objects(r, sprintf("arn:%s:s3:::%s", [partitions[_], n]))
 }
 
-# Values that cannot be resolved statically (a generated bucket name, variables,
-# locals, module outputs) are given the benefit of the doubt.
+# Values that cannot be resolved statically are given the benefit of the doubt.
 tf_covers_every_object(r, bucket, name) {
     not contains(r, "${")
     not literal_bucket_name(bucket)
@@ -138,13 +172,33 @@ tf_covers_every_object(r, bucket, name) {
     regex.match(`^(var|local|module|data)\.`, r)
 }
 
-has_restriction(document, bucket, name) {
-    r := bucket_restrictions(document, bucket, name)[_]
+document_has_restriction(ds, src, bucket, name) {
+    r := ap_restrictions(ds, src.pol)[_]
     tf_covers_every_object(r.resources[_], bucket, name)
 }
 
-allowed_aps(document, bucket, name) := {ap |
-    ap := bucket_restrictions(document, bucket, name)[_].aps[_]
+# A data block defined in several files must hold the restriction in each.
+source_has_restriction(bucket, name, src) {
+    count([ds | ds := source_documents(src)[_]; not document_has_restriction(ds, src, bucket, name)]) == 0
+}
+
+source_lacks_restriction(i, bucket, name) {
+    src := bucket_policies(i, bucket, name)[_]
+    not source_has_restriction(bucket, name, src)
+}
+
+# Only one of several policies applies, so each must hold the restriction alone.
+has_restriction(i, bucket, name) {
+    count(bucket_policies(i, bucket, name)) > 0
+    not source_lacks_restriction(i, bucket, name)
+}
+
+multiple_sources(i, bucket, name) {
+    count(bucket_policies(i, bucket, name)) > 1
+}
+
+allowed_aps(i, bucket, name) := {ap |
+    ap := bucket_restrictions(i, bucket, name)[_].aps[_]
 }
 
 # --- Logic ---
@@ -152,7 +206,9 @@ allowed_aps(document, bucket, name) := {ap |
 WizPolicy[result] {
     document := input.document[i]
     bucket := document.resource.aws_s3_bucket[name]
-    not has_restriction(document, bucket, name)
+    not tf_not_created(bucket)
+    not has_restriction(i, bucket, name)
+    not multiple_sources(i, bucket, name)
 
     result := {
         "documentId": document.id,
@@ -160,8 +216,28 @@ WizPolicy[result] {
         "resourceName": terraLib.get_resource_name(bucket, name),
         "searchKey": sprintf("aws_s3_bucket[%s]", [name]),
         "issueType": "MissingAttribute",
-        "keyExpectedValue": sprintf("bucket '%s' must have a bucket policy Deny for all principals and all S3 actions on every object whose only condition is StringNotEquals on s3:DataAccessPointArn, listing only authorized access points: %v", [name, authorized_access_points]),
-        "keyActualValue": sprintf("bucket '%s' has no bucket policy restricting access to authorized access points at that scope", [name]),
+        "keyExpectedValue": sprintf("bucket '%s' must have a bucket policy Deny for all principals and all S3 actions on every object whose only condition is StringNotEquals on s3:DataAccessPointArn, with no NotPrincipal, NotAction or NotResource, listing only authorized access points: %v", [name, authorized_access_points]),
+        "keyActualValue": sprintf("bucket '%s' has no bucket policy (policy argument or aws_s3_bucket_policy) restricting access to authorized access points at that scope", [name]),
+        "resourceTags": terraLib.get_resource_tags(bucket),
+    }
+}
+
+# Fail 1b: one of several bucket policies lacks the restriction.
+WizPolicy[result] {
+    document := input.document[i]
+    bucket := document.resource.aws_s3_bucket[name]
+    not tf_not_created(bucket)
+    not has_restriction(i, bucket, name)
+    multiple_sources(i, bucket, name)
+
+    result := {
+        "documentId": document.id,
+        "resourceType": "aws_s3_bucket",
+        "resourceName": terraLib.get_resource_name(bucket, name),
+        "searchKey": sprintf("aws_s3_bucket[%s]", [name]),
+        "issueType": "IncorrectValue",
+        "keyExpectedValue": sprintf("each bucket policy of bucket '%s' (policy argument and every aws_s3_bucket_policy) must hold a Deny for all principals and all S3 actions on every object whose only condition is StringNotEquals on s3:DataAccessPointArn, listing only authorized access points: %v", [name, authorized_access_points]),
+        "keyActualValue": sprintf("bucket '%s' sets more than one bucket policy and only one applies after apply; not every one restricts access to authorized access points at that scope", [name]),
         "resourceTags": terraLib.get_resource_tags(bucket),
     }
 }
@@ -170,7 +246,8 @@ WizPolicy[result] {
 WizPolicy[result] {
     document := input.document[i]
     bucket := document.resource.aws_s3_bucket[name]
-    unauth := allowed_aps(document, bucket, name) - authorized_access_points
+    not tf_not_created(bucket)
+    unauth := allowed_aps(i, bucket, name) - authorized_access_points
     count(unauth) > 0
 
     result := {
@@ -184,6 +261,148 @@ WizPolicy[result] {
         "resourceTags": terraLib.get_resource_tags(bucket),
     }
 }
+
+# --- tf_scan_lookup: begin ---
+# A reference reads the definition in its own file, else every definition in
+# the other files of its module: the document id up to its last "/" or "\".
+tf_module(i) := m[1] {
+    m := regex.find_all_string_submatch_n(`^(.*)[/\\][^/\\]*$`, input.document[i].id, 1)[0]
+} else := ""
+
+# Documents whose <kind>.<rtype>.<name> a reference in document i reads.
+tf_lookup_docs(i, kind, rtype, name) := {i} {
+    input.document[i][kind][rtype][name]
+} else := {j |
+    input.document[j][kind][rtype][name]
+    j != i
+    tf_module(j) == tf_module(i)
+}
+
+# Those definitions, as {"doc": index, "block": definition}.
+tf_lookup(i, kind, rtype, name) := {{"doc": j, "block": input.document[j][kind][rtype][name]} |
+    j := tf_lookup_docs(i, kind, rtype, name)[_]
+}
+
+# A value naming <rtype>.<name> by its address, with any instance index.
+tf_names_address(v, rtype, name) {
+    is_string(v)
+    regex.match(sprintf(`(^|[^A-Za-z0-9_.-])%s\.%s(\[[^\]]*\])?\.`, [rtype, name]), v)
+}
+
+# A reference v in document j reaches <rtype>.<name> of document i.
+tf_reference_reaches(i, j, v, rtype, name) {
+    j == i
+}
+
+tf_reference_reaches(i, j, v, rtype, name) {
+    j != i
+    tf_names_address(v, rtype, name)
+    tf_lookup_docs(j, "resource", rtype, name)[i]
+}
+# --- tf_scan_lookup: end ---
+
+# --- tf_never_created: begin ---
+# A resource with a literal count of 0 or an empty for_each is never created
+# and is not judged; any other expression is judged.
+tf_expression(v) := trim_space(trim_suffix(trim_prefix(trim_space(v), "${"), "}")) {
+    is_string(v)
+}
+
+tf_empty_collection := `^(\[\s*\]|\{\s*\}|toset\(\s*(\[\s*\]|\{\s*\})\s*\))$`
+
+tf_zero(v) {
+    v == 0
+}
+
+tf_zero(v) {
+    tf_expression(v) == "0"
+}
+
+tf_empty(v) {
+    is_array(v)
+    count(v) == 0
+}
+
+tf_empty(v) {
+    is_object(v)
+    count(v) == 0
+}
+
+tf_empty(v) {
+    regex.match(tf_empty_collection, tf_expression(v))
+}
+
+tf_not_created(r) {
+    tf_zero(object.get(r, "count", null))
+}
+
+tf_not_created(r) {
+    tf_empty(object.get(r, "for_each", null))
+}
+# --- tf_never_created: end ---
+
+# --- tf_dynamic: begin ---
+# A dynamic block generates blocks the source does not show; one whose
+# for_each is a literal empty collection generates nothing. Needs
+# tf_never_created.
+tf_dynamic_blocks(b, label) := {d |
+    d := terraLib.getArray(b.dynamic[_][label])[_]
+    is_object(d)
+} | {d |
+    d := terraLib.getArray(b.dynamic[label])[_]
+    is_object(d)
+}
+
+tf_dynamic(b, label) {
+    d := tf_dynamic_blocks(b, label)[_]
+    not tf_empty(object.get(d, "for_each", null))
+}
+# --- tf_dynamic: end ---
+
+# --- tf_policy_document: begin ---
+# Statements a policy document does not show: a dynamic statement block, and
+# source or override documents. Needs tf_dynamic.
+tf_document_set(v) {
+    v != null
+    v != []
+    v != {}
+    v != ""
+}
+
+tf_document_overridden(ds) {
+    tf_document_set(object.get(ds, {"override_policy_documents", "override_json"}[_], null))
+}
+
+# The document may hold statements beyond the ones it writes out.
+tf_document_unshown(ds) {
+    tf_dynamic(ds, "statement")
+}
+
+tf_document_unshown(ds) {
+    tf_document_set(object.get(ds, {"source_policy_documents", "source_json"}[_], null))
+}
+
+tf_document_unshown(ds) {
+    tf_document_overridden(ds)
+}
+
+# A written statement whose principals a dynamic block generates.
+tf_statement_dynamic_principals(stmt) {
+    tf_dynamic(stmt, {"principals", "not_principals"}[_])
+}
+
+tf_statement_dynamic(stmt) {
+    tf_dynamic(stmt, {"condition", "principals", "not_principals"}[_])
+}
+
+# Written statements that can prove a Deny: none when an override document
+# may replace them, and none with a dynamic block inside.
+tf_deny_statements(ds) := [stmt |
+    not tf_document_overridden(ds)
+    stmt := terraLib.getArray(object.get(ds, "statement", []))[_]
+    not tf_statement_dynamic(stmt)
+]
+# --- tf_policy_document: end ---
 
 # --- Matching helpers ---
 # --- toc-match begin: iampattern v1 ---

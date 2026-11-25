@@ -49,3 +49,12 @@ resource "aws_s3_access_point" "by_data_source" {
   name              = "by-data-source-ap"
   bucket_account_id = "123456789012"
 }
+
+# Never created (a literal count of 0): not judged, though the bucket is not
+# authorized
+resource "aws_s3_access_point" "count_zero_ap" {
+  count             = 0
+  bucket            = "rogue-bucket"
+  name              = "never-created-ap"
+  bucket_account_id = "123456789012"
+}

@@ -38,8 +38,8 @@ allow_statements[s] {
     s.Effect == "Allow"
 }
 
-# An Allow may name an authorized bucket, or objects in one. The bucket name
-# must be written out in full: a wildcard there can reach other buckets.
+# An Allow may name an authorized bucket or its objects, with no wildcard in
+# the bucket name.
 resource_authorized(res) {
     bucket := tocm_s3_arn_bucket(res)
     not regex.match(`[*?]`, bucket)

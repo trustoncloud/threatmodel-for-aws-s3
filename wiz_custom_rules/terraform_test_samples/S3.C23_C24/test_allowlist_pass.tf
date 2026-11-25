@@ -169,3 +169,45 @@ data "aws_iam_policy_document" "pd_ref_approved" {
     }
   }
 }
+
+# --- Never-created resources and statements the source does not show ---
+
+# An S3 VPC endpoint that is never created is not judged, even with no
+# policy.
+resource "aws_vpc_endpoint" "zzncsubj" {
+  count             = 0
+  vpc_id            = "vpc-0123456789abcdef0"
+  service_name      = "com.amazonaws.us-east-1.s3"
+  vpc_endpoint_type = "Gateway"
+}
+
+# An endpoint policy that is never created grants nothing; the endpoint's
+# own policy names only the authorized bucket.
+resource "aws_vpc_endpoint" "zzncpol" {
+  vpc_id            = "vpc-0123456789abcdef0"
+  service_name      = "com.amazonaws.us-east-1.s3"
+  vpc_endpoint_type = "Gateway"
+  policy            = data.aws_iam_policy_document.zz_nc_inline.json
+}
+
+data "aws_iam_policy_document" "zz_nc_inline" {
+  statement {
+    sid       = "AuthorizedBucket"
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["arn:aws:s3:::authorized-bucket/*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+  }
+}
+
+resource "aws_vpc_endpoint_policy" "zzncpolres" {
+  count           = 0
+  vpc_endpoint_id = aws_vpc_endpoint.zzncpol.id
+  policy          = <<POLICY
+{"Version": "2012-10-17", "Statement": [{"Effect": "Allow", "Principal": "*", "Action": "s3:GetObject", "Resource": "arn:aws:s3:::other-bucket/*"}]}
+POLICY
+}

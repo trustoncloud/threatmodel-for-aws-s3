@@ -3,19 +3,19 @@ package wiz
 import data.generic.terraform as terraLib
 
 # --- Policy helpers ---
-# Policies reach the matcher in three shapes: a JSON string with real IAM keys
-# (jsonencode or heredoc), a JSON string with resolved data-source keys
-# (Actions/Resources/Principals, condition values as arrays), or an unresolved
-# reference to an aws_iam_policy_document data block (walked directly,
-# lowercase names). The policy sits inline on the endpoint or on an associated
-# aws_vpc_endpoint_policy.
+# A policy is IAM JSON, resolved data source JSON (Actions, Resources), or a
+# reference to an aws_iam_policy_document read as HCL.
 is_s3_service(sn) { endswith(sn, ".s3") }
 
-endpoint_policies(document, ep, name) := inline | assoc {
-    inline := {ep.policy | is_string(ep.policy)}
-    assoc := {p.policy |
-        p := document.resource.aws_vpc_endpoint_policy[pn]
+# The policy argument and each linked aws_vpc_endpoint_policy overwrite each
+# other, so each must satisfy the control on its own.
+endpoint_policies(i, ep, name) := inline | assoc {
+    inline := {src | is_string(ep.policy); src := {"id": "policy argument", "doc": i, "policy": ep.policy}}
+    assoc := {{"id": sprintf("aws_vpc_endpoint_policy.%s", [pn]), "doc": j, "policy": p.policy} |
+        p := input.document[j].resource.aws_vpc_endpoint_policy[pn]
+        not tf_not_created(p)
         terraLib.associatedResources(p, ep, pn, name, "vpc_endpoint_id", "id")
+        tf_reference_reaches(i, j, p.vpc_endpoint_id, "aws_vpc_endpoint", name)
         is_string(p.policy)
     }
 }
@@ -24,21 +24,27 @@ ep_json_statements(policy) := array.concat(terraLib.getStatement(doc), terraLib.
     doc := json.unmarshal(policy)
 }
 
-# Every statement of the endpoint's policies, tagged with the shape it came in.
-ep_statements(document, ep, name) := json_stmts | hcl_stmts {
-    policies := endpoint_policies(document, ep, name)
-    json_stmts := {{"shape": "json", "stmt": stmt} | stmt := ep_json_statements(policies[_])[_]}
-    hcl_stmts := {{"shape": "hcl", "stmt": stmt} |
-        ds := document.data.aws_iam_policy_document[policy_data_source_name(policies[_])]
-        stmt := terraLib.getArray(ds.statement)[_]
-    }
+# One statement set per data block the source names (each must hold the
+# Deny), or one set read from its JSON.
+ep_views(src) := [ep_view(ds, src.policy) | ds := tf_documents_or_none(src.doc, src.policy)[_]]
+
+ep_view(ds, policy) := json_stmts | hcl_stmts {
+    json_stmts := {{"shape": "json", "stmt": stmt} | stmt := ep_json_statements(policy)[_]}
+    hcl_stmts := {{"shape": "hcl", "stmt": stmt} | stmt := tf_deny_statements(ds)[_]}
 }
 
 ep_list(v) := v { is_array(v) } else := [v]
 
-# effect is optional in the data source and defaults to Allow.
-ep_effect(s) := lower(s.stmt.Effect) { s.shape == "json" }
-ep_effect(s) := lower(object.get(s.stmt, "effect", "Allow")) { s.shape == "hcl" }
+# HCL effect defaults to Allow; the JSON Effect is case sensitive.
+tf_ep_deny(s) {
+    s.shape == "json"
+    s.stmt.Effect == "Deny"
+}
+
+tf_ep_deny(s) {
+    s.shape == "hcl"
+    lower(object.get(s.stmt, "effect", "Allow")) == "deny"
+}
 
 ep_actions(s) := array.concat(ep_list(object.get(s.stmt, "Action", [])), ep_list(object.get(s.stmt, "Actions", []))) { s.shape == "json" }
 ep_actions(s) := ep_list(object.get(s.stmt, "actions", [])) { s.shape == "hcl" }
@@ -46,8 +52,9 @@ ep_actions(s) := ep_list(object.get(s.stmt, "actions", [])) { s.shape == "hcl" }
 ep_resources(s) := array.concat(ep_list(object.get(s.stmt, "Resource", [])), ep_list(object.get(s.stmt, "Resources", []))) { s.shape == "json" }
 ep_resources(s) := ep_list(object.get(s.stmt, "resources", [])) { s.shape == "hcl" }
 
-ep_conditions(s) := [{"operator": lower(op), "key": lower(key), "values": ep_list(v)} | v := s.stmt.Condition[op][key]] { s.shape == "json" }
-ep_conditions(s) := [{"operator": lower(c.test), "key": lower(c.variable), "values": ep_list(c.values)} | c := ep_list(object.get(s.stmt, "condition", []))[_]] { s.shape == "hcl" }
+# Operators match by exact name; condition key names are not case sensitive.
+ep_conditions(s) := [{"operator": op, "key": lower(key), "values": ep_list(v)} | v := s.stmt.Condition[op][key]] { s.shape == "json" }
+ep_conditions(s) := [{"operator": c.test, "key": lower(c.variable), "values": ep_list(c.values)} | c := ep_list(object.get(s.stmt, "condition", []))[_]] { s.shape == "hcl" }
 
 ep_wildcard(v) { ep_list(v)[_] == "*" }
 
@@ -63,8 +70,7 @@ ep_everyone(s) {
     ep_wildcard(p.identifiers)
 }
 
-# A statement written with a Not element leaves something out, so it never
-# counts as a covering deny.
+# A statement with a Not element never counts.
 ep_negated_elements := {
     "NotPrincipal", "NotAction", "NotResource",
     "NotPrincipals", "NotActions", "NotResources",
@@ -81,16 +87,14 @@ ep_all_s3_actions := {"*", "s3:*"}
 ep_all_actions(s) { ep_all_s3_actions[lower(ep_actions(s)[_])] }
 
 # --- Resource scope ---
-# The endpoint reaches every bucket, so the deny must cover every bucket and
-# every object, in any of these partitions.
+# The Deny must cover every bucket and object, in any of these partitions.
 ep_partitions := {"aws", "aws-cn", "aws-us-gov"}
 
 ep_resource_covers_all(r) {
     tocm_s3_pattern_covers_all(r, ep_partitions[_])
 }
 
-# Values that cannot be resolved statically are given the benefit of the
-# doubt; a reference to one bucket is never all buckets.
+# An unresolved value gets the benefit of the doubt, unless it names a bucket.
 ep_resource_covers_all(r) {
     contains(r, "${")
     not regex.match(`\$\{aws_s3_bucket\.`, r)
@@ -101,34 +105,29 @@ ep_resource_covers_all(r) {
 }
 
 ep_full_scope_deny(s) {
-    ep_effect(s) == "deny"
+    tf_ep_deny(s)
     not ep_negated(s)
     ep_everyone(s)
     ep_all_actions(s)
     ep_resource_covers_all(ep_resources(s)[_])
 }
 
-# The organization test must be the only condition; any extra key narrows the deny.
+# The organization test must be the only condition.
 ep_sole_condition(s) := c {
     cs := ep_conditions(s)
     count(cs) == 1
     c := cs[0]
 }
 
-# Operators that make the Deny apply to every principal outside the listed
-# values, by condition key. aws:PrincipalOrgID and aws:PrincipalAccount hold
-# one value. aws:PrincipalOrgPaths holds a set, so it needs ForAllValues: a
-# principal outside any organization has no paths, ForAllValues is then true
-# and the Deny applies, while a ForAnyValue condition is then false.
+# Operators that Deny every principal outside the listed values, by key.
+# aws:PrincipalOrgPaths needs ForAllValues, true for a principal with no paths.
 ep_org_key_operators := {
-    "aws:principalorgid": {"stringnotequals", "stringnotequalsifexists"},
-    "aws:principalaccount": {"stringnotequals", "stringnotequalsifexists"},
-    "aws:principalorgpaths": {"forallvalues:stringnotequals", "forallvalues:stringnotlike"},
+    "aws:principalorgid": {"StringNotEquals", "StringNotEqualsIfExists"},
+    "aws:principalaccount": {"StringNotEquals", "StringNotEqualsIfExists"},
+    "aws:principalorgpaths": {"ForAllValues:StringNotEquals", "ForAllValues:StringNotLike"},
 }
 
-# A full-scope Deny with an org condition lets through exactly the listed
-# values. Values are compared with the configured list as exact text, patterns
-# included.
+# A full-scope Deny with an org condition lets through exactly its values.
 ep_org_condition(s) := c {
     ep_full_scope_deny(s)
     c := ep_sole_condition(s)
@@ -136,17 +135,34 @@ ep_org_condition(s) := c {
 }
 
 # This mode does not check the specific values.
-tf_has_org_restriction(document, ep, name) {
-    c := ep_org_condition(ep_statements(document, ep, name)[_])
+ep_view_restricts(v) {
+    c := ep_org_condition(v[_])
     is_string(c.values[_])
 }
+
+ep_source_restricts(src) {
+    views := ep_views(src)
+    count([v | v := views[_]; not ep_view_restricts(v)]) == 0
+}
+
+# Every policy source of the endpoint must hold the restriction on its own.
+tf_has_org_restriction(i, ep, name) {
+    sources := endpoint_policies(i, ep, name)
+    count(sources) > 0
+    count({src | src := sources[_]; not ep_source_restricts(src)}) == 0
+}
+
+tf_restriction_actual_value(i, ep, name) := sprintf("S3 VPC endpoint '%s' sets more than one endpoint policy (its policy argument or aws_vpc_endpoint_policy resources) and only one applies after apply, so each must hold a Deny that restricts access by organization at that scope, and at least one does not", [name]) {
+    count(endpoint_policies(i, ep, name)) > 1
+} else := sprintf("S3 VPC endpoint '%s' policy has no Deny that restricts access by organization at that scope", [name])
 
 # --- Logic ---
 WizPolicy[result] {
     document := input.document[i]
     ep := document.resource.aws_vpc_endpoint[name]
+    not tf_not_created(ep)
     is_s3_service(ep.service_name)
-    not tf_has_org_restriction(document, ep, name)
+    not tf_has_org_restriction(i, ep, name)
 
     result := {
         "documentId": document.id,
@@ -155,17 +171,164 @@ WizPolicy[result] {
         "searchKey": sprintf("aws_vpc_endpoint[%s]", [name]),
         "issueType": "MissingAttribute",
         "keyExpectedValue": sprintf("S3 VPC endpoint '%s' must have a Deny for all principals and all S3 actions on all buckets and objects, with StringNotEquals or StringNotEqualsIfExists on aws:PrincipalOrgID or aws:PrincipalAccount, or ForAllValues:StringNotEquals or ForAllValues:StringNotLike on aws:PrincipalOrgPaths, as its only condition", [name]),
-        "keyActualValue": sprintf("S3 VPC endpoint '%s' policy has no Deny that restricts access by organization at that scope", [name]),
+        "keyActualValue": tf_restriction_actual_value(i, ep, name),
         "resourceTags": terraLib.get_resource_tags(ep),
     }
 }
 
-# The data block a policy names: data.aws_iam_policy_document.<name>.json,
-# written with or without "${}".
+# policy = data.aws_iam_policy_document.<name>.json, with or without "${}".
 policy_data_source_name(v) := m[1] {
     is_string(v)
     m := regex.find_all_string_submatch_n(`^\s*(?:\$\{)?\s*data\.aws_iam_policy_document\.([A-Za-z0-9_-]+)\.(?:minified_)?json\s*\}?\s*$`, v, 1)[0]
 }
+
+# A policy naming no data block in the scan is read from its JSON alone ([{}]).
+tf_documents_or_none(i, v) := docs {
+    docs := [c.block | c := tf_lookup(i, "data", "aws_iam_policy_document", policy_data_source_name(v))[_]]
+    count(docs) > 0
+} else := [{}]
+
+# --- tf_scan_lookup: begin ---
+# A reference reads the definition in its own file, else every definition in
+# the other files of its module: the document id up to its last "/" or "\".
+tf_module(i) := m[1] {
+    m := regex.find_all_string_submatch_n(`^(.*)[/\\][^/\\]*$`, input.document[i].id, 1)[0]
+} else := ""
+
+# Documents whose <kind>.<rtype>.<name> a reference in document i reads.
+tf_lookup_docs(i, kind, rtype, name) := {i} {
+    input.document[i][kind][rtype][name]
+} else := {j |
+    input.document[j][kind][rtype][name]
+    j != i
+    tf_module(j) == tf_module(i)
+}
+
+# Those definitions, as {"doc": index, "block": definition}.
+tf_lookup(i, kind, rtype, name) := {{"doc": j, "block": input.document[j][kind][rtype][name]} |
+    j := tf_lookup_docs(i, kind, rtype, name)[_]
+}
+
+# A value naming <rtype>.<name> by its address, with any instance index.
+tf_names_address(v, rtype, name) {
+    is_string(v)
+    regex.match(sprintf(`(^|[^A-Za-z0-9_.-])%s\.%s(\[[^\]]*\])?\.`, [rtype, name]), v)
+}
+
+# A reference v in document j reaches <rtype>.<name> of document i.
+tf_reference_reaches(i, j, v, rtype, name) {
+    j == i
+}
+
+tf_reference_reaches(i, j, v, rtype, name) {
+    j != i
+    tf_names_address(v, rtype, name)
+    tf_lookup_docs(j, "resource", rtype, name)[i]
+}
+# --- tf_scan_lookup: end ---
+
+# --- tf_never_created: begin ---
+# A resource with a literal count of 0 or an empty for_each is never created
+# and is not judged; any other expression is judged.
+tf_expression(v) := trim_space(trim_suffix(trim_prefix(trim_space(v), "${"), "}")) {
+    is_string(v)
+}
+
+tf_empty_collection := `^(\[\s*\]|\{\s*\}|toset\(\s*(\[\s*\]|\{\s*\})\s*\))$`
+
+tf_zero(v) {
+    v == 0
+}
+
+tf_zero(v) {
+    tf_expression(v) == "0"
+}
+
+tf_empty(v) {
+    is_array(v)
+    count(v) == 0
+}
+
+tf_empty(v) {
+    is_object(v)
+    count(v) == 0
+}
+
+tf_empty(v) {
+    regex.match(tf_empty_collection, tf_expression(v))
+}
+
+tf_not_created(r) {
+    tf_zero(object.get(r, "count", null))
+}
+
+tf_not_created(r) {
+    tf_empty(object.get(r, "for_each", null))
+}
+# --- tf_never_created: end ---
+
+# --- tf_dynamic: begin ---
+# A dynamic block generates blocks the source does not show; one whose
+# for_each is a literal empty collection generates nothing. Needs
+# tf_never_created.
+tf_dynamic_blocks(b, label) := {d |
+    d := terraLib.getArray(b.dynamic[_][label])[_]
+    is_object(d)
+} | {d |
+    d := terraLib.getArray(b.dynamic[label])[_]
+    is_object(d)
+}
+
+tf_dynamic(b, label) {
+    d := tf_dynamic_blocks(b, label)[_]
+    not tf_empty(object.get(d, "for_each", null))
+}
+# --- tf_dynamic: end ---
+
+# --- tf_policy_document: begin ---
+# Statements a policy document does not show: a dynamic statement block, and
+# source or override documents. Needs tf_dynamic.
+tf_document_set(v) {
+    v != null
+    v != []
+    v != {}
+    v != ""
+}
+
+tf_document_overridden(ds) {
+    tf_document_set(object.get(ds, {"override_policy_documents", "override_json"}[_], null))
+}
+
+# The document may hold statements beyond the ones it writes out.
+tf_document_unshown(ds) {
+    tf_dynamic(ds, "statement")
+}
+
+tf_document_unshown(ds) {
+    tf_document_set(object.get(ds, {"source_policy_documents", "source_json"}[_], null))
+}
+
+tf_document_unshown(ds) {
+    tf_document_overridden(ds)
+}
+
+# A written statement whose principals a dynamic block generates.
+tf_statement_dynamic_principals(stmt) {
+    tf_dynamic(stmt, {"principals", "not_principals"}[_])
+}
+
+tf_statement_dynamic(stmt) {
+    tf_dynamic(stmt, {"condition", "principals", "not_principals"}[_])
+}
+
+# Written statements that can prove a Deny: none when an override document
+# may replace them, and none with a dynamic block inside.
+tf_deny_statements(ds) := [stmt |
+    not tf_document_overridden(ds)
+    stmt := terraLib.getArray(object.get(ds, "statement", []))[_]
+    not tf_statement_dynamic(stmt)
+]
+# --- tf_policy_document: end ---
 
 # --- Matching helpers ---
 # --- toc-match begin: iampattern v1 ---

@@ -192,3 +192,215 @@ data "aws_iam_policy_document" "pol_scopevar_doc" {
     }
   }
 }
+
+# Both denies exempt AWS service principals with aws:PrincipalIsAWSService
+# false under BoolIfExists (anonymous requests omit the key and stay denied);
+# the TLS deny in its IfExists spelling, its exemption in its own block
+resource "aws_vpc_endpoint" "exempt_services" {
+  vpc_id            = "vpc-0ab1"
+  service_name      = "com.amazonaws.us-east-1.s3"
+  vpc_endpoint_type = "Gateway"
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    { "Effect": "Allow", "Principal": "*", "Action": "*", "Resource": "*" },
+    {
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": "*",
+      "Condition": { "BoolIfExists": { "aws:SecureTransport": "false", "aws:PrincipalIsAWSService": "false" } }
+    },
+    {
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": "*",
+      "Condition": {
+        "NumericLessThanIfExists": { "s3:TlsVersion": "1.2" },
+        "BoolIfExists": { "aws:PrincipalIsAWSService": "false" }
+      }
+    }
+  ]
+}
+POLICY
+}
+
+# --- Never-created resources and statements the source does not show ---
+
+# A S3 VPC endpoint that is never created (count = 0, or for_each over an empty
+# collection) is not judged, even with no endpoint policy.
+resource "aws_vpc_endpoint" "zzncsubj" {
+  count             = 0
+  vpc_id            = "vpc-0123456789abcdef0"
+  service_name      = "com.amazonaws.us-east-1.s3"
+  vpc_endpoint_type = "Gateway"
+}
+
+resource "aws_vpc_endpoint" "zzfesubj" {
+  for_each          = toset([])
+  vpc_id            = "vpc-0123456789abcdef0"
+  service_name      = "com.amazonaws.us-east-1.s3"
+  vpc_endpoint_type = "Gateway"
+}
+
+# source_policy_documents adds statements; the document's own statements win
+# on a shared sid, so the written Deny still counts.
+resource "aws_vpc_endpoint" "zzsrcadd" {
+  vpc_id            = "vpc-0123456789abcdef0"
+  service_name      = "com.amazonaws.us-east-1.s3"
+  vpc_endpoint_type = "Gateway"
+}
+
+data "aws_iam_policy_document" "zz_src_extra" {
+  statement {
+    sid       = "ReadObjects"
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "zz_src_added" {
+  source_policy_documents = [data.aws_iam_policy_document.zz_src_extra.json]
+
+  statement {
+    sid       = "DenyInsecureTransport"
+    effect    = "Deny"
+    actions   = ["s3:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+
+  statement {
+    sid       = "DenyOldTls"
+    effect    = "Deny"
+    actions   = ["s3:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values   = ["1.2"]
+    }
+  }
+}
+
+resource "aws_vpc_endpoint_policy" "zzsrcadd" {
+  vpc_endpoint_id = aws_vpc_endpoint.zzsrcadd.id
+  policy          = data.aws_iam_policy_document.zz_src_added.json
+}
+
+# --- Competing endpoint policy sources ---
+
+# An endpoint holds one policy, and its policy argument and an
+# aws_vpc_endpoint_policy overwrite each other: when both hold the control,
+# whichever applies holds it.
+resource "aws_vpc_endpoint" "zzbothgood" {
+  vpc_id            = "vpc-0123456789abcdef0"
+  service_name      = "com.amazonaws.us-east-1.s3"
+  vpc_endpoint_type = "Gateway"
+  policy            = data.aws_iam_policy_document.zz_both_inline.json
+}
+
+data "aws_iam_policy_document" "zz_both_inline" {
+  statement {
+    sid       = "DenyInsecureTransport"
+    effect    = "Deny"
+    actions   = ["s3:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+
+  statement {
+    sid       = "DenyOldTls"
+    effect    = "Deny"
+    actions   = ["s3:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values   = ["1.2"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "zz_both_standalone" {
+  statement {
+    sid       = "DenyInsecureTransport"
+    effect    = "Deny"
+    actions   = ["s3:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+
+  statement {
+    sid       = "DenyOldTls"
+    effect    = "Deny"
+    actions   = ["s3:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values   = ["1.2"]
+    }
+  }
+}
+
+resource "aws_vpc_endpoint_policy" "zzbothgood" {
+  vpc_endpoint_id = aws_vpc_endpoint.zzbothgood.id
+  policy          = data.aws_iam_policy_document.zz_both_standalone.json
+}

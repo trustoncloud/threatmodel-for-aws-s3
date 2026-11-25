@@ -200,3 +200,185 @@ resource "aws_s3_bucket_policy" "dotted" {
 }
 POLICY
 }
+
+# The bucket's own policy argument holds both Denies, each exempting AWS
+# service principals with aws:PrincipalIsAWSService false under BoolIfExists
+# (anonymous requests omit the key and stay denied), the TLS Deny in its
+# IfExists spelling
+resource "aws_s3_bucket" "inline_policy" {
+  bucket = "inline-policy-bucket"
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyInsecureTransport",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["arn:aws:s3:::inline-policy-bucket", "arn:aws:s3:::inline-policy-bucket/*"],
+      "Condition": { "BoolIfExists": { "aws:SecureTransport": "false", "aws:PrincipalIsAWSService": "false" } }
+    },
+    {
+      "Sid": "DenyOldTls",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["arn:aws:s3:::inline-policy-bucket", "arn:aws:s3:::inline-policy-bucket/*"],
+      "Condition": {
+        "NumericLessThanIfExists": { "s3:TlsVersion": "1.2" },
+        "BoolIfExists": { "aws:PrincipalIsAWSService": "false" }
+      }
+    }
+  ]
+}
+POLICY
+}
+
+# The bucket's own policy argument and an aws_s3_bucket_policy each hold both
+# Denies, so whichever applies last, the bucket keeps them
+resource "aws_s3_bucket" "both_forms" {
+  bucket = "both-forms-bucket"
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyInsecureTransport",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["arn:aws:s3:::both-forms-bucket", "arn:aws:s3:::both-forms-bucket/*"],
+      "Condition": { "Bool": { "aws:SecureTransport": "false" } }
+    },
+    {
+      "Sid": "DenyOldTls",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["arn:aws:s3:::both-forms-bucket", "arn:aws:s3:::both-forms-bucket/*"],
+      "Condition": { "NumericLessThan": { "s3:TlsVersion": "1.2" } }
+    }
+  ]
+}
+POLICY
+}
+
+resource "aws_s3_bucket_policy" "both_forms" {
+  bucket = aws_s3_bucket.both_forms.id
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyInsecureTransport",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["arn:aws:s3:::both-forms-bucket", "arn:aws:s3:::both-forms-bucket/*"],
+      "Condition": { "Bool": { "aws:SecureTransport": "false" } }
+    },
+    {
+      "Sid": "DenyOldTls",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": ["arn:aws:s3:::both-forms-bucket", "arn:aws:s3:::both-forms-bucket/*"],
+      "Condition": { "NumericLessThan": { "s3:TlsVersion": "1.2" } }
+    }
+  ]
+}
+POLICY
+}
+
+# --- Never-created resources and statements the source does not show ---
+
+# A bucket that is never created (count = 0, or for_each over an empty
+# collection) is not judged, even with no bucket policy.
+resource "aws_s3_bucket" "zzncsubj" {
+  count  = 0
+  bucket = "zz-transport-bucket"
+}
+
+resource "aws_s3_bucket" "zzfesubj" {
+  for_each = toset([])
+  bucket = "zz-transport-bucket"
+}
+
+# source_policy_documents adds statements; the document's own statements win
+# on a shared sid, so the written Deny still counts.
+resource "aws_s3_bucket" "zzsrcadd" {
+  bucket = "zz-transport-bucket"
+}
+
+data "aws_iam_policy_document" "zz_src_extra" {
+  statement {
+    sid       = "ReadObjects"
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "zz_src_added" {
+  source_policy_documents = [data.aws_iam_policy_document.zz_src_extra.json]
+
+  statement {
+    sid       = "DenyInsecureTransport"
+    effect    = "Deny"
+    actions   = ["s3:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+
+  statement {
+    sid       = "DenyOldTls"
+    effect    = "Deny"
+    actions   = ["s3:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values   = ["1.2"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "zzsrcadd" {
+  bucket = aws_s3_bucket.zzsrcadd.id
+  policy = data.aws_iam_policy_document.zz_src_added.json
+}
+
+# Action names are not case sensitive in IAM, so "S3:*" covers every S3
+# action.
+resource "aws_s3_bucket" "zzactcase" {
+  bucket = "zz-transport-bucket"
+}
+
+resource "aws_s3_bucket_policy" "zzactcase" {
+  bucket = aws_s3_bucket.zzactcase.id
+  policy = <<POLICY
+{"Version": "2012-10-17", "Statement": [{"Effect": "Deny", "Principal": "*", "Action": "S3:*", "Resource": "*", "Condition": {"Bool": {"aws:SecureTransport": "false"}}}, {"Effect": "Deny", "Principal": "*", "Action": ["S3:*"], "Resource": "*", "Condition": {"NumericLessThan": {"s3:TlsVersion": "1.2"}}}]}
+POLICY
+}

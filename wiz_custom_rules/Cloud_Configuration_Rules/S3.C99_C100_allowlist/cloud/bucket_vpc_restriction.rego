@@ -30,10 +30,10 @@ statements[s] {
     s := policy_doc.Statement
 }
 
-covers_all_s3(action) { action == "s3:*" }
-covers_all_s3(action) { action == "*" }
-covers_all_s3(action) { action[_] == "s3:*" }
-covers_all_s3(action) { action[_] == "*" }
+# IAM action names are not case sensitive, so they are compared in lower case.
+all_s3_actions := {"s3:*", "*"}
+
+covers_all_s3(action) { all_s3_actions[lower(as_array(action)[_])] }
 
 wildcard(v) { v == "*" }
 wildcard(v) { v[_] == "*" }
@@ -50,8 +50,7 @@ scope_targets := {"bucket", "objects"}
 
 as_array(v) := v { is_array(v) } else := [v]
 
-# A Resource pattern reaches the bucket when it matches the bucket ARN, and
-# the objects only when it leaves no key out.
+# A pattern covers the objects only when it leaves no key out.
 resource_covers(stmt, "bucket") {
     tocm_iam_pattern_matches(as_array(stmt.Resource)[_], bucket_arn)
 }
@@ -60,16 +59,15 @@ resource_covers(stmt, "objects") {
     tocm_s3_pattern_covers_objects(as_array(stmt.Resource)[_], bucket_arn)
 }
 
-# A statement written with NotResource, NotAction or NotPrincipal is never
-# counted as the covering deny.
+# A statement with NotResource, NotAction or NotPrincipal never counts.
 uses_not_element(stmt) {
     _ = stmt[{"NotResource", "NotAction", "NotPrincipal"}[_]]
 }
 
-restriction_operators := {"stringnotequals", "stringnotequalsifexists"}
+# Condition operator names are case sensitive, so they match by exact name.
+restriction_operators := {"StringNotEquals", "StringNotEqualsIfExists"}
 
-# A Deny for everyone on all S3 actions whose only condition is a
-# StringNotEquals on aws:SourceVpc allows exactly the listed VPCs.
+# A Deny for everyone on all S3 actions whose only condition is aws:SourceVpc.
 vpc_condition_values(stmt) := vals {
     stmt.Effect == "Deny"
     not uses_not_element(stmt)
@@ -77,7 +75,7 @@ vpc_condition_values(stmt) := vals {
     applies_to_everyone(stmt.Principal)
     count(stmt.Condition) == 1
     conditions := stmt.Condition[operator]
-    restriction_operators[lower(operator)]
+    restriction_operators[operator]
     count(conditions) == 1
     val := conditions[key]
     lower(key) == "aws:sourcevpc"
